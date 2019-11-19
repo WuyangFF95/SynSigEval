@@ -9,13 +9,13 @@ r:
   - devel
 
 bioc_packages:
-  -BiocManager
-  -DelayedArray
-  -BSGenome
-  -GenomeInfoDb
-  -GenomicRanges
-  -IRanges
-  -Biostrings
+  - BiocManager
+  - DelayedArray
+  - BSGenome
+  - GenomeInfoDb
+  - GenomicRanges
+  - IRanges
+  - Biostrings
 
 
 
