@@ -3,9 +3,19 @@
 language: R
 sudo: false
 cache: packages
+
+# environment variables set for all builds
+env:
+  global:
+    - BIOC_USE_DEVEL="FALSE"  ## Use the current release version
+
 r:
   - release
   - devel
+
+# we need to install BiocInstaller for testing Bioconductor packages
+bioc_required: true
+
 
 
 
