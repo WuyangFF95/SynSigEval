@@ -4,18 +4,12 @@ language: R
 sudo: false
 cache: packages
 r:
-  - oldrel
   - release
   - devel
 
 bioc_packages:
-  - BiocManager
-  - DelayedArray
-  - BSGenome
-  - GenomeInfoDb
-  - GenomicRanges
-  - IRanges
-  - Biostrings
+  BiocManager, DelayedArray, BSGenome, GenomeInfoDb,
+  GenomicRanges, IRanges, Biostrings
 
 
 
