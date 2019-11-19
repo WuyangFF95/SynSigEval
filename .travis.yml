@@ -8,8 +8,14 @@ r:
   - release
   - devel
 
-bioc_packages: BiocManager, DelayedArray, BSGenome,
-GenomeInfoDb, GenomicRanges, IRanges, Biostrings
+bioc_packages:
+  -BiocManager
+  -DelayedArray
+  -BSGenome
+  -GenomeInfoDb
+  -GenomicRanges
+  -IRanges
+  -Biostrings
 
 
 
