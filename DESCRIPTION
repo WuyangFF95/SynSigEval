@@ -2,7 +2,7 @@ Package: SynSigEval
 Type: Package
 Title: Evaluate Mutational Signature Analysis Software 
   Using Synthetic Spectra Created by Package SynSigGen
-Version: 0.0.3.9003
+Version: 0.0.4.9001
 Author: Steven G. Rozen, Yang Wu
 Maintainer: Steven G. Rozen <steverozen@gmail.com>
 Description: Create catalogs of synthetic mutational spectra and assess the
@@ -32,20 +32,6 @@ Suggests:
     knitr,
     rmarkdown,
     DelayedArray,
-    BiocManager,
-    NMF,
-    SparseSignatures,
-    YAPSA,
-    decompTumor2Sig,
-    deconstructSigs,
-    hdp,
-    maftools,
-    MutationalPatterns,
-    mutSignatures,
-    mSigAct,
-    rstan,
-    sigfit,
-    SignatureEstimation,
-    signeR
+    BiocManager
     
 

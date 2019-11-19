@@ -4,18 +4,12 @@ language: R
 sudo: false
 cache: packages
 r:
-- oldrel
-- release
-- devel
+  - oldrel
+  - release
+  - devel
 
 bioc_packages: BiocManager, DelayedArray, BSGenome,
-GenomeInfoDb, GenomicRanges, IRanges, Biostrings,
-YAPSA, signeR, maftools, SparseSignatures
-
-r_github_packages:
-kgori/sigfit
-nicolaroberts/hdp
-renozao/NMF/devel
+GenomeInfoDb, GenomicRanges, IRanges, Biostrings
 
 
 
