@@ -38,7 +38,7 @@ SignatureAnalyzerPrepHyper1Secondary <-
       non.hyper.results, overwrite = overwrite)
   best.run.file <- paste0(non.hyper.results, "/best.run/sa.output.sigs.csv")
   if (!file.exists(best.run.file)) stop(best.run.file, " does not exist")
-  best.sigs <- read.fn(best.run.file)
+  best.sigs <- ICAMS::ReadCatalog(best.run.file)
 
   best.exp.file <- paste0(non.hyper.results, "/best.run/sa.output.raw.exp.csv")
   if (!file.exists(best.exp.file)) stop(best.exp.file, " does not exist")
@@ -67,14 +67,14 @@ SignatureAnalyzerPrepHyper1Secondary <-
 
   # Make sure the number of mutations in pseudo.catalog is close
   # to the number in the input catalog.
-  ground.truth.catalog <- read.fn(primary.catalog)
+  ground.truth.catalog <- ICAMS::ReadCatalog(primary.catalog)
   new.mut.count <- sum(pseudo.catalog)
   orig.mut.count <- sum(ground.truth.catalog)
   cat("orig =", orig.mut.count, "new =", new.mut.count,"\n")
   pseudo.catalog <- pseudo.catalog * orig.mut.count / new.mut.count
   cat("orig =", orig.mut.count, "new =", sum(pseudo.catalog),"\n")
 
-  hyper.catalog <- read.fn(hyper.catalog)
+  hyper.catalog <- ICAMS::ReadCatalog(hyper.catalog)
   hyper.catalog.plus <- cbind(hyper.catalog, pseudo.catalog)
 
   cat("dim of hyper.catalog.plus is", dim(hyper.catalog.plus), "\n")
