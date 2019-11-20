@@ -53,12 +53,10 @@ SummarizeSigOneSigProExtractorSubdir <-
     # Need special function to read in extracted signatures
     # Converted signatures will be included in the /summary folder.
     if(flagSBS96){
-      extractedSigs <- ReadSigProfilerSig96(paste0(inputPath,"/De_Novo_Solution_Signatures_SBS96.txt"))
+      extractedSigs <- ReadSigProfilerSigDBS96(paste0(inputPath,"/De_Novo_Solution_Signatures_SBS96.txt"))
     } else if(flagDBS78) {
-      extractedSigs <- ReadSigProfilerSig96(paste0(inputPath,"/De_Novo_Solution_Signatures_SBSDINUC.txt"))
+      extractedSigs <- ReadSigProfilerSigSBS78(paste0(inputPath,"/De_Novo_Solution_Signatures_SBSDINUC.txt"))
     }
-
-
 
     extractedSigs <- ICAMS::as.catalog(object = extractedSigs,
                                        region = "unknown",

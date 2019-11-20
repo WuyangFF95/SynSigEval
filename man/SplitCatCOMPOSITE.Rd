@@ -2,7 +2,7 @@
 % Please edit documentation in R/ReadWriteCOMPOSITECatalogs.R
 \name{SplitCatCOMPOSITE}
 \alias{SplitCatCOMPOSITE}
-\title{Split COMPOSITE (SNS1536+DBS78+ID83) catalogues
+\title{Split COMPOSITE (SNS1536+DBS78+ID83) catalogs
 in ICAMS format into 3 individual catalogs.}
 \usage{
 SplitCatCOMPOSITE(catalog)
@@ -16,6 +16,6 @@ a list, containing 3 catalog matrices in MultiModalMuSig format.
 Each matrix contains SNS1536, DBS78 and ID83 information, respectively.
 }
 \description{
-Split COMPOSITE (SNS1536+DBS78+ID83) catalogues
+Split COMPOSITE (SNS1536+DBS78+ID83) catalogs
 in ICAMS format into 3 individual catalogs.
 }

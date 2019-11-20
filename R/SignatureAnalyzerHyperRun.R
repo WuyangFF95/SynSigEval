@@ -17,10 +17,6 @@
 #' \code{cbind} of pseudo-spectra generated from the PRIMARY
 #' signatures with the \code{hyper.catalog}.
 #'
-#' @param read.fn Function to use for reading signatures.
-#'
-#' @param write.fn Function to use for writing signatures.
-#'
 #' @param overwrite If \code{TRUE} overwrite possible previously
 #' computed files and/or directories.
 #'
@@ -31,8 +27,6 @@ SignatureAnalyzerPrepHyper1Secondary <-
            primary.catalog,
            hyper.catalog,
            secondary.catalog,
-           read.fn,
-           write.fn,
            overwrite = TRUE) {
   if (!dir.exists(non.hyper.results)) {
     stop(non.hyper.results, "does not exist")
@@ -84,7 +78,7 @@ SignatureAnalyzerPrepHyper1Secondary <-
   hyper.catalog.plus <- cbind(hyper.catalog, pseudo.catalog)
 
   cat("dim of hyper.catalog.plus is", dim(hyper.catalog.plus), "\n")
-  write.fn(hyper.catalog.plus, secondary.catalog)
+  ICAMS::WriteCatalog(hyper.catalog.plus, secondary.catalog)
 
   # We don't deal with the exposures, because we will remove the
   # pseudo-catalog from the input before assessing the extracted signatures.
@@ -122,14 +116,10 @@ SignatureAnalyzerPrepHyper4 <-
   if (!dir.exists(h.prefix)) stop(h.prefix, "does not exist")
 
   subdirs <- c("sa.sa.96", "sp.sp", "sa.sa.COMPOSITE", "sp.sa.COMPOSITE")
-  read.fn <- c(ReadCatalog, ReadCatalog,
-               ReadCatCOMPOSITE, ReadCatCOMPOSITE)
-  write.fn <- c(WriteCatalog, WriteCatalog,
-                WriteCatCOMPOSITE, WriteCatCOMPOSITE)
 
   # TODO(Steve): This function should be rewritten to use
   # SignatureAnalyzerPrepHyper1Secondary
-  tmp.fn <- function(subdir, read.fn, write.fn) {
+  tmp.fn <- function(subdir) {
     dir1 <- paste0(non.h.prefix, "/", subdir)
     cat("\n\nProcessing", dir1, "\n\n")
     if (!dir.exists(dir1)) stop(dir1, "does not exist")
@@ -143,7 +133,7 @@ SignatureAnalyzerPrepHyper4 <-
         non.hyper.results, overwrite = overwrite)
     best.run.file <- paste0(dir1, "/sa.results/best.run/sa.output.sigs.csv")
     if (!file.exists(best.run.file)) stop(best.run.file, " does not exist")
-    best.sigs <- read.fn(best.run.file)
+    best.sigs <- ICAMS::ReadCatalog(best.run.file)
 
     best.exp.file <- paste0(dir1, "/sa.results/best.run/sa.output.exp.csv")
     if (!file.exists(best.exp.file)) stop(best.exp.file, " does not exist")
@@ -173,11 +163,11 @@ SignatureAnalyzerPrepHyper4 <-
     # Make sure the number of mutations in pseudo.catalog is close
     # to the number in the input catalog.
     ground.truth.catalog <-
-      read.fn(paste0(dir1, "/ground.truth.syn.catalog.csv"))
+      ICAMS::ReadCatalog(paste0(dir1, "/ground.truth.syn.catalog.csv"))
     cat(sum(pseudo.catalog), sum(ground.truth.catalog), "\n")
 
     hyper.catalog.name <- paste0(dir2, "/ground.truth.syn.catalog.csv")
-    hyper.catalog <- read.fn(hyper.catalog.name)
+    hyper.catalog <- ICAMS::ReadCatalog(hyper.catalog.name)
     hyper.catalog.plus <- cbind(hyper.catalog, pseudo.catalog)
 
     new.name <- paste0(dir2, "/prev.ground.truth.syn.catalog.csv")
@@ -186,7 +176,7 @@ SignatureAnalyzerPrepHyper4 <-
                      " to ", new.name )}
 
     cat("dim of hyper.catalog.plus is", dim(hyper.catalog.plus))
-    write.fn(hyper.catalog.plus, hyper.catalog.name)
+    ICAMS::WriteCatalog(hyper.catalog.plus, hyper.catalog.name)
 
     # We don't deal with the exposures, because we will remove the
     # pseudo-catalog from the input before assessing the extracted signatures.
@@ -196,7 +186,7 @@ SignatureAnalyzerPrepHyper4 <-
 
   }
 
-  mapply(tmp.fn, subdirs, read.fn, write.fn)
+  mapply(tmp.fn, subdirs)
 
   invisible(NULL)
 

@@ -6,7 +6,7 @@
 of a split non-hyper and hyper data set.)}
 \usage{
 SignatureAnalyzerPrepHyper1Secondary(non.hyper.results, primary.catalog,
-  hyper.catalog, secondary.catalog, read.fn, write.fn, overwrite = TRUE)
+  hyper.catalog, secondary.catalog, overwrite = TRUE)
 }
 \arguments{
 \item{non.hyper.results}{The directory containing the the results of the analysis
@@ -24,10 +24,6 @@ secondary analysis.}
 the secondary analysis will be performed; this is a
 \code{cbind} of pseudo-spectra generated from the PRIMARY
 signatures with the \code{hyper.catalog}.}
-
-\item{read.fn}{Function to use for reading signatures.}
-
-\item{write.fn}{Function to use for writing signatures.}
 
 \item{overwrite}{If \code{TRUE} overwrite possible previously
 computed files and/or directories.}

@@ -6,13 +6,16 @@
 #'
 #' @param type See \code{\link[ICAMS]{PlotCatalogToPdf}}.
 #'
-#' @importFrom ICAMS PlotCatalogToPdf Collapse1536CatalogTo96
-#'
 #' @keywords internal
 
 Plot96PartOfComposite <- function(catalog, name, type = "density") {
-  cat1536 <- catalog[1:1536, ]
-  cat96 <- Collapse1536CatalogTo96(cat1536)
+  catalog.type <- attr(catalog,"catalog.type")
+  region <- attr(catalog,"region")
+  cat1536 <- ICAMS::as.catalog(
+    catalog[1:1536, ],
+    catalog.type = catalog.type,
+    region = region)
+  cat96 <- ICAMS::Collapse1536CatalogTo96(cat1536)
   all.0 <- which(colSums(cat96) == 0)
   if (length(all.0) > 0 ) {
     cat96[ , all.0] <- 1
@@ -20,8 +23,9 @@ Plot96PartOfComposite <- function(catalog, name, type = "density") {
     cn[all.0] <- paste(cn[all.0], "WARNING all 0")
     colnames(cat96) <- cn
   }
-  PlotCatalogToPdf(catalog = cat96/sum(cat96),
-                   file = name)
+  ICAMS::PlotCatalogToPdf(
+    catalog = cat96/sum(cat96),
+    file = name)
 }
 
 #' Plot the a SignatureAnalyzer COMPOSITE signature or catalog into separate pdfs
@@ -47,30 +51,23 @@ PlotCatCOMPOSITE <- function(catalog, filename.header, type, id = colnames(catal
 
   ## Read in COMPOSITE catalogue
   test.COMPOSITE.sigs <-
-    ReadCatCOMPOSITE(catalog)
+    ICAMS::ReadCatalog(catalog)
 
   ## Check
   stopifnot(nrow(test.COMPOSITE.sigs) == 1697)
   # TODO WUYang: check whether the base context is in correct order
 
   ## Subsetting COMPOSITE catalogue
-  test.SNS1536.sigs <- test.COMPOSITE.sigs[1:1536,]
-  test.DNS78.sigs <- test.COMPOSITE.sigs[1537:1614,]
-  test.ID83.sigs <- test.COMPOSITE.sigs[1615:1697,]
+  catalog.list <- SplitCatCOMPOSITE(test.COMPOSITE.sigs)
 
   ## Plot using ICAMS embedded plotting function
-
-
-  ICAMS::PlotCatalogToPdf(test.SNS1536.sigs,
-                             filename = paste0(filename.header,".SNS.1536.pdf"),
-                             type = type,
-                             id = id)
-  ICAMS::PlotCatalogToPdf(test.DNS78.sigs,
-                           filename = paste0(filename.header,".DNS.78.pdf"),
-                           type = type,
-                           id = id)
-  ICAMS::PlotCatalogToPdf(test.ID83.sigs,
-                        filename = paste0(filename.header,".ID.83.pdf"),
-                        type = type,
-                        id = id)
+  ICAMS::PlotCatalogToPdf(
+    catalog.list$SBS1536,
+    filename = paste0(filename.header,".SNS.1536.pdf"))
+  ICAMS::PlotCatalogToPdf(
+    catalog.list$DBS78,
+    filename = paste0(filename.header,".DNS.78.pdf"))
+  ICAMS::PlotCatalogToPdf(
+    catalog.list$ID83,
+    filename = paste0(filename.header,".ID.83.pdf"))
 }
