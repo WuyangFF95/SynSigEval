@@ -168,8 +168,10 @@ SummarizeSigOneSubdir <-
          file = paste0(outputPath,"/sigAnalysis.RDa"))
     ## Save exposure attribution summary into RDa file,
     ## for reuse in SummarizeMultiRuns().
-    save(exposureDiff,
-         file = paste0(outputPath,"/exposureDiff.RDa"))
+    if(file.exists(attributed.exp.path)){
+      save(exposureDiff,
+           file = paste0(outputPath,"/exposureDiff.RDa"))
+    }
 
     invisible(sigAnalysis) # So we have something to check in tests
   }
