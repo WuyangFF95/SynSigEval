@@ -115,11 +115,11 @@ SummarizeSigOneSubdir <-
     ## TODO(Wuyang): To add a ICAMS:::PlotCatalog.COMPOSITECatalog function
 
     # Output ground-truth sigs to a PDF file
-    if("COMPOSITECatalog" %in% class(sigAnalysis$gt.sigs == FALSE)){
+    if("COMPOSITECatalog" %in% class(sigAnalysis$gt.sigs) == FALSE){
       ICAMS::PlotCatalogToPdf(sigAnalysis$gt.sigs,
                               paste0(outputPath,"/ground.truth.sigs.pdf"))
     }
-    if("COMPOSITECatalog" %in% class(sigAnalysis$ex.sigs == FALSE)){
+    if("COMPOSITECatalog" %in% class(sigAnalysis$ex.sigs) == FALSE){
       # Output extracted sigs to a PDF file
       ICAMS::PlotCatalogToPdf(sigAnalysis$ex.sigs,
                               paste0(outputPath,"/extracted.sigs.pdf"))
