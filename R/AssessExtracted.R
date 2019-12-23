@@ -38,11 +38,19 @@ MatchSigsAndRelabel <-
 
     sim <- MatchSigs2Directions(ex.sigs, gt.sigs)
 
+    ## Software-reported signatures with a best cosine similarity lower than 0.90
+    ## is not considered an "extracted signature", it will rather be regarded as
+    ## an artefact.
+    true.match1 <- sim$match1
+    true.match1 <- true.match1[true.match1$sim >= 0.9,]
+    true.match2 <- sim$match2
+    true.match2 <- true.match2[true.match2$sim >= 0.9,]
+
     sim$extracted.with.no.best.match <-
-      setdiff(colnames(ex.sigs), sim$match2$to)
+      setdiff(colnames(ex.sigs), true.match2$to)
 
     sim$ground.truth.with.no.best.match <-
-      setdiff(colnames(gt.sigs), sim$match1$to)
+      setdiff(colnames(gt.sigs), true.match1$to)
     # TODO(Steve) Review documentation / explanation. Note that
     # e.g. SBS29 might have a best match (BI_COMPOSITE_SBS18_P)
     # but no BI signatures has SBS29 as its best match
