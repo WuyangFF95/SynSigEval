@@ -774,7 +774,7 @@ SummarizeMultiToolsMultiDatasets <-
     } else{
       indexes <- c("averCosSim","FDR")
       indexLabels <- c("Average cosine similarity of all signatures",
-                       "False Discovery Rate (FDR)")
+                       "FDR for both signatures against 400 runs")
     }
 
 
@@ -909,7 +909,7 @@ SummarizeMultiToolsMultiDatasets <-
 
         ## Change title for general violin + beeswarm plot
         ggplot2::ggtitle(label = "Measures of extraction performance",
-                           subtitle = "for all software packages, ratios and correlation values.") +
+                         subtitle = "for all software packages, ratios and correlation values.") +
         ## Change axis titles
         ggplot2::labs(x = "Software package") +
         ## Remove axis.title.y (defaults to be "value", meaningless)
@@ -930,7 +930,11 @@ SummarizeMultiToolsMultiDatasets <-
           legend.position = "none") +
         ## Split the plot into multiple facets,
         ## according to different indexes
-        ggplot2::facet_wrap(ggplot2::vars(.data$indexLabel),scales = "free") +
+        ggplot2::facet_wrap(
+          ggplot2::vars(.data$indexLabel),
+          scales = "free",
+          ## Put facet label to the left
+          strip.position = "left") +
         ## Restrict the decimal numbers of values of indexes to be 2
         ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
