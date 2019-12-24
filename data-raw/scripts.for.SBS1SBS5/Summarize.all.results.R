@@ -61,7 +61,7 @@ for(datasetName in datasetNames){
     }
     ## Summarize sigproSS (a Python-based attribution-only tool)
     SynSigEval::SummarizeSigOneSigProSSSubdir(
-      run.dir = paste0(datasetName,"/sp.sp/Attr/sigproextractor.results/seed.",
+      run.dir = paste0(datasetName,"/sp.sp/Attr/SigProSS.results/seed.",
                        seedInUse,"/"),
       ground.truth.exposure.dir = paste0(datasetName,"/sp.sp/"),
       overwrite = T)
@@ -76,7 +76,7 @@ for(datasetName in datasetNames){
     ## Summarize SigProExtractor
     SynSigEval::SummarizeSigOneSigProExtractorSubdir(
       run.dir = paste0(datasetName,
-                       "/sp.sp/ExtrAttr/sigproextractor.results/seed.",
+                       "/sp.sp/ExtrAttr/SigProExtractor.results/seed.",
                        seedInUse,"/"),
       ground.truth.exposure.dir = paste0(datasetName,"/sp.sp/"),
       overwrite = T)
@@ -121,7 +121,7 @@ for(datasetName in datasetNames){
 }
 
 ## Part II: Write summary table for 20 seeds for each tool with each dataset
-otherExtrAttrToolNames <- c("helmsman","MultiModalMuSig","sigproextractor","SignatureAnalyzer")
+otherExtrAttrToolNames <- c("helmsman","MultiModalMuSig","SigProExtractor","SignatureAnalyzer")
 for(datasetName in datasetNames){
   ## For each dataset, summarize 20 runs
   ## using different seeds by EMu
@@ -149,7 +149,7 @@ for(datasetName in datasetNames){
     tool.dir = paste0(datasetName,"/sp.sp/ExtrAttr/","maftools",
                       ".results/"),
     run.names = paste0("seed.","123456"))
-  for(attrToolName in c(attrToolNames,"sigproextractor")){
+  for(attrToolName in c(attrToolNames,"SigProSS")){
     SynSigEval::SummarizeMultiRuns(
       datasetName = datasetName,
       toolName = attrToolName,
@@ -175,8 +175,8 @@ for(slope in slopes){
       datasetSubGroupName = "SBS1:SBS5 mutation count ratio")
     SynSigEval::SummarizeMultiToolsOneDataset(
       third.level.dir = paste0(datasetName,"/sp.sp/Attr/"),
-      toolName = c(attrToolNames,"sigproextractor"),
-      tool.dirnames = paste0(c(attrToolNames,"sigproextractor"),".results"),
+      toolName = c(attrToolNames,"SigProSS"),
+      tool.dirnames = paste0(c(attrToolNames,"SigProSS"),".results"),
       datasetGroup =  Rsq,
       datasetGroupName = "Pearson's R^2",
       datasetSubGroup = slope,
@@ -206,7 +206,7 @@ for(toolName in c(
     out.dir = paste0("FinalToolWiseSummary/ExtrAttr/",toolName,"/"),
     overwrite = T)
 }
-for(toolName in c(attrToolNames,"sigproextractor")){
+for(toolName in c(attrToolNames,"SigProSS")){
   SummarizeOneToolMultiDatasets(
     dataset.dirs = datasetNames,
     datasetGroup = datasetGroup,
