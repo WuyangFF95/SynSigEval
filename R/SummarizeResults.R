@@ -2128,6 +2128,9 @@ SummarizeOneToolMultiDatasets <-
                 quote = F, row.names = F)
     }
 
+    ## Write median information into a text file.
+    utils::capture.output(OneToolSummary$median,file = file = paste0(out.dir,"/median.txt"))
+
     OneToolSummary$datasetGroupName <- datasetGroupName
     OneToolSummary$datasetSubGroupName <- datasetSubGroupName
 
