@@ -1609,11 +1609,11 @@ SummarizeOneToolMultiDatasets <-
       }
 
       ## Calculate the median of each extraction performance measurement.
-      OneToolSummary[["median"]] <- numeric(0)
+      OneToolSummary$median <- list()
       for(index in indexes){
         currentMedian <- median(OneToolSummary[[index]][,"value"])
         names(currentMedian) <- index
-        OneToolSummary[["median"]] <- c(OneToolSummary[["median"]],currentMedian)
+        OneToolSummary$median[[index]] <- currentMedian
       }
     }
 
@@ -1800,10 +1800,11 @@ SummarizeOneToolMultiDatasets <-
       }
 
       ## Calculate the median of one-signature cosine similarity.
+      OneToolSummary$median$cosSim <- list()
       for(gtSigName in gtSigNames){
-        currentMedian <- median(OneToolSummary[[gtSigName]][,"value"])
+        currentMedian <- median(OneToolSummary$cosSim[[gtSigName]][,"value"])
         names(currentMedian) <- gtSigName
-        OneToolSummary[["median"]] <- c(OneToolSummary[["median"]],currentMedian)
+        OneToolSummary$median$cosSim[[gtSigName]] <- currentMedian
       }
 
       ## Combine multiple ground-truth signature Manhattan-distance data.frame
