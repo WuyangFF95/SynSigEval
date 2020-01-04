@@ -444,7 +444,7 @@ SummarizeMultiRuns <-
     }
     multiRun$meanSDMD <- meanSDMD
 
-    ## Calculate fivenums for exposure attribution Manhattan Distance
+    ## Calculate fivenums for exposure attribution Scaled Manhattan distance
     multiRun$fivenumMD <- matrix(nrow = length(gtSigNames), ncol = 5)
     rownames(multiRun$fivenumMD) <- gtSigNames
     colnames(multiRun$fivenumMD) <- c("min","lower-hinge","median","upperhinge","max")
@@ -700,7 +700,7 @@ SummarizeMultiToolsOneDataset <- function(
     }
 
     ## meanSDMD contains mean and standard deviation
-    ## for Manhattan Distance between ground-truth exposures
+    ## for Scaled Manhattan distance between ground-truth exposures
     ## and attributed exposures for each ground-truth signature
     {
       meanSDMD <- multiRun$meanSDMD
@@ -759,33 +759,25 @@ SummarizeMultiToolsMultiDatasets <-
            out.dir,
            overwrite = FALSE){
 
-    ## For each index,
-    ## Create a data.frame integrating results of
-    ## all runs and for all datasets
-    if(FALSE){ ## Remove redundant indexes
-      indexes <- c("averCosSim","falseNeg","falsePos",
-                   "truePos","TPR","FDR")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "False negatives",
-                       "False positives",
-                       "True positives",
-                       "True Positive Rate (TPR, sensitivity)",
-                       "False Discovery Rate (FDR)")
-    } else{
-      indexes <- c("averCosSim","FDR")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "FDR for both signatures against 400 runs")
-    }
-
-
-    indexNums <- length(indexes)
-
     ## Create output directory
     if (dir.exists(out.dir)) {
       if (!overwrite) stop(out.dir, " already exits")
     } else {
       dir.create(out.dir, recursive = T)
     }
+
+    ## For each index,
+    ## Create a data.frame integrating results of
+    ## all runs and for all datasets
+    indexes <- c("averCosSim","falseNeg","falsePos",
+                 "truePos","TPR","FDR")
+    indexLabels <- c("Average cosine similarity of all signatures",
+                     "False negatives",
+                     "False positives",
+                     "True positives",
+                     "True Positive Rate (TPR, sensitivity)",
+                     "False Discovery Rate (FDR)")
+    indexNums <- length(indexes)
 
     ## Summarizing extraction results.
     ## Showing individual values rather than
@@ -822,6 +814,13 @@ SummarizeMultiToolsMultiDatasets <-
       }
     }
 
+
+    ## Only plot for average cosine similarity and FDR.
+    {
+      indexes <- c("averCosSim","FDR")
+      indexLabels <- c("Average cosine similarity of all signatures",
+                       "FDR for both signatures against 400 runs")
+    }
     ## Plot general png and pdf for extraction summary
     ## Plot a general violin + beeswarm plot for multiple indexes
     ## in all runs and in all datasets.
@@ -1235,11 +1234,11 @@ SummarizeMultiToolsMultiDatasets <-
     }
 
 
-    ## Summarizing attribution Manhattan Distance results.
+    ## Summarizing attribution Scaled Manhattan distance results.
     {
       FinalAttr <- list()
       ## Combine attribution assessment onto multiple sheets.
-      ## Each sheet shows Manhattan distance for one mutational signature.
+      ## Each sheet shows Scaled Manhattan distance for one mutational signature.
       for(datasetDir in dataset.dirs){
         thirdLevelDir <- paste0(datasetDir,"/",second.third.level.dirname)
         ## Add multiTools <- NULL to please R check
@@ -1255,7 +1254,7 @@ SummarizeMultiToolsMultiDatasets <-
           }
         }
 
-        ## Combine Manhattan Distance
+        ## Combine Scaled Manhattan distance
         current <- list()
         for(gtSigName in gtSigNames){
           current[[gtSigName]] <- multiTools$combMeanSDMD[gtSigName,,drop = F]
@@ -1267,7 +1266,7 @@ SummarizeMultiToolsMultiDatasets <-
                   file = paste0(out.dir,"/ManhattanDist.",gtSigName,".csv"))
       }
     }
-    ## Plot general png and pdf for attribution Manhattan Distance summary
+    ## Plot general png and pdf for attribution Scaled Manhattan distance summary
     ## Plot a general violin + beeswarm plot for multiple signatures
     ## in all runs and in all datasets.
     {
@@ -1325,14 +1324,14 @@ SummarizeMultiToolsMultiDatasets <-
         #  groupOnX = TRUE, size = 0.3
         #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
         #) +
-        ## Show median of the Manhattan distance distribution
+        ## Show median of the Scaled Manhattan distance distribution
         ggplot2::stat_summary(fun.y="median", geom="point") +
         ## Add title for general violin + beeswarm plot
-        ggplot2::ggtitle(label = "Manhattan distance between attributed and grond-truth exposures",
+        ggplot2::ggtitle(label = "Scaled Manhattan distance between attributed and grond-truth exposures",
                          subtitle = "for all software packages, ratios and correlation values.") +
         ## Change axis titles
         ggplot2::labs(x = "Software package",
-                      y = "Manhattan Distance") +
+                      y = "Scaled Manhattan distance") +
         ## Rotate the names of tools,
         ## move axis.text.x right below the tick marks
         ## and remove legends
@@ -1383,15 +1382,15 @@ SummarizeMultiToolsMultiDatasets <-
         #  groupOnX = TRUE, size = 0.3
         #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
         #) +
-        ## Show median of the Manhattan distance distribution
+        ## Show median of the Scaled Manhattan distance distribution
         ggplot2::stat_summary(fun.y="median", geom="point") +
         ## Add title for general violin + beeswarm plot
         ggplot2::ggtitle(
-          label = paste0("Manhattan Distance summary plot as a function of "),
+          label = paste0("Scaled Manhattan distance summary plot as a function of "),
           subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
         ## Change axis titles
         ggplot2::labs(x = "Software package",
-                      y = "Manhattan Distance") +
+                      y = "Scaled Manhattan distance") +
         ## Rotate the axis.text.x (names of tools),
         ## move axis.text.x right below the tick marks
         ## and remove legends
@@ -1529,8 +1528,9 @@ SummarizeOneToolMultiDatasets <-
       names(datasetSubGroup) <- datasetNames
     }
 
-    ## Specifying measures for extraction performance
-    if(FALSE){ ## Remove redundant indexes
+    ## Calculate summary tables for measures of extraction performance
+    ## Need to calculate tables for All 6 indexes
+    {
       indexes <- c("averCosSim","falseNeg","falsePos",
                    "truePos","TPR","FDR")
       indexLabels <- c("Average cosine similarity of all signatures",
@@ -1545,28 +1545,15 @@ SummarizeOneToolMultiDatasets <-
                      "Number of extracted ground-truth signatures",
                      "True Positives / (True Positives + False Negatives)",
                      "False Positives / (True Positives + False Positives)")
-    } else{
-      indexes <- c("averCosSim","FDR")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "False Discovery Rate (FDR)")
-      subtitles <- c("",
-                     "False Positives / (True Positives + False Positives)")
-    }
+      names(indexLabels) <- indexes
+      names(subtitles) <- indexes
+      indexNums <- length(indexes)
 
-    names(indexLabels) <- indexes
-    names(subtitles) <- indexes
-    indexNums <- length(indexes)
-
-
-    ## Summarizing extraction results for one software package.
-    {
       ## Construct a summary list for storage
       OneToolSummary <- list()
 
-      ## Combine extraction assessment for multiple datasets
-      ## in multiple runs onto 1 sheet:
-      OneToolSummary[["extraction"]] <- data.frame()
-
+      ## Combine each measurement for extraction performance for multiple datasets
+      ## in multiple runs onto one summary table:
       for(datasetDir in dataset.dirs){
         thirdLevelDir <- paste0(datasetDir,"/",tool.dirname)
         toolName <- strsplit(basename(tool.dirname),".results")[[1]]
@@ -1603,6 +1590,9 @@ SummarizeOneToolMultiDatasets <-
         }
       }
 
+      ## Combine tables of different measurement for extraction performance
+      ## into OneToolSummary$extraction.
+      OneToolSummary[["extraction"]] <- data.frame()
       for(index in indexes){
         tmp <- data.frame(OneToolSummary[[index]],
                           stringsAsFactors = FALSE)
@@ -1618,15 +1608,27 @@ SummarizeOneToolMultiDatasets <-
         }
       }
 
+      ## Calculate the median of each extraction performance measurement.
+      OneToolSummary[["median"]] <- numeric(0)
+      for(index in indexes){
+        currentMedian <- median(OneToolSummary[[index]][,"value"])
+        names(currentMedian) <- index
+        OneToolSummary[["median"]] <- c(OneToolSummary[["median"]],currentMedian)
+      }
     }
+
     ## Draw boxplot + beeswarm plot for extraction indexes
     {
+      ## Only average cosine similarity, one-signature cosine similarity and FDR are plotted.
+      indexes <- c("averCosSim","FDR")
+      indexLabels <- c("Average cosine similarity of all signatures",
+                       "False Discovery Rate (FDR)")
+      subtitles <- c("",
+                     "False Positives / (True Positives + False Positives)")
+
       ## Designate titles and subtitles for each page
       titles <- indexLabels
       names(titles) <- indexes
-      subtitles <- c("",
-                     "Number of signatures extracted, but different from ground-truth signatures",
-                     "False Positives / (True Positives + False Positives)")
       names(subtitles) <- indexes
       ylabels <- titles
 
@@ -1763,6 +1765,7 @@ SummarizeOneToolMultiDatasets <-
     {
       OneToolSummary$cosSim <- list()
 
+      ## Combine one-signature cosine similarity from different spectra datasets
       for(datasetDir in dataset.dirs){
         thirdLevelDir <- paste0(datasetDir,"/",tool.dirname)
         toolName <- strsplit(basename(tool.dirname),".results")[[1]]
@@ -1794,6 +1797,13 @@ SummarizeOneToolMultiDatasets <-
           }
           OneToolSummary$cosSim[[gtSigName]] <- rbind(OneToolSummary$cosSim[[gtSigName]],tmp)
         }
+      }
+
+      ## Calculate the median of one-signature cosine similarity.
+      for(gtSigName in gtSigNames){
+        currentMedian <- median(OneToolSummary[[gtSigName]][,"value"])
+        names(currentMedian) <- gtSigName
+        OneToolSummary[["median"]] <- c(OneToolSummary[["median"]],currentMedian)
       }
 
       ## Combine multiple ground-truth signature Manhattan-distance data.frame
@@ -2020,7 +2030,7 @@ SummarizeOneToolMultiDatasets <-
           #ggplot2::scale_fill_manual(
           #  values = grDevices::topo.colors(length(indexes)))
           ## Add title for general boxplot + beeswarm plot
-          ggplot2::labs(title = paste0(toolName,": Summary plot for Manhattan distance")) +
+          ggplot2::labs(title = paste0(toolName,": Summary plot for Scaled Manhattan distance")) +
           ## Restrict the decimal numbers of values of indexes to be 2
           ggplot2::scale_y_continuous(
             labels =function(x) sprintf("%.2f", x))
@@ -2071,10 +2081,10 @@ SummarizeOneToolMultiDatasets <-
           ## Change titles
           ggplot2::labs(
             ## Add title for value~datasetSubGroup beeswarm plot
-            title = paste0(toolName,": Manhattan distance of ",gtSigName," exposure"),
+            title = paste0(toolName,": Scaled Manhattan distance of ",gtSigName," exposure"),
             subtitle = "Between ground-truth exposure and attributed exposure",
             ## Change title of y axis (axis.title.y) same as gtSigName info (same as title)
-            y = paste0("Manhattan distance of ",gtSigName," exposure"),
+            y = paste0("Scaled Manhattan distance of ",gtSigName," exposure"),
             ## Change title of x axis to "Pearson's R squared"
             x = "Pearson's R squared") +
           ## Change title of legend to datasetGroupName
