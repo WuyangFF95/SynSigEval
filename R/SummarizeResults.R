@@ -1608,13 +1608,22 @@ SummarizeOneToolMultiDatasets <-
         }
       }
 
-      ## Calculate the median of each extraction performance measurement.
-      OneToolSummary$median <- list()
+      ## Calculate the stats of each extraction performance measurement.
+      OneToolSummary$stats <- list()
       for(index in indexes){
-        currentMedian <- median(OneToolSummary[[index]][,"value"])
-        names(currentMedian) <- index
-        OneToolSummary$median[[index]] <- currentMedian
+        currentStats <- summary(OneToolSummary[[index]][,"value"])
+        OneToolSummary$stats[[index]] <- currentStats
       }
+
+      ## For TPR (sensitivity) and Number of False Negatives,
+      ## calculate the proportion of 1.
+      OneToolSummary$prop1 <- list()
+      for(index in c("TPR","falseNeg")){
+        currentProp <- length(which(OneToolSummary[[index]][,"value"] == 1)) / length(OneToolSummary[[index]][,"value"])
+        OneToolSummary$prop1[[index]] <- currentProp
+      }
+
+
     }
 
     ## Draw boxplot + beeswarm plot for extraction indexes
@@ -1799,13 +1808,14 @@ SummarizeOneToolMultiDatasets <-
         }
       }
 
-      ## Calculate the median of one-signature cosine similarity.
-      OneToolSummary$median$cosSim <- list()
+      ## Calculate the stats of one-signature cosine similarity.
+      OneToolSummary$stats$cosSim <- list()
       for(gtSigName in gtSigNames){
-        currentMedian <- median(OneToolSummary$cosSim[[gtSigName]][,"value"])
-        names(currentMedian) <- gtSigName
-        OneToolSummary$median$cosSim[[gtSigName]] <- currentMedian
+        currentStats <- summary(OneToolSummary$cosSim[[gtSigName]][,"value"])
+        OneToolSummary$stats$cosSim[[gtSigName]] <- currentStats
       }
+
+
 
       ## Combine multiple ground-truth signature Manhattan-distance data.frame
       ## into OneToolSummary$cosSim$combined
@@ -2121,15 +2131,16 @@ SummarizeOneToolMultiDatasets <-
     }
 
 
-    ## Write Summary tables
-    for(summaryFileName in names(OneToolSummary)){
-      write.csv(OneToolSummary[[summaryFileName]],
-                file = paste0(out.dir,"/",summaryFileName,".csv"),
+    ## Write Summary tables for indexes
+    for(index in indexes){
+      write.csv(OneToolSummary[[index]],
+                file = paste0(out.dir,"/",index,".csv"),
                 quote = F, row.names = F)
     }
 
-    ## Write median information into a text file.
-    utils::capture.output(OneToolSummary$median,file = file = paste0(out.dir,"/median.txt"))
+    ## Write stat summary information into a text file.
+    utils::capture.output(OneToolSummary$stats,file = paste0(out.dir,"/stats.txt"))
+    utils::capture.output(OneToolSummary$prop1,file = paste0(out.dir,"/prop1.txt"))
 
     OneToolSummary$datasetGroupName <- datasetGroupName
     OneToolSummary$datasetSubGroupName <- datasetSubGroupName
