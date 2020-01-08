@@ -933,11 +933,15 @@ SummarizeMultiToolsMultiDatasets <-
           ## according to different indexes
           ggplot2::facet_wrap(
             ggplot2::vars(.data$indexLabel),
+            ## Force facet_wrap to have 2 columns
+            ncol = 2,
             scales = "free",
-            ## Put facet label to the top
-            strip.position = "top",
             ## Let facet label to be print on multiple lines
-            labeller = ggplot2::label_wrap_gen(multi_line = T)
+            labeller = ggplot2::label_wrap_gen(multi_line = T),
+            ## Let facets be plotted vertically
+            dir = "v",
+            ## Put facet label to the top
+            strip.position = "top"
           ) +
           ## Restrict the decimal numbers of values of indexes to be 2
           ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
@@ -1161,7 +1165,14 @@ SummarizeMultiToolsMultiDatasets <-
             legend.position = "none") +
           ## Split the plot into multiple facets,
           ## according to different gtSigNames
-          ggplot2::facet_wrap(ggplot2::vars(gtSigName),scales = "free") +
+          ggplot2::facet_wrap(
+            ggplot2::vars(gtSigName),
+            ## Force facet_wrap to have 2 columns
+            ncol = 2,
+            scales = "free",
+            ## Let facets be plotted vertically
+            dir = "v"
+            ) +
           ## Restrict the decimal numbers of values of indexes to be 2
           ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
@@ -1353,7 +1364,14 @@ SummarizeMultiToolsMultiDatasets <-
             legend.position = "none") +
           ## Split the plot into multiple facets,
           ## according to different gtSigNames
-          ggplot2::facet_wrap(ggplot2::vars(gtSigName),scales = "free") +
+          ggplot2::facet_wrap(
+            ggplot2::vars(gtSigName),
+            ## Force facet_wrap to have 2 columns
+            ncol = 2,
+            scales = "free",
+            ## Let facets be plotted vertically
+            dir = "v"
+            ) +
           ## Restrict the decimal numbers of values of indexes to be 2
           ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
