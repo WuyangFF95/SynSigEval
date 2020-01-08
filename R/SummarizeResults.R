@@ -601,11 +601,11 @@ SummarizeMultiToolsOneDataset <- function(
       indexes <- c("averCosSim","falseNeg","falsePos",
                    "truePos","TPR","FDR")
       indexLabels <- c("Average cosine similarity of all signatures",
-                       "False negatives",
-                       "False positives",
-                       "True positives",
-                       "True Positive Rate (TPR, sensitivity)",
-                       "False Discovery Rate (FDR)")
+                       "Number of False negatives",
+                       "Number of False positives",
+                       "Number of True positives",
+                       "True Positive Rate",
+                       "False Discovery Rate")
       for(index in indexes){
         indexNum <- which(index == indexes)
         tmp <- data.frame(seed = names(multiRun[[index]]),
@@ -879,6 +879,11 @@ SummarizeMultiToolsMultiDatasets <-
       plotDFList$combined$datasetSubGroup <- factor(
         plotDFList$combined$datasetSubGroup,
         levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
+
+      ## Add "for all replicates" at the end of facet label.
+      plotDFList$combined$indexLabel <-
+        paste0(plotDFList$combined$indexLabel," for all replicates")
+
 
       ggplotList <- list()
       ## Plot a multi-facet ggplot for all indexes and all runs.
