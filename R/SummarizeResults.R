@@ -815,11 +815,13 @@ SummarizeMultiToolsMultiDatasets <-
     }
 
 
-    ## Only plot for average cosine similarity and FDR.
+    ## Only plot FDR.
     {
-      indexes <- c("averCosSim","FDR")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "FDR for both signatures against 400 runs")
+      #indexes <- c("averCosSim","FDR")
+      #indexLabels <- c("Average cosine similarity of all signatures",
+      #                 "False discovery rate for all replicates")
+      indexes <- c("FDR")
+      indexLabels<- c("False discovery rate for all replicates")
     }
     ## Plot general png and pdf for extraction summary
     ## Plot a general violin + beeswarm plot for multiple indexes
@@ -885,57 +887,60 @@ SummarizeMultiToolsMultiDatasets <-
         ggplotList$general <- ggplot2::ggplot(
           plotDFList$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
-        ## Draw geom_violin and geom_quasirandom
-        ggplot2::geom_violin(
-          ## Change filling color to white
-          fill = "#FFFFFF",
-          #ggplot2::aes(fill = index),
-          ## Maximize the violin plot width
-          scale = "width",
-          ## Make bandwidth larger
-          #position = "dodge",
-          #width = 1.2
-          ## Hide outliers
-          #outlier.shape = NA
-        ) +
-        #
-        #ggbeeswarm::geom_quasirandom(
-        #  groupOnX = TRUE, size = 0.3
-        #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-        #) +
-        ## Show median of the extraction measure distribution
-        ggplot2::stat_summary(fun.y="median", geom="point") +
+          ## Draw geom_violin and geom_quasirandom
+          ggplot2::geom_violin(
+            ## Change filling color to white
+            fill = "#FFFFFF",
+            #ggplot2::aes(fill = index),
+            ## Maximize the violin plot width
+            scale = "width",
+            ## Make bandwidth larger
+            #position = "dodge",
+            #width = 1.2
+            ## Hide outliers
+            #outlier.shape = NA
+          ) +
+          #
+          #ggbeeswarm::geom_quasirandom(
+          #  groupOnX = TRUE, size = 0.3
+          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
+          #) +
+          ## Show median of the extraction measure distribution
+          ggplot2::stat_summary(fun.y="median", geom="point") +
 
-        ## Change title for general violin + beeswarm plot
-        ggplot2::ggtitle(label = "Measures of extraction performance",
-                         subtitle = "for all software packages, ratios and correlation values.") +
-        ## Change axis titles
-        ggplot2::labs(x = "Software package") +
-        ## Remove axis.title.y (defaults to be "value", meaningless)
-        ## Rotate axis.text.x 90 degrees,
-        ## move axis.text.x right below the tick marks,
-        ## and remove legends.
-        ggplot2::theme(
-          ## Remove axis.title.y
-          axis.title.y = ggplot2::element_blank(),
-          axis.text.x = ggplot2::element_text(
-            ## Rotate the axis.text.x
-            angle = 90,
-            ## move axis.text.x right below the tick marks
-            hjust = 1,vjust = 0.5),
-          ## Make font size of facet label smaller.
-          strip.text = ggplot2::element_text(size = 6),
-          ## remove legends.
-          legend.position = "none") +
-        ## Split the plot into multiple facets,
-        ## according to different indexes
-        ggplot2::facet_wrap(
-          ggplot2::vars(.data$indexLabel),
-          scales = "free",
-          ## Put facet label to the left
-          strip.position = "left") +
-        ## Restrict the decimal numbers of values of indexes to be 2
-        ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ## Change title for general violin + beeswarm plot
+          ggplot2::ggtitle(label = "Measures of extraction performance",
+                           subtitle = "for all software packages, ratios and correlation values.") +
+          ## Change axis titles
+          ggplot2::labs(x = "Software package") +
+          ## Remove axis.title.y (defaults to be "value", meaningless)
+          ## Rotate axis.text.x 90 degrees,
+          ## move axis.text.x right below the tick marks,
+          ## and remove legends.
+          ggplot2::theme(
+            ## Remove axis.title.y
+            axis.title.y = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_text(
+              ## Rotate the axis.text.x
+              angle = 90,
+              ## move axis.text.x right below the tick marks
+              hjust = 1,vjust = 0.5),
+            ## Make font size of facet label smaller.
+            strip.text = ggplot2::element_text(size = 10),
+            ## remove legends.
+            legend.position = "none") +
+          ## Split the plot into multiple facets,
+          ## according to different indexes
+          ggplot2::facet_wrap(
+            ggplot2::vars(.data$indexLabel),
+            scales = "free",
+            ## Put facet label to the top
+            strip.position = "top",
+            ## Let facet label to be print on multiple lines
+            labeller = ggplot2::label_wrap_gen(multi_line = T)
+          ) +
+          ## Restrict the decimal numbers of values of indexes to be 2
+          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a multi-facet ggplot,
       ## facets are separated by indexes and datasetGroup
@@ -950,59 +955,63 @@ SummarizeMultiToolsMultiDatasets <-
         ggplotList[[by]] <- ggplot2::ggplot(
           plotDFList$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
-        ## Draw geom_violin and geom_quasirandom
-        ggplot2::geom_violin(
-          ## Change filling color to white
-          fill = "#FFFFFF",
-          #ggplot2::aes(fill = index),
-          ## Maximize the violin plot width
-          scale = "width",
-          ## Make bandwidth larger
-          #position = "dodge",
-          #width = 1.2
-          ## Hide outliers
-          #outlier.shape = NA
-        ) +
-        #
-        #ggbeeswarm::geom_quasirandom(
-        #  groupOnX = TRUE, size = 0.3
-        #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-        #) +
-        ## Show median of the extraction measure distribution
-        ggplot2::stat_summary(fun.y="median", geom="point") +
-        ## Add title for general violin + beeswarm plot
-        ggplot2::ggtitle(
-          label = paste0("Measures of extraction performance as a function of"),
-          subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
-        ## Change axis titles
-        ggplot2::labs(x = "Software package") +
-        ## Remove axis.title.y (defaults to be "value", meaningless)
-        ## Rotate the axis.text.x (names of tools),
-        ## move axis.text.x right below the tick marks
-        ## and remove legends
-        ggplot2::theme(
-          ## Remove axis.title.y
-          axis.title.y = ggplot2::element_blank(),
-          axis.text.x = ggplot2::element_text(
-            ## Rotate the axis.text.x (names of tools)
-            angle = 90,
-            ## move axis.text.x right below the tick marks
-            hjust = 1, vjust = 0.5),
-          ## remove legends
-          legend.position = "none") +
-        ## Split the plot into multiple facets,
-        ## according to different indexes
-        ggplot2::facet_grid(rows =  ggplot2::vars(.data$indexLabel),
-                            cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
-                            scales = "free") +
-        ## Make facet label font size smaller
-        ggplot2::theme(strip.text.y = ggplot2::element_text(size = 4)) +
-        ## Add title for general violin + beeswarm plot
-        ggplot2::ggtitle(
-          label = paste0("Measures of extraction performance as a function of"),
-          subtitle = paste0("indexes and ",byCaption,".")) +
-        ## Restrict the decimal numbers of values of indexes to be 2
-        ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ## Draw geom_violin and geom_quasirandom
+          ggplot2::geom_violin(
+            ## Change filling color to white
+            fill = "#FFFFFF",
+            #ggplot2::aes(fill = index),
+            ## Maximize the violin plot width
+            scale = "width",
+            ## Make bandwidth larger
+            #position = "dodge",
+            #width = 1.2
+            ## Hide outliers
+            #outlier.shape = NA
+          ) +
+          #
+          #ggbeeswarm::geom_quasirandom(
+          #  groupOnX = TRUE, size = 0.3
+          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
+          #) +
+          ## Show median of the extraction measure distribution
+          ggplot2::stat_summary(fun.y="median", geom="point") +
+          ## Add title for general violin + beeswarm plot
+          ggplot2::ggtitle(
+            label = paste0("Measures of extraction performance as a function of"),
+            subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
+          ## Change axis titles
+          ggplot2::labs(x = "Software package") +
+          ## Remove axis.title.y (defaults to be "value", meaningless)
+          ## Rotate the axis.text.x (names of tools),
+          ## move axis.text.x right below the tick marks
+          ## and remove legends
+          ggplot2::theme(
+            ## Remove axis.title.y
+            axis.title.y = ggplot2::element_blank(),
+            axis.text.x = ggplot2::element_text(
+              ## Rotate the axis.text.x (names of tools)
+              angle = 90,
+              ## move axis.text.x right below the tick marks
+              hjust = 1, vjust = 0.5),
+            ## remove legends
+            legend.position = "none") +
+          ## Split the plot into multiple facets,
+          ## according to different indexes
+          ggplot2::facet_grid(
+            rows =  ggplot2::vars(.data$indexLabel),
+            cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
+            scales = "free",
+            ## Let facet label to be print on multiple lines
+            labeller = ggplot2::label_wrap_gen(multi_line = T)
+          ) +
+          ## Make facet label font size smaller
+          ggplot2::theme(strip.text.y = ggplot2::element_text(size = 4)) +
+          ## Add title for general violin + beeswarm plot
+          ggplot2::ggtitle(
+            label = paste0("Measures of extraction performance as a function of"),
+            subtitle = paste0("indexes and ",byCaption,".")) +
+          ## Restrict the decimal numbers of values of indexes to be 2
+          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
       ## Plot violin + beeswarm plots in png format
       for(by in names(ggplotList)){
@@ -1127,34 +1136,34 @@ SummarizeMultiToolsMultiDatasets <-
             ## Hide outliers
             #outlier.shape = NA
           ) +
-        #
-        #ggbeeswarm::geom_quasirandom(
-        #  groupOnX = TRUE, size = 0.3
-        #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-        #) +
-        ## Show median of the cosine similarity distribution
-        ggplot2::stat_summary(fun.y="median", geom="point") +
-        ## Add title for general violin + beeswarm plot
-        ggplot2::ggtitle(label = "Cosine similarity between ground-truth and extracted signatures",
+          #
+          #ggbeeswarm::geom_quasirandom(
+          #  groupOnX = TRUE, size = 0.3
+          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
+          #) +
+          ## Show median of the cosine similarity distribution
+          ggplot2::stat_summary(fun.y="median", geom="point") +
+          ## Add title for general violin + beeswarm plot
+          ggplot2::ggtitle(label = "Cosine similarity between ground-truth and extracted signatures",
                            subtitle = "for all software packages, ratios and correlation values.") +
-        ## Change axis titles
-        ggplot2::labs(x = "Software package",
+          ## Change axis titles
+          ggplot2::labs(x = "Software package",
                         y = "Cosine Similarity") +
-        ## Rotate the axis.text.x (names of tools),
-        ## move axis.text.x right below the tick marks
-        ## and remove legends
-        ggplot2::theme(axis.text.x = ggplot2::element_text(
-          ## Rotate the axis.text.x (names of tools)
-          angle = 90,
+          ## Rotate the axis.text.x (names of tools),
           ## move axis.text.x right below the tick marks
-          hjust = 1, vjust = 0.5),
-          ## remove legends.
-          legend.position = "none") +
-        ## Split the plot into multiple facets,
-        ## according to different gtSigNames
-        ggplot2::facet_wrap(ggplot2::vars(gtSigName),scales = "free") +
-        ## Restrict the decimal numbers of values of indexes to be 2
-        ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ## and remove legends
+          ggplot2::theme(axis.text.x = ggplot2::element_text(
+            ## Rotate the axis.text.x (names of tools)
+            angle = 90,
+            ## move axis.text.x right below the tick marks
+            hjust = 1, vjust = 0.5),
+            ## remove legends.
+            legend.position = "none") +
+          ## Split the plot into multiple facets,
+          ## according to different gtSigNames
+          ggplot2::facet_wrap(ggplot2::vars(gtSigName),scales = "free") +
+          ## Restrict the decimal numbers of values of indexes to be 2
+          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a multi-facet ggplot,
       ## facets are separated by gtSigNames and datasetGroup
@@ -1170,51 +1179,51 @@ SummarizeMultiToolsMultiDatasets <-
         ggplotList[[by]] <- ggplot2::ggplot(
           plotDFList$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
-        ## Draw geom_violin and geom_quasirandom
-        ggplot2::geom_violin(
-          ## Change filling color to white
-          fill = "#FFFFFF",
-          #ggplot2::aes(fill = gtSigName),
-          ## Maximize the violin plot width
-          scale = "width",
-          ## Make bandwidth larger
-          #position = "dodge",
-          #width = 1.2
-          ## Hide outliers
-          #outlier.shape = NA
-        ) +
-        #ggbeeswarm::geom_quasirandom(
-        #  groupOnX = TRUE, size = 0.3
-        #  ## Need to add a single color (different from black)
-        #  ## for all data points.
-        #  , ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-        #) +
-        ## Show median of the extraction measure distribution
-        ggplot2::stat_summary(fun.y="median", geom="point") +
-        ## Add title for general violin + beeswarm plot
-        ggplot2::ggtitle(
-          label = paste0("Extraction cosine similarity as a function of"),
-          subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
-        ## Change axis titles
-        ggplot2::labs(x = "Software package",
-                      y = "Cosine Similarity") +
-        ## Rotate the axis.text.x (names of tools),
-        ## move axis.text.x right below the tick marks
-        ## and remove legends
-        ggplot2::theme(axis.text.x = ggplot2::element_text(
-          ## Rotate the axis.text.x (names of tools)
-          angle = 90,
+          ## Draw geom_violin and geom_quasirandom
+          ggplot2::geom_violin(
+            ## Change filling color to white
+            fill = "#FFFFFF",
+            #ggplot2::aes(fill = gtSigName),
+            ## Maximize the violin plot width
+            scale = "width",
+            ## Make bandwidth larger
+            #position = "dodge",
+            #width = 1.2
+            ## Hide outliers
+            #outlier.shape = NA
+          ) +
+          #ggbeeswarm::geom_quasirandom(
+          #  groupOnX = TRUE, size = 0.3
+          #  ## Need to add a single color (different from black)
+          #  ## for all data points.
+          #  , ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
+          #) +
+          ## Show median of the extraction measure distribution
+          ggplot2::stat_summary(fun.y="median", geom="point") +
+          ## Add title for general violin + beeswarm plot
+          ggplot2::ggtitle(
+            label = paste0("Extraction cosine similarity as a function of"),
+            subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
+          ## Change axis titles
+          ggplot2::labs(x = "Software package",
+                        y = "Cosine Similarity") +
+          ## Rotate the axis.text.x (names of tools),
           ## move axis.text.x right below the tick marks
-          hjust = 1, vjust = 0.5),
-          ## remove legends.
-          legend.position = "none") +
-        ## Split the plot into multiple facets,
-        ## according to different gtSigNames
-        ggplot2::facet_grid(rows = ggplot2::vars(gtSigName),
-                            cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
-                            scales = "free") +
-        ## Restrict the decimal numbers of values of indexes to be 2
-        ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ## and remove legends
+          ggplot2::theme(axis.text.x = ggplot2::element_text(
+            ## Rotate the axis.text.x (names of tools)
+            angle = 90,
+            ## move axis.text.x right below the tick marks
+            hjust = 1, vjust = 0.5),
+            ## remove legends.
+            legend.position = "none") +
+          ## Split the plot into multiple facets,
+          ## according to different gtSigNames
+          ggplot2::facet_grid(rows = ggplot2::vars(gtSigName),
+                              cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
+                              scales = "free") +
+          ## Restrict the decimal numbers of values of indexes to be 2
+          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
       ## Plot violin + beeswarm plots in png format
       for(by in names(ggplotList)){
@@ -1307,46 +1316,46 @@ SummarizeMultiToolsMultiDatasets <-
         ggplotList$general <- ggplot2::ggplot(
           plotDFList$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
-        ## Draw geom_violin and geom_quasirandom
-        ggplot2::geom_violin(
-          ## Change filling color to white
-          fill = "#FFFFFF",
-          #ggplot2::aes(fill = gtSigName),
-          ## Maximize the violin plot width
-          scale = "width",
-          ## Make bandwidth larger
-          #position = "dodge",
-          #width = 1.2
-          ## Hide outliers
-          #outlier.shape = NA
-        ) +
-        #ggbeeswarm::geom_quasirandom(
-        #  groupOnX = TRUE, size = 0.3
-        #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-        #) +
-        ## Show median of the Scaled Manhattan distance distribution
-        ggplot2::stat_summary(fun.y="median", geom="point") +
-        ## Add title for general violin + beeswarm plot
-        ggplot2::ggtitle(label = "Scaled Manhattan distance between attributed and grond-truth exposures",
-                         subtitle = "for all software packages, ratios and correlation values.") +
-        ## Change axis titles
-        ggplot2::labs(x = "Software package",
-                      y = "Scaled Manhattan distance") +
-        ## Rotate the names of tools,
-        ## move axis.text.x right below the tick marks
-        ## and remove legends
-        ggplot2::theme(axis.text.x = ggplot2::element_text(
-          ## Rotate the axis.text.x (names of tools),
-          angle = 90,
+          ## Draw geom_violin and geom_quasirandom
+          ggplot2::geom_violin(
+            ## Change filling color to white
+            fill = "#FFFFFF",
+            #ggplot2::aes(fill = gtSigName),
+            ## Maximize the violin plot width
+            scale = "width",
+            ## Make bandwidth larger
+            #position = "dodge",
+            #width = 1.2
+            ## Hide outliers
+            #outlier.shape = NA
+          ) +
+          #ggbeeswarm::geom_quasirandom(
+          #  groupOnX = TRUE, size = 0.3
+          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
+          #) +
+          ## Show median of the Scaled Manhattan distance distribution
+          ggplot2::stat_summary(fun.y="median", geom="point") +
+          ## Add title for general violin + beeswarm plot
+          ggplot2::ggtitle(label = "Scaled Manhattan distance between attributed and grond-truth exposures",
+                           subtitle = "for all software packages, ratios and correlation values.") +
+          ## Change axis titles
+          ggplot2::labs(x = "Software package",
+                        y = "Scaled Manhattan distance") +
+          ## Rotate the names of tools,
           ## move axis.text.x right below the tick marks
-          hjust = 1, vjust = 0.5),
-          ## remove legends.
-          legend.position = "none") +
-        ## Split the plot into multiple facets,
-        ## according to different gtSigNames
-        ggplot2::facet_wrap(ggplot2::vars(gtSigName),scales = "free") +
-        ## Restrict the decimal numbers of values of indexes to be 2
-        ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ## and remove legends
+          ggplot2::theme(axis.text.x = ggplot2::element_text(
+            ## Rotate the axis.text.x (names of tools),
+            angle = 90,
+            ## move axis.text.x right below the tick marks
+            hjust = 1, vjust = 0.5),
+            ## remove legends.
+            legend.position = "none") +
+          ## Split the plot into multiple facets,
+          ## according to different gtSigNames
+          ggplot2::facet_wrap(ggplot2::vars(gtSigName),scales = "free") +
+          ## Restrict the decimal numbers of values of indexes to be 2
+          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a multi-facet ggplot,
       ## facets are separated by gtSigNames and datasetGroup
@@ -1378,36 +1387,36 @@ SummarizeMultiToolsMultiDatasets <-
             ## Hide outliers
             #outlier.shape = NA
           ) +
-        #ggbeeswarm::geom_quasirandom(
-        #  groupOnX = TRUE, size = 0.3
-        #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-        #) +
-        ## Show median of the Scaled Manhattan distance distribution
-        ggplot2::stat_summary(fun.y="median", geom="point") +
-        ## Add title for general violin + beeswarm plot
-        ggplot2::ggtitle(
-          label = paste0("Scaled Manhattan distance summary plot as a function of "),
-          subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
-        ## Change axis titles
-        ggplot2::labs(x = "Software package",
-                      y = "Scaled Manhattan distance") +
-        ## Rotate the axis.text.x (names of tools),
-        ## move axis.text.x right below the tick marks
-        ## and remove legends
-        ggplot2::theme(axis.text.x = ggplot2::element_text(
+          #ggbeeswarm::geom_quasirandom(
+          #  groupOnX = TRUE, size = 0.3
+          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
+          #) +
+          ## Show median of the Scaled Manhattan distance distribution
+          ggplot2::stat_summary(fun.y="median", geom="point") +
+          ## Add title for general violin + beeswarm plot
+          ggplot2::ggtitle(
+            label = paste0("Scaled Manhattan distance summary plot as a function of "),
+            subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
+          ## Change axis titles
+          ggplot2::labs(x = "Software package",
+                        y = "Scaled Manhattan distance") +
           ## Rotate the axis.text.x (names of tools),
-          angle = 90,
           ## move axis.text.x right below the tick marks
-          hjust = 1, vjust = 0.5),
-          ## remove legends.
-          legend.position = "none") +
-        ## Split the plot into multiple facets,
-        ## according to different gtSigNames
-        ggplot2::facet_grid(rows =  ggplot2::vars(gtSigName),
-                            cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
-                            scales = "free") +
-        ## Restrict the decimal numbers of values of indexes to be 2
-        ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ## and remove legends
+          ggplot2::theme(axis.text.x = ggplot2::element_text(
+            ## Rotate the axis.text.x (names of tools),
+            angle = 90,
+            ## move axis.text.x right below the tick marks
+            hjust = 1, vjust = 0.5),
+            ## remove legends.
+            legend.position = "none") +
+          ## Split the plot into multiple facets,
+          ## according to different gtSigNames
+          ggplot2::facet_grid(rows =  ggplot2::vars(gtSigName),
+                              cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
+                              scales = "free") +
+          ## Restrict the decimal numbers of values of indexes to be 2
+          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
       ## Plot violin + beeswarm plots in png format
       for(by in names(ggplotList)){
