@@ -1332,6 +1332,8 @@ SummarizeMultiToolsMultiDatasets <-
         ggplotList$general <- ggplot2::ggplot(
           plotDFList$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
+          ## For scaled Manhattan distance, set ylim from 0 to 4
+          ggplot2::ylim(c(0,4)) +
           ## Draw geom_violin and geom_quasirandom
           ggplot2::geom_violin(
             ## Change filling color to white
@@ -1395,6 +1397,9 @@ SummarizeMultiToolsMultiDatasets <-
         ggplotList[[by]] <- ggplot2::ggplot(
           plotDFList$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value))
+        ## For scaled Manhattan distance, set ylim from 0 to 4
+        ggplotList[[by]] <- ggplotList[[by]] +
+          ggplot2::ylim(c(0,4))
         ## Draw geom_violin and geom_quasirandom
         ggplotList[[by]] <- ggplotList[[by]] +
           ggplot2::geom_violin(
@@ -1849,7 +1854,7 @@ SummarizeOneToolMultiDatasets <-
 
 
 
-      ## Combine multiple ground-truth signature Manhattan-distance data.frame
+      ## Combine multiple one-signature cosine similarity data.frame
       ## into OneToolSummary$cosSim$combined
       OneToolSummary$cosSim$combined <- data.frame()
       for(gtSigName in gtSigNames){
@@ -1987,7 +1992,7 @@ SummarizeOneToolMultiDatasets <-
 
 
 
-    ## Summarize attribution performance for one tool.
+    ## Summarize attribution scaled Manhattan distance for one tool.
     {
       OneToolSummary$ManhattanDist <- list()
 
@@ -2051,7 +2056,9 @@ SummarizeOneToolMultiDatasets <-
       if(FALSE){
         ggplotList[["general"]] <- ggplot2::ggplot(
           OneToolSummary$ManhattanDist$combined,
-          ggplot2::aes(x = .data$toolName, y = .data$value))
+          ggplot2::aes(x = .data$toolName, y = .data$value)) +
+          ## For scaled Manhattan distance, set ylim from 0 to 4
+          ggplot2::ylim(c(0,4))
         ## Draw boxplot + beeswarm plot
         ggplotList[["general"]] <- ggplotList[["general"]] +
           ## Draw geom_violin
@@ -2086,7 +2093,9 @@ SummarizeOneToolMultiDatasets <-
           ## Make sure that only one x-label is shown in one small facet.
           #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
           ggplot2::aes(x = .data$toolName, y = .data$value)
-        )
+        ) +
+        ## For scaled Manhattan distance, set ylim from 0 to 4
+        ggplot2::ylim(c(0,4))
         ## Add facets
         ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
           ggplot2::facet_grid(
