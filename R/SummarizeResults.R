@@ -1179,7 +1179,10 @@ SummarizeMultiToolsMultiDatasets <-
             dir = "v"
             ) +
           ## Restrict the decimal numbers of values of indexes to be 2
-          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ggplot2::scale_y_continuous(
+            ## For one-signature cosine similarity, set ylim from the minimum of cosine similarity value to 1
+            limits = c(min(plotDFList$combined$value), 1),
+            labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a multi-facet ggplot,
       ## facets are separated by gtSigNames and datasetGroup
@@ -1239,7 +1242,10 @@ SummarizeMultiToolsMultiDatasets <-
                               cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
                               scales = "free") +
           ## Restrict the decimal numbers of values of indexes to be 2
-          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ggplot2::scale_y_continuous(
+            ## For one-signature cosine similarity, set ylim from the minimum of cosine similarity value to 1
+            limits = c(min(plotDFList$combined$value), 1),
+            labels = function(x) sprintf("%.2f", x))
       }
       ## Plot violin + beeswarm plots in png format
       for(by in names(ggplotList)){
@@ -1332,8 +1338,6 @@ SummarizeMultiToolsMultiDatasets <-
         ggplotList$general <- ggplot2::ggplot(
           plotDFList$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
-          ## For scaled Manhattan distance, set ylim from 0 to 4
-          ggplot2::ylim(c(0,4)) +
           ## Draw geom_violin and geom_quasirandom
           ggplot2::geom_violin(
             ## Change filling color to white
@@ -1380,7 +1384,10 @@ SummarizeMultiToolsMultiDatasets <-
             dir = "v"
             ) +
           ## Restrict the decimal numbers of values of indexes to be 2
-          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ggplot2::scale_y_continuous(
+            ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+            limits = c(0, max(plotDFList$combined$value)),
+            labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a multi-facet ggplot,
       ## facets are separated by gtSigNames and datasetGroup
@@ -1397,9 +1404,6 @@ SummarizeMultiToolsMultiDatasets <-
         ggplotList[[by]] <- ggplot2::ggplot(
           plotDFList$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value))
-        ## For scaled Manhattan distance, set ylim from 0 to 4
-        ggplotList[[by]] <- ggplotList[[by]] +
-          ggplot2::ylim(c(0,4))
         ## Draw geom_violin and geom_quasirandom
         ggplotList[[by]] <- ggplotList[[by]] +
           ggplot2::geom_violin(
@@ -1444,7 +1448,10 @@ SummarizeMultiToolsMultiDatasets <-
                               cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
                               scales = "free") +
           ## Restrict the decimal numbers of values of indexes to be 2
-          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ggplot2::scale_y_continuous(
+            ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+            limits = c(0, max(plotDFList$combined$value)),
+            labels =function(x) sprintf("%.2f", x))
       }
       ## Plot violin + beeswarm plots in png format
       for(by in names(ggplotList)){
@@ -1905,7 +1912,10 @@ SummarizeOneToolMultiDatasets <-
           ## Add title for general boxplot + beeswarm plot
           ggplot2::labs(title = paste0(toolName,": Summary plot for one-signature cosine similarity")) +
           ## Restrict the decimal numbers of values of indexes to be 2
-          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+          ggplot2::scale_y_continuous(
+            ## For one-signature cosine similarity, set ylim from the minimum of Manhattan distance value to 1.
+            limits = c(min(OneToolSummary$cosSim$combined$value),1),
+            labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a value~datasetSubGroup beeswarm plot for each signature.
       for(gtSigName in gtSigNames){
@@ -1963,6 +1973,8 @@ SummarizeOneToolMultiDatasets <-
           ggplot2::guides(color = ggplot2::guide_legend(title = datasetGroupName)) +
           ## Restrict the decimal numbers of values of measures (y) to be 2
           ggplot2::scale_y_continuous(
+            ## For one-signature cosine similarity, set ylim from the minimum of Manhattan distance value to 1.
+            limits = c(min(OneToolSummary$cosSim$combined$value),1),
             labels =function(x) sprintf("%.2f", x),
             ## Add a secondary axis title on the top of the plot
             ## Showing axis label indicating facets
@@ -2048,7 +2060,7 @@ SummarizeOneToolMultiDatasets <-
       }
 
     }
-    ## Plot attribution performance boxplot + beeswarm plot for one tool
+    ## Plot normalized Manhattan distance violin plot + beeswarm plot for one tool
     { ## debug
       ## Create a list to store ggplot2 boxplot + beeswarm plot objects
       ggplotList <- list()
@@ -2056,9 +2068,7 @@ SummarizeOneToolMultiDatasets <-
       if(FALSE){
         ggplotList[["general"]] <- ggplot2::ggplot(
           OneToolSummary$ManhattanDist$combined,
-          ggplot2::aes(x = .data$toolName, y = .data$value)) +
-          ## For scaled Manhattan distance, set ylim from 0 to 4
-          ggplot2::ylim(c(0,4))
+          ggplot2::aes(x = .data$toolName, y = .data$value))
         ## Draw boxplot + beeswarm plot
         ggplotList[["general"]] <- ggplotList[["general"]] +
           ## Draw geom_violin
@@ -2083,6 +2093,8 @@ SummarizeOneToolMultiDatasets <-
           ggplot2::labs(title = paste0(toolName,": Summary plot for Scaled Manhattan distance")) +
           ## Restrict the decimal numbers of values of indexes to be 2
           ggplot2::scale_y_continuous(
+            ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+            limits = c(0,max(OneToolSummary$ManhattanDist$combined$value)),
             labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a value~datasetSubGroup beeswarm plot for each signature.
@@ -2093,9 +2105,7 @@ SummarizeOneToolMultiDatasets <-
           ## Make sure that only one x-label is shown in one small facet.
           #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
           ggplot2::aes(x = .data$toolName, y = .data$value)
-        ) +
-        ## For scaled Manhattan distance, set ylim from 0 to 4
-        ggplot2::ylim(c(0,4))
+        )
         ## Add facets
         ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
           ggplot2::facet_grid(
@@ -2143,6 +2153,8 @@ SummarizeOneToolMultiDatasets <-
           ggplot2::guides(color = ggplot2::guide_legend(title = datasetGroupName)) +
           ## Restrict the decimal numbers of values of measures (y) to be 2
           ggplot2::scale_y_continuous(
+            ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+            limits = c(0,max(OneToolSummary$ManhattanDist$combined$value)),
             ## Restrict the decimal numbers of values of measures (y) to be 2
             labels =function(x) sprintf("%.2f", x),
             ## Add a secondary axis title on the top of the plot
