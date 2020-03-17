@@ -769,15 +769,17 @@ SummarizeMultiToolsMultiDatasets <-
     ## For each index,
     ## Create a data.frame integrating results of
     ## all runs and for all datasets
-    indexes <- c("averCosSim","falseNeg","falsePos",
-                 "truePos","TPR","FDR")
-    indexLabels <- c("Average cosine similarity of all signatures",
-                     "False negatives",
-                     "False positives",
-                     "True positives",
-                     "True Positive Rate (TPR, sensitivity)",
-                     "False Discovery Rate (FDR)")
-    indexNums <- length(indexes)
+    {
+      indexes <- c("averCosSim","falseNeg","falsePos",
+                   "truePos","TPR","FDR")
+      indexLabels <- c("Average cosine similarity of all signatures",
+                       "False negatives",
+                       "False positives",
+                       "True positives",
+                       "True Positive Rate (TPR, sensitivity)",
+                       "False Discovery Rate (FDR)")
+      indexNums <- length(indexes)
+    }
 
     ## Summarizing extraction results.
     ## Showing individual values rather than
@@ -815,20 +817,16 @@ SummarizeMultiToolsMultiDatasets <-
     }
 
 
-    ## Only plot FDR.
-    {
-      #indexes <- c("averCosSim","FDR")
-      #indexLabels <- c("Average cosine similarity of all signatures",
-      #                 "False discovery rate for all replicates")
-      indexes <- c("FDR")
-      indexLabels<- c("False discovery rate for all replicates")
-    }
     ## Plot general png and pdf for extraction summary
     ## Plot a general violin + beeswarm plot for multiple indexes
     ## in all runs and in all datasets.
     {
       plotDFList <- list()
 
+      ## The first index to plot are truePos and FDR.
+      indexes <- c("truePos","FDR")
+      indexLabels<- c("Number of true positives for all replicates",
+                      "False discovery rate for all replicates")
       for(index in indexes){
         plotDFList[[index]] <- data.frame()
       }
@@ -844,7 +842,8 @@ SummarizeMultiToolsMultiDatasets <-
           plotDFList[[index]] <- rbind(plotDFList[[index]],multiTools[[index]])
         }
 
-        ## Also add one-signature cosine similarity into plotDFList.
+        ## The next to plot are one-signature cosine similarity into plotDFList.
+        ## In SBS1-SBS5-correlation study, refer to average SBS1 and average SBS5 similarity.
         gtSigNames <- names(multiTools$cosSim)
         for(gtSigName in gtSigNames){
           if(is.null(plotDFList[[gtSigName]])){
@@ -852,8 +851,58 @@ SummarizeMultiToolsMultiDatasets <-
           }
           plotDFList[[gtSigName]] <- rbind(plotDFList[[gtSigName]],multiTools$cosSim[[gtSigName]])
         }
+
+        ## The third to plot is the overall one-dimension measure
+        ## equals to:
+        ## Average of (1-FDR) in 20 runs +
+        ## Average of one-signature cosine similarity in 20 runs +
+        ## Proportion of True Positives = Total number of ground-truth signatures.
+	      if(is.null(plotDFList[["compositeMeasure"]])){
+          plotDFList[["compositeMeasure"]] <- data.frame()
+        }
+
+        ## Calculate values for each tool/software package.
+        toolNames <- unique(multiTools$averCosSim$toolName)
+        for(toolName in toolNames){
+
+          ## Calculate the value for mean(1 - FDR) for all runs of each tool on this dataset.
+          rowNum <- which(multiTools$FDR[,"toolName"] == toolName)
+          currentAver1MinusFDR <- 1 - mean(multiTools$FDR[rowNum,"value"])
+
+          ## Calculate the value for mean(one signature cosine similarity) for all runs of each tool on this dataset.
+          currentAverOneSigCosSim <- list()
+          for(gtSigName in gtSigNames){
+            rowNum <- which(multiTools$cosSim[[gtSigName]][,"toolName"] == toolName)
+            currentAverOneSigCosSim[[gtSigName]] <- mean(multiTools$cosSim[[gtSigName]][rowNum,"value"])
+          }
+
+          ## Calculate the value for mean(one signature cosine similarity) for all runs of each tool on this dataset.
+          rowNum <- which(multiTools$truePos[,"toolName"] == toolName)
+          currentPropAllExtracted <-
+            sum(multiTools$truePos[rowNum,"value"] == length(multiTools$gtSigNames)) / length(rowNum)
+
+          ## Sum up all the measurements, as the overall measurement
+          currentMeasureValue <- sum(c(currentAver1MinusFDR , unlist(currentAverOneSigCosSim) , currentPropAllExtracted))
+
+
+          ## Add current composite measure to the plotDFList$compositeMeasure
+          currentMeasureDF <- data.frame(
+            "seed" = "all",
+            "index" = "compositeMeasure",
+            "indexLabel" = "Composite measure for extraction performance",
+            "value" = currentMeasureValue,
+            "toolName" = toolName,
+            "datasetName" = multiTools$averCosSim$datasetName[1],
+            "datasetGroup" = multiTools$averCosSim$datasetGroup[1],
+            "datasetGroupName" = multiTools$datasetGroupName,
+            "datasetSubGroup" = multiTools$averCosSim$datasetSubGroup[1],
+            "datasetSubGroupName" = multiTools$datasetSubGroupName)
+
+          plotDFList$compositeMeasure <- rbind(plotDFList$compositeMeasure,currentMeasureDF)
+        }
       }
-      ## Change column names of one-signature cosine similarity
+
+      ## Change column names of plotDFList[[gtSigName]] (one-signature cosine similarity DFs)
       for(gtSigName in gtSigNames){
         colnames(plotDFList[[gtSigName]])[2] <- "index"
         colnames(plotDFList[[gtSigName]])[3] <- "indexLabel"
@@ -862,11 +911,8 @@ SummarizeMultiToolsMultiDatasets <-
       ## Combine all extraction measurements, plotDFList[[index]] into plotDFList$Combined
       ## combined all one-signature cosine similarity, plotDFList[[gtSigName]] into plotDFList$Combined
       plotDFList$combined <- data.frame()
-      for(index in indexes){
+      for(index in c(indexes,gtSigNames,"compositeMeasure")){
         plotDFList$combined <- rbind(plotDFList$combined,plotDFList[[index]])
-      }
-      for(gtSigName in gtSigNames){
-        plotDFList$combined <- rbind(plotDFList$combined,plotDFList[[gtSigName]])
       }
 
       ## Convert plotDFList$combined$datasetGroup and
@@ -882,7 +928,7 @@ SummarizeMultiToolsMultiDatasets <-
 
       ## Add "for all replicates" at the end of facet label.
       plotDFList$combined$indexLabel <-
-        paste0(plotDFList$combined$indexLabel," for all replicates")
+        paste0(plotDFList$combined$indexLabel," for all replicates.")
 
 
       ggplotList <- list()
@@ -910,9 +956,10 @@ SummarizeMultiToolsMultiDatasets <-
           #  groupOnX = TRUE, size = 0.3
           #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
-          ## Show median of the extraction measure distribution
+          ## Show median of the extraction measure distribution, as a solid dot.
           ggplot2::stat_summary(fun.y="median", geom="point") +
-
+          ## Show mean of the extraction meaasure distribution, as a blue diamond.
+          ggplot2::stat_summary(fun.y="mean", geom="point", fill="blue", shape = 23) +
           ## Change title for general violin + beeswarm plot
           ggplot2::ggtitle(label = "Measures of extraction performance",
                            subtitle = "for all software packages, ratios and correlation values.") +
@@ -982,8 +1029,10 @@ SummarizeMultiToolsMultiDatasets <-
           #  groupOnX = TRUE, size = 0.3
           #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
-          ## Show median of the extraction measure distribution
+          ## Show median of the extraction measure distribution, as a solid dot.
           ggplot2::stat_summary(fun.y="median", geom="point") +
+          ## Show mean of the extraction meaasure distribution, as a blue diamond.
+          ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
           ggplot2::ggtitle(
             label = paste0("Measures of extraction performance as a function of"),
@@ -1022,24 +1071,18 @@ SummarizeMultiToolsMultiDatasets <-
           ## Restrict the decimal numbers of values of indexes to be 2
           ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
-      ## Plot violin + beeswarm plots in png format
-      for(by in names(ggplotList)){
-        suppressMessages(
-          ggplot2::ggsave(filename = paste0(out.dir,"/extraction.violin.by.",by,".png"),
-                          plot = ggplotList[[by]], device = "png", dpi = 1000
-                          ,limitsize = FALSE  ## debug
-          )
-        )
-      }
       ## Plot violin + beeswarm plots in pdf format
       grDevices::pdf(paste0(out.dir,"/extraction.violins.pdf"),
                      #paper = "a4", ## A4 size
+                     width = 7,
+                     height = 10.5, ## Make height larger
                      pointsize = 1)
       for(by in names(ggplotList)){
         print(ggplotList[[by]])
       }
       grDevices::dev.off()
     }
+
 
     ## Write a table for extraction measures.
     if(FALSE){ ## Remove redundant indexes
@@ -1177,7 +1220,7 @@ SummarizeMultiToolsMultiDatasets <-
             scales = "free",
             ## Let facets be plotted vertically
             dir = "v"
-            ) +
+          ) +
           ## Restrict the decimal numbers of values of indexes to be 2
           ggplot2::scale_y_continuous(
             ## For one-signature cosine similarity, set ylim from the minimum of cosine similarity value to 1
@@ -1247,15 +1290,7 @@ SummarizeMultiToolsMultiDatasets <-
             limits = c(min(plotDFList$combined$value), 1),
             labels = function(x) sprintf("%.2f", x))
       }
-      ## Plot violin + beeswarm plots in png format
-      for(by in names(ggplotList)){
-        suppressMessages(
-          ggplot2::ggsave(filename = paste0(out.dir,"/onesig.cossim.violin.by.",by,".png"),
-                          plot = ggplotList[[by]], device = "png", dpi = 1000
-                          ,limitsize = FALSE
-          )
-        )
-      }
+
       ## Plot violin + beeswarm plots in pdf format
       grDevices::pdf(paste0(out.dir,"/onesig.cossim.violins.pdf"), pointsize = 1)
       for(by in names(ggplotList)){
@@ -1382,7 +1417,7 @@ SummarizeMultiToolsMultiDatasets <-
             scales = "free",
             ## Let facets be plotted vertically
             dir = "v"
-            ) +
+          ) +
           ## Restrict the decimal numbers of values of indexes to be 2
           ggplot2::scale_y_continuous(
             ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
@@ -1453,15 +1488,7 @@ SummarizeMultiToolsMultiDatasets <-
             limits = c(0, max(plotDFList$combined$value)),
             labels =function(x) sprintf("%.2f", x))
       }
-      ## Plot violin + beeswarm plots in png format
-      for(by in names(ggplotList)){
-        suppressMessages(
-          ggplot2::ggsave(filename = paste0(out.dir,"/Manhattan.Dist.violin.by.",by,".png"),
-                          plot = ggplotList[[by]], device = "png", dpi = 1000
-                          ,limitsize = FALSE
-          )
-        )
-      }
+
       ## Plot violin + beeswarm plots in pdf format
       grDevices::pdf(paste0(out.dir,"/Manhattan.Dist.violins.pdf"), pointsize = 1)
       for(by in names(ggplotList)){
