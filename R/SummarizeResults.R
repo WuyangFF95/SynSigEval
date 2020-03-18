@@ -876,14 +876,24 @@ SummarizeMultiToolsMultiDatasets <-
             currentAverOneSigCosSim[[gtSigName]] <- mean(multiTools$cosSim[[gtSigName]][rowNum,"value"])
           }
 
-          ## Calculate the value for mean(one signature cosine similarity) for all runs of each tool on this dataset.
-          rowNum <- which(multiTools$truePos[,"toolName"] == toolName)
-          currentPropAllExtracted <-
+          if(FALSE){ ## Considering whether to calculate all-extracted-proportion, or the mean of .
+            ## Calculate the value for mean(one signature cosine similarity) for all runs of each tool on this dataset.
+            rowNum <- which(multiTools$truePos[,"toolName"] == toolName)
+            currentPropAllExtracted <-
             sum(multiTools$truePos[rowNum,"value"] == length(multiTools$gtSigNames)) / length(rowNum)
+          } else {
+            ## Calculate the value for mean(truePos) / total number of ground-truth signatures for all runs of each tool on this dataset.
+            rowNum <- which(multiTools$truePos[,"toolName"] == toolName)
+            currentAverTruePosProp <-   mean(multiTools$truePos[rowNum,"value"]) / length(multiTools$gtSigNames)
+
+          }
 
           ## Sum up all the measurements, as the overall measurement
-          currentMeasureValue <- sum(c(currentAver1MinusFDR , unlist(currentAverOneSigCosSim) , currentPropAllExtracted))
-
+          if(FALSE){
+            currentMeasureValue <- sum(c(currentAver1MinusFDR , unlist(currentAverOneSigCosSim) , currentPropAllExtracted))
+          } else{
+            currentMeasureValue <- sum(c(currentAver1MinusFDR , unlist(currentAverOneSigCosSim) , currentAverTruePosProp))
+          }
 
           ## Add current composite measure to the plotDFList$compositeMeasure
           currentMeasureDF <- data.frame(
@@ -928,7 +938,7 @@ SummarizeMultiToolsMultiDatasets <-
 
       ## Add "for all replicates" at the end of facet label.
       plotDFList$combined$indexLabel <-
-        paste0(plotDFList$combined$indexLabel," for all replicates.")
+        paste0(plotDFList$combined$indexLabel," for all replicates")
 
 
       ggplotList <- list()
