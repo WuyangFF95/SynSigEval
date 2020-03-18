@@ -19,8 +19,7 @@ for(slope in slopes){
 # R-based tools which can do both extraction and attribution,
 # excluding SignatureAnalyzer (due to special folder structure)
 # and maftools (its seed is hard-coded)
-#RBasedExtrAttrToolNames <- c("signeR","hdp","hdp.clean","sigfit.nmf","sigfit.emu")
-RBasedExtrAttrToolNames <- c("signeR","hdp.clean","sigfit.nmf","sigfit.emu")
+RBasedExtrAttrToolNames <- c("hdp","MutationalPatterns","sigfit.EMu","sigfit.NMF","signeR")
 # Python or other language based tools.
 # excluding maftools (seed is fixed) and EMu (cannot designate seed)
 otherExtrAttrToolNames <- c("MultiModalMuSig")
@@ -29,7 +28,7 @@ attrToolNames <-
   c("decompTumor2Sig","deconstructSigs","mSigAct",
     "MutationalPatterns","mutSignatures",
     "SignatureEstimation.QP","SignatureEstimation.SA",
-    "YAPSA","sigfit.nmf","sigfit.emu")
+    "YAPSA","sigfit.NMF","sigfit.EMu")
 
 
 ## Specify seeds used in analysis.
@@ -121,7 +120,7 @@ for(datasetName in datasetNames){
 }
 
 ## Part II: Write summary table for 20 seeds for each tool with each dataset
-otherExtrAttrToolNames <- c("helmsman","MultiModalMuSig","SigProExtractor","SignatureAnalyzer")
+otherExtrAttrToolNames <- c("helmsman.NMF","MultiModalMuSig","SigProExtractor","SignatureAnalyzer")
 for(datasetName in datasetNames){
   ## For each dataset, summarize 20 runs
   ## using different seeds by EMu
