@@ -22,7 +22,7 @@ for(slope in slopes){
 RBasedExtrAttrToolNames <- c("hdp","MutationalPatterns","sigfit.EMu","sigfit.NMF","signeR")
 # Python or other language based tools.
 # excluding maftools (seed is fixed) and EMu (cannot designate seed)
-otherExtrAttrToolNames <- c("MultiModalMuSig")
+otherExtrAttrToolNames <- c("MultiModalMuSig.CTM","MultiModalMuSig.LDA")
 # Tools can only do attribution
 attrToolNames <-
   c("decompTumor2Sig","deconstructSigs","mSigAct",
@@ -82,7 +82,7 @@ for(datasetName in datasetNames){
     ## Summarize helmsman
     SynSigEval::SummarizeSigOnehelmsmanSubdir(
       run.dir = paste0(datasetName,
-                       "/sp.sp/ExtrAttr/helmsman.results/seed.",
+                       "/sp.sp/ExtrAttr/helmsman.NMF.results/seed.",
                        seedInUse,"/"),
       ground.truth.exposure.dir = paste0(datasetName,"/sp.sp/"),
       overwrite = T)
@@ -120,7 +120,7 @@ for(datasetName in datasetNames){
 }
 
 ## Part II: Write summary table for 20 seeds for each tool with each dataset
-otherExtrAttrToolNames <- c("helmsman.NMF","MultiModalMuSig","SigProExtractor","SignatureAnalyzer")
+otherExtrAttrToolNames <- c("helmsman.NMF","MultiModalMuSig.CTM","MultiModalMuSig.LDA","SigProExtractor","SignatureAnalyzer")
 for(datasetName in datasetNames){
   ## For each dataset, summarize 20 runs
   ## using different seeds by EMu
