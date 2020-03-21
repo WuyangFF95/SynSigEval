@@ -38,6 +38,45 @@ seedsInUse <- c(1, 691, 1999, 3511, 8009,
                 27847, 34637, 49081, 75679, 103333,
                 145879, 200437, 310111, 528401, 1076753)
 
+## Before summarizing, convert MultiModalMuSig-formatted catalog
+## to ICAMS-formatted catalog.
+for(datasetName in datasetNames){
+  for(seedInUse in seedsInUse){
+    ## Do for MultiModalMuSig.LDA
+    cat <- MMCatalog2ICAMS(
+      paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.LDA.results/",
+             "seed.",seedInUse,"/extracted.signatures.tsv"),
+      region = "genome",
+      catalog.type = "counts.signature")
+    ICAMS::WriteCatalog(
+      cat,
+      paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.LDA.results/",
+             "seed.",seedInUse,"/extracted.signatures.csv"))
+    expo <- ReadExposureMM(paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.LDA.results/",
+                           "seed.",seedInUse,"/attributed.exposures.tsv"))
+    WriteExposure(
+      expo,
+      paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.LDA.results/",
+             "seed.",seedInUse,"/attributed.exposures.csv"))
+
+    ## Do for MultiModalMuSig.CTM
+    cat <- MMCatalog2ICAMS(
+      paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.CTM.results/",
+             "seed.",seedInUse,"/extracted.signatures.tsv"),
+      region = "genome",
+      catalog.type = "counts.signature")
+    ICAMS::WriteCatalog(
+      cat,
+      paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.CTM.results/",
+             "seed.",seedInUse,"/extracted.signatures.csv"))
+    expo <- ReadExposureMM(paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.CTM.results/",
+                                  "seed.",seedInUse,"/attributed.exposures.tsv"))
+    WriteExposure(
+      expo,
+      paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.CTM.results/",
+             "seed.",seedInUse,"/attributed.exposures.csv"))
+  }
+}
 
 ## Part I: Run Summarize functions in SynSigEval
 for(datasetName in datasetNames){
