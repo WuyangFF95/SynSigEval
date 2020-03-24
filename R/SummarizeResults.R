@@ -640,7 +640,7 @@ SummarizeMultiToolsOneDataset <- function(
       for(gtSigName in gtSigNames){
         tmp <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
                           gtSigName = gtSigName,
-                          label = paste0("Cosine similarity for signature ",gtSigName),
+                          label = paste0("Cosine similarity to signature ",gtSigName),
                           value = multiRun$cosSim[[gtSigName]],
                           toolName = toolName,
                           datasetName = multiRun$datasetName,
@@ -825,8 +825,8 @@ SummarizeMultiToolsMultiDatasets <-
 
       ## The first index to plot are truePos and FDR.
       indexes <- c("truePos","FDR")
-      indexLabels<- c("Number of true positives for all replicates",
-                      "False discovery rate for all replicates")
+      indexLabels<- c("Number of true positives",
+                      "False discovery rate")
       for(index in indexes){
         plotDFList[[index]] <- data.frame()
       }
@@ -899,7 +899,7 @@ SummarizeMultiToolsMultiDatasets <-
           currentMeasureDF <- data.frame(
             "seed" = "all",
             "index" = "compositeMeasure",
-            "indexLabel" = "Composite measure for extraction performance",
+            "indexLabel" = "Composite measure",
             "value" = currentMeasureValue,
             "toolName" = toolName,
             "datasetName" = multiTools$averCosSim$datasetName[1],
@@ -936,9 +936,6 @@ SummarizeMultiToolsMultiDatasets <-
         plotDFList$combined$datasetSubGroup,
         levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
 
-      ## Add "for all replicates" at the end of facet label.
-      plotDFList$combined$indexLabel <-
-        paste0(plotDFList$combined$indexLabel," for all replicates")
 
 
       ggplotList <- list()
@@ -971,8 +968,8 @@ SummarizeMultiToolsMultiDatasets <-
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", fill="blue", shape = 23) +
           ## Change title for general violin + beeswarm plot
-          ggplot2::ggtitle(label = "Measures of extraction performance",
-                           subtitle = "for all software packages, ratios and correlation values.") +
+          ggplot2::ggtitle(label = "Extraction performance",
+                           subtitle = "for all methods across all data sets and replicates") +
           ## Change axis titles
           ggplot2::labs(x = "Software package") +
           ## Remove axis.title.y (defaults to be "value", meaningless)
