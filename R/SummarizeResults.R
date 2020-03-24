@@ -997,8 +997,8 @@ SummarizeMultiToolsMultiDatasets <-
             scales = "free",
             ## Let facet label to be print on multiple lines
             labeller = ggplot2::label_wrap_gen(multi_line = T),
-            ## Let facets be plotted vertically
-            dir = "v",
+            ## Let facets be plotted horizontally
+            dir = "h",
             ## Put facet label to the top
             strip.position = "top"
           ) +
