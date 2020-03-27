@@ -58,8 +58,8 @@ the spectra, and extracted.
 False Negatives(FN): Ground-truth signatures not extracted.
 False Positives(FP): Signatures wrongly extracted, not resembling
 any ground-truth signatures.
-True Positive Rate (TPR, Sensitivity): TP / (TP + FN)
-False Discovery Rate (FDR): FP / (FP + TP)
+True positive rate (TPR, Sensitivity): TP / (TP + FN)
+False discovery rate (FDR): FP / (FP + TP)
 }
 \description{
 Summarize results from each software package in \code{third.level.dir}/\code{tool.dirnames}

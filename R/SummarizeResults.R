@@ -211,8 +211,8 @@ SummarizeSigOneSubdir <-
 #' False Negatives(FN): Ground-truth signatures not extracted.
 #' False Positives(FP): Signatures wrongly extracted, not resembling
 #' any ground-truth signatures.
-#' True Positive Rate (TPR, Sensitivity): TP / (TP + FN)
-#' False Discovery Rate (FDR): FP / (FP + TP)
+#' True positive rate (TPR, Sensitivity): TP / (TP + FN)
+#' False discovery rate (FDR): FP / (FP + TP)
 #'
 #' @details Also writes multiple files into folder \code{tool.dir}:
 #'
@@ -260,7 +260,7 @@ SummarizeMultiRuns <-
       falsePos <- c(falsePos,length(falsePosNames))
       truePos <- c(truePos, length(truePosNames))
 
-      ## Concatenate TPR (True Positive Rate) and FDR (False Discovery Rate)
+      ## Concatenate TPR (True positive rate) and FDR (False discovery rate)
       currentTPR <- length(truePosNames) / length(gtSigNames)
       currentFDR <- length(falsePosNames) / (length(truePosNames) + length(falsePosNames))
       TPR <- c(TPR, currentTPR)
@@ -330,8 +330,8 @@ SummarizeMultiRuns <-
                   "False negatives",
                   "False positives",
                   "True positives",
-                  "True Positive Rate (sensitivity)",
-                  "False Discovery Rate (FDR)")
+                  "True positive rate (sensitivity)",
+                  "False discovery rate (FDR)")
       subtitles <- c("","Number of ground-truth signatures not extracted",
                      "Number of signatures extracted, but different from ground-truth signatures",
                      "Number of ground-truth signatures extracted",
@@ -568,8 +568,8 @@ SummarizeMultiRuns <-
 #' False Negatives(FN): Ground-truth signatures not extracted.
 #' False Positives(FP): Signatures wrongly extracted, not resembling
 #' any ground-truth signatures.
-#' True Positive Rate (TPR, Sensitivity): TP / (TP + FN)
-#' False Discovery Rate (FDR): FP / (FP + TP)
+#' True positive rate (TPR, Sensitivity): TP / (TP + FN)
+#' False discovery rate (FDR): FP / (FP + TP)
 #'
 #' @export
 #'
@@ -604,8 +604,8 @@ SummarizeMultiToolsOneDataset <- function(
                        "Number of False negatives",
                        "Number of False positives",
                        "Number of True positives",
-                       "True Positive Rate",
-                       "False Discovery Rate")
+                       "True positive rate",
+                       "False discovery rate")
       for(index in indexes){
         indexNum <- which(index == indexes)
         tmp <- data.frame(seed = names(multiRun[[index]]),
@@ -776,8 +776,8 @@ SummarizeMultiToolsMultiDatasets <-
                        "False negatives",
                        "False positives",
                        "True positives",
-                       "True Positive Rate (TPR, sensitivity)",
-                       "False Discovery Rate (FDR)")
+                       "True positive rate (TPR, sensitivity)",
+                       "False discovery rate (FDR)")
       indexNums <- length(indexes)
     }
 
@@ -1099,12 +1099,12 @@ SummarizeMultiToolsMultiDatasets <-
                        "False negatives",
                        "False positives",
                        "True positives",
-                       "True Positive Rate (TPR, sensitivity)",
-                       "False Discovery Rate (FDR)")
+                       "True positive Rate (TPR, sensitivity)",
+                       "False discovery Rate (FDR)")
     } else{
       indexes <- c("averCosSim","FDR")
       indexLabels <- c("Average cosine similarity of all signatures",
-                       "False Discovery Rate (FDR)")
+                       "False discovery rate (FDR)")
     }
 
 
@@ -1112,7 +1112,7 @@ SummarizeMultiToolsMultiDatasets <-
     {
       FinalExtr$cosSim <- list()
       ## Combine assessment onto multiple sheets.
-      ## Each sheet shows cosine similarity for one mutational signature.
+      ## Each sheet shows cosine similarity to one mutational signature.
       for(datasetDir in dataset.dirs){
         thirdLevelDir <- paste0(datasetDir,"/",second.third.level.dirname)
         ## Add multiTools <- NULL to please R check
@@ -1623,8 +1623,8 @@ SummarizeOneToolMultiDatasets <-
                        "False negatives",
                        "False positives",
                        "True positives",
-                       "True Positive Rate (TPR, sensitivity)",
-                       "False Discovery Rate (FDR)")
+                       "True positive rate (TPR, sensitivity)",
+                       "False discovery rate (FDR)")
       subtitles <- c("",
                      "Number of missing ground-truth signatures",
                      "Number of artefact signatures extracted, but different from ground-truth signatures",
@@ -1717,7 +1717,7 @@ SummarizeOneToolMultiDatasets <-
       ## Only average cosine similarity, one-signature cosine similarity and FDR are plotted.
       indexes <- c("averCosSim","FDR")
       indexLabels <- c("Average cosine similarity of all signatures",
-                       "False Discovery Rate (FDR)")
+                       "False discovery rate (FDR)")
       subtitles <- c("",
                      "False Positives / (True Positives + False Positives)")
 
@@ -2014,7 +2014,7 @@ SummarizeOneToolMultiDatasets <-
             title = paste0(toolName,": Cosine similarity between signature ",gtSigName),
             subtitle = paste0("and all extracted signatures resembling ",gtSigName),
             ## Change title of y axis (axis.title.y) into gtSigName info (same as title)
-            y = paste0("Cosine similarity between signature ",gtSigName),
+            y = paste0("Cosine similarity to signature ",gtSigName),
             ## Change title of x axis to "Pearson's R squared"
             x = "Pearson's R squared") +
           ## Change title of legend to datasetGroupName
