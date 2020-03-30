@@ -964,7 +964,7 @@ SummarizeMultiToolsMultiDatasets <-
           #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
           ## Show median of the extraction measure distribution, as a solid dot.
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red", shape = 21) +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", fill="blue", shape = 23) +
           ## Change title for general violin + beeswarm plot
@@ -1037,7 +1037,7 @@ SummarizeMultiToolsMultiDatasets <-
           #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
           ## Show median of the extraction measure distribution, as a solid dot.
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
@@ -1201,7 +1201,7 @@ SummarizeMultiToolsMultiDatasets <-
           #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
           ## Show median of the cosine similarity distribution
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
@@ -1270,7 +1270,7 @@ SummarizeMultiToolsMultiDatasets <-
           #  , ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
           ## Show median of the extraction measure distribution
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
@@ -1402,7 +1402,7 @@ SummarizeMultiToolsMultiDatasets <-
           #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
           ## Show median of the Scaled Manhattan distance distribution
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
@@ -1472,7 +1472,7 @@ SummarizeMultiToolsMultiDatasets <-
           #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
           ## Show median of the Scaled Manhattan distance distribution
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
@@ -1787,7 +1787,7 @@ SummarizeOneToolMultiDatasets <-
             ## Maximize the violin plot width
             scale = "width"
           ) +
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Draw beeswarm plot
@@ -1944,7 +1944,7 @@ SummarizeOneToolMultiDatasets <-
             ## Hide outliers
             #outlier.shape = NA
           ) +
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
@@ -1990,7 +1990,7 @@ SummarizeOneToolMultiDatasets <-
             ## Hide outliers
             #outlier.shape = NA
           ) +
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Draw beeswarm plot
@@ -2128,7 +2128,7 @@ SummarizeOneToolMultiDatasets <-
             ## Hide outliers
             #outlier.shape = NA
           ) +
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
@@ -2174,7 +2174,7 @@ SummarizeOneToolMultiDatasets <-
             ## Hide outliers
             #outlier.shape = NA
           ) +
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red") +
+          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Draw beeswarm plot
