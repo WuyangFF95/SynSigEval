@@ -1793,9 +1793,12 @@ SummarizeOneToolMultiDatasets <-
           ## Draw beeswarm plot
           ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
                                        ## Make dot size smaller
-                                       size = 0.3,
+                                       size = 0.3
+                                       #,
+                                       ## Remove differentiated colors for beeswarm dots
                                        ## Set groups for the filling functionalities to differentiate
-                                       ggplot2::aes(color = .data$datasetGroup)) +
+                                       #ggplot2::aes(color = .data$datasetGroup)
+                                       ) +
           ## Change filling color
           ggplot2::scale_fill_brewer(palette = "Greys") +
           ## Change titles
@@ -1995,8 +1998,12 @@ SummarizeOneToolMultiDatasets <-
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Draw beeswarm plot
           ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
-                                       size = 0.3, ## Make dot size smaller
-                                       ggplot2::aes(color = .data$datasetGroup)) +     ## Set groups for the filling functionalities to differentiate
+                                       size = 0.3 ## Make dot size smaller
+                                       #,
+                                       ## Remove differentiated colors for beeswarm dots
+                                       ## Set groups for the filling functionalities to differentiate
+                                       #ggplot2::aes(color = .data$datasetGroup)
+                                       ) +
           ## Change filling color
           ggplot2::scale_fill_brewer(palette = "Greys") +
           ## Change axis.text and tickmarks
@@ -2179,8 +2186,12 @@ SummarizeOneToolMultiDatasets <-
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Draw beeswarm plot
           ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
-                                       size = 0.3, ## Make dot size smaller
-                                       ggplot2::aes(color = .data$datasetGroup)) +     ## Set groups for the filling functionalities to differentiate
+                                       size = 0.3 ## Make dot size smaller
+                                       ,
+                                       ## Remove differentiated colors for beeswarm dots
+                                       ## Set groups for the filling functionalities to differentiate
+                                       #ggplot2::aes(color = .data$datasetGroup)
+                                       ) +
           ## Change filling color
           ggplot2::scale_fill_brewer(palette = "Greys") +
           ## Change axis.text and tickmarks
