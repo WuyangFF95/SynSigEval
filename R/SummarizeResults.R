@@ -1074,7 +1074,7 @@ SummarizeMultiToolsMultiDatasets <-
           ## Add title for general violin + beeswarm plot
           ggplot2::ggtitle(
             label = paste0("Measures of extraction performance as a function of"),
-            subtitle = paste0("indexes and ",byCaption,".")) +
+            subtitle = paste0(byCaption,".")) +
           ## Restrict the decimal numbers of values of indexes to be 2
           ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
