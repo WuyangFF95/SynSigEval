@@ -64,21 +64,21 @@ SummarizeSigOneSigProExtractorSubdir <-
     extracted.sigs.path <- paste0(run.dir,"/extracted.signatures.csv")
     ICAMS::WriteCatalog(extractedSigs, extracted.sigs.path)
 
-    # Read in attributed exposures in SP format,
+    # Read in inferred exposures in SP format,
     # and convert it into our internal format
     if(flagSBS96){
-      attributed.exp.path.SP.format <-
+      inferred.exp.path.SP.format <-
         paste0(inputPath,"/De_Novo_Solution_Activities_SBS96.txt")
     } else if(flagDBS78){
-      attributed.exp.path.SP.format <-
+      inferred.exp.path.SP.format <-
         paste0(inputPath,"/De_Novo_Solution_Activities_DINUC.txt")
     }
 
 
 
-    attributedExposures <- ReadSigProfilerExposure(attributed.exp.path.SP.format)
-    attributed.exp.path <- paste0(run.dir,"/attributed.exposures.csv")
-    WriteExposure(exposure.matrix = attributedExposures, file = attributed.exp.path)
+    inferredExposures <- ReadSigProfilerExposure(inferred.exp.path.SP.format)
+    inferred.exp.path <- paste0(run.dir,"/inferred.exposures.csv")
+    WriteExposure(exposure.matrix = inferredExposures, file = inferred.exp.path)
 
 
     # SummarizeSigOneSubdir will generate a "/summary" folder
@@ -89,7 +89,7 @@ SummarizeSigOneSigProExtractorSubdir <-
         run.dir = run.dir,
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = extracted.sigs.path,
-        attributed.exp.path = attributed.exp.path,
+        inferred.exp.path = inferred.exp.path,
         #read.extracted.sigs.fn = ReadCatalog,
         #read.ground.truth.sigs.fn = ReadCatalog,
         #write.cat.fn = WriteCatalog,
@@ -200,12 +200,12 @@ SummarizeSigOneSigProSSSubdir <-
   gt.sigs.path <- paste0(ground.truth.exposure.dir,"/ground.truth.syn.sigs.csv")
 
 
-  attributed.exp.path.SP.format <- paste0(run.dir,"/sig_activities.txt")
-  attributedExposures <- ReadSigProfilerExposure(attributed.exp.path.SP.format)
+  inferred.exp.path.SP.format <- paste0(run.dir,"/sig_activities.txt")
+  inferredExposures <- ReadSigProfilerExposure(inferred.exp.path.SP.format)
   ## Remove the first "Similarity" row.
-  attributedExposures <- attributedExposures[-1,,drop = FALSE]
-  attributed.exp.path <- paste0(run.dir,"/attributed.exposures.csv")
-  WriteExposure(exposure.matrix = attributedExposures, file = attributed.exp.path)
+  inferredExposures <- inferredExposures[-1,,drop = FALSE]
+  inferred.exp.path <- paste0(run.dir,"/inferred.exposures.csv")
+  WriteExposure(exposure.matrix = inferredExposures, file = inferred.exp.path)
 
 
   # SummarizeSigOneSubdir will generate a "/summary" folder
@@ -216,7 +216,7 @@ SummarizeSigOneSigProSSSubdir <-
       run.dir = run.dir,
       ground.truth.exposure.dir = ground.truth.exposure.dir,
       extracted.sigs.path = gt.sigs.path,
-      attributed.exp.path = attributed.exp.path,
+      inferred.exp.path = inferred.exp.path,
       overwrite = overwrite)
 
   # Copy stability.pdf and result_stat.csv

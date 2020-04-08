@@ -43,7 +43,7 @@ SummarizeSigOneSASubdir <-
         run.dir = run.dir,
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = paste0(inputPath,"/sa.output.sigs.csv"),
-        attributed.exp.path = paste0(inputPath,"/sa.output.exp.csv"),
+        inferred.exp.path = paste0(inputPath,"/sa.output.exp.csv"),
         overwrite = overwrite)
 
     invisible(retval)

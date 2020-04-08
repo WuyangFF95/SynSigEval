@@ -64,7 +64,7 @@ test_that("SummarizeSigOneSigProExtractorSubdir (SBS96)", {
     if (res != 0) cat("Failed to unlink ", file2, "\n")
     file3 <- paste0(tdir.res,
                     "SBS96/Suggested_Solution/",
-                    "De_Novo_Solution/attributed.exposures.csv")
+                    "De_Novo_Solution/inferred.exposures.csv")
     res <- unlink(file3)
     if (res != 0) cat("Failed to unlink ", file3, "\n")
   }

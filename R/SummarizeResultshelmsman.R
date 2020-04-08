@@ -50,12 +50,12 @@ SummarizeSigOnehelmsmanSubdir <-
     extracted.sigs.path <- paste0(run.dir,"/extracted.signatures.csv")
     ICAMS::WriteCatalog(extractedSigs, extracted.sigs.path)
 
-    # Read in attributed exposures in SP format,
+    # Read in inferred exposures in SP format,
     # and convert it into our internal format
-    attributed.exp.path.helmsman.format <-
+    inferred.exp.path.helmsman.format <-
       paste0(inputPath,"/W_components.txt")
     rawExposure <- ReadhelmsmanExposure(
-      attributed.exp.path.helmsman.format,
+      inferred.exp.path.helmsman.format,
       check.names = FALSE)
 
     spectra <- ICAMS::ReadCatalog(
@@ -67,9 +67,9 @@ SummarizeSigOnehelmsmanSubdir <-
       exposureCounts[,sample] <- rawExposure[,sample] / sum(rawExposure[,sample]) * sum(spectra[,sample])
     }
 
-    attributed.exp.path <- paste0(run.dir,"/attributed.exposures.csv")
+    inferred.exp.path <- paste0(run.dir,"/inferred.exposures.csv")
     WriteExposure(exposure.matrix = exposureCounts,
-                  file = attributed.exp.path)
+                  file = inferred.exp.path)
 
 
     # SummarizeSigOneSubdir will generate a "/summary" folder
@@ -80,7 +80,7 @@ SummarizeSigOnehelmsmanSubdir <-
         run.dir = run.dir,
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = extracted.sigs.path,
-        attributed.exp.path = attributed.exp.path,
+        inferred.exp.path = inferred.exp.path,
         overwrite = overwrite)
 
     invisible(retval) # So we can test without looking at a file.

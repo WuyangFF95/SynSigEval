@@ -31,7 +31,7 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 #' @param extracted.sigs.path Path to extracted sigs file, e.g.
 #' \code{<run.dir>/SBS96/Selected_Solution/De_Novo_Solution/signatures.PCAWG.format.csv}.
 #'
-#' @param attributed.exp.path Path to attributed exposures file.
+#' @param inferred.exp.path Path to inferred exposures file.
 #'
 #' @param overwrite If TRUE overwrite existing directories and files.
 #'
@@ -46,7 +46,7 @@ SummarizeSigOneSubdir <-
   function(run.dir,
            ground.truth.exposure.dir,
            extracted.sigs.path,
-           attributed.exp.path = NULL,
+           inferred.exp.path = NULL,
            # TODO(Steve): copy this to the summary and do analysis on how much
            # extracted signature contributes to exposures.
            overwrite = FALSE,
@@ -125,36 +125,36 @@ SummarizeSigOneSubdir <-
                               paste0(outputPath,"/extracted.sigs.pdf"))
     }
 
-    ## Analyze exposure attribution
+    ## Analyze signature attribution (a.k.a. exposure inference)
     # To be compatible with PCAWG project which only studies
-    # signature extraction not exposure attribution,
-    # errors will not be thrown if !is.null(attributed.exp.path) == F.
+    # signature extraction not signature attribution,
+    # errors will not be thrown if !is.null(inferred.exp.path) == F.
     # Here we shouldn't use "exists("attritbuted.exp.path")" because
-    # attributed.exp.path is defaulted to be NULL, but is always defined
+    # inferred.exp.path is defaulted to be NULL, but is always defined
     # therefore exists.
-    if(!is.null(attributed.exp.path)) {
+    if(!is.null(inferred.exp.path)) {
 
-      if(file.exists(attributed.exp.path)) {
+      if(file.exists(inferred.exp.path)) {
         exposureDiff <- ReadAndAnalyzeExposures(
           extracted.sigs = extracted.sigs.path,
           ground.truth.sigs =
             paste0(ground.truth.exposure.dir,"/ground.truth.syn.sigs.csv"),
-          attributed.exp.path = attributed.exp.path,
+          inferred.exp.path = inferred.exp.path,
           ground.truth.exposures =
             paste0(ground.truth.exposure.dir,"/ground.truth.syn.exposures.csv"))
 
-        # Write results of exposure attribution analysis
+        # Write results of exposure inference analysis
         write.csv(exposureDiff,
                   file = paste0(outputPath,"/exposureDifference.csv"),
                   quote = T)
 
-        # Copy attributed exposures to summary folder.
-        CopyWithChecks(attributed.exp.path,
-                       paste0(outputPath,"/attributed.exposures.csv"),
+        # Copy inferred exposures to summary folder.
+        CopyWithChecks(inferred.exp.path,
+                       paste0(outputPath,"/inferred.exposures.csv"),
                        overwrite = overwrite)
       }
       else {
-        warning("Cannot find", attributed.exp.path, "\n\nSkipping\n\n")
+        warning("Cannot find", inferred.exp.path, "\n\nSkipping\n\n")
       }
     }
 
@@ -166,9 +166,9 @@ SummarizeSigOneSubdir <-
     ## for reuse in SummarizeMultiRuns().
     save(sigAnalysis,
          file = paste0(outputPath,"/sigAnalysis.RDa"))
-    ## Save exposure attribution summary into RDa file,
+    ## Save exposure inference summary into RDa file,
     ## for reuse in SummarizeMultiRuns().
-    if(file.exists(attributed.exp.path)){
+    if(file.exists(inferred.exp.path)){
       save(exposureDiff,
            file = paste0(outputPath,"/exposureDiff.RDa"))
     }
@@ -419,7 +419,7 @@ SummarizeMultiRuns <-
       grDevices::dev.off()
     }
 
-    ## Indexes for exposure attribution in multiple runs
+    ## Indexes for exposure inference in multiple runs
     ManhattanDist <- matrix(nrow = length(gtSigNames), ncol = length(run.names))
     rownames(ManhattanDist) <- gtSigNames
     colnames(ManhattanDist) <- run.names
@@ -434,7 +434,7 @@ SummarizeMultiRuns <-
     }
     multiRun$ManhattanDist <- ManhattanDist
 
-    ## Calculate mean and SD for indexes of exposure attribution
+    ## Calculate mean and SD for indexes of exposure inference
     meanSDMD <- matrix(nrow = length(gtSigNames), ncol = 2)
     rownames(meanSDMD) <- gtSigNames
     colnames(meanSDMD) <- c("mean","stdev")
@@ -444,7 +444,7 @@ SummarizeMultiRuns <-
     }
     multiRun$meanSDMD <- meanSDMD
 
-    ## Calculate fivenums for exposure attribution Scaled Manhattan distance
+    ## Calculate fivenums for exposure inference Scaled Manhattan distance
     multiRun$fivenumMD <- matrix(nrow = length(gtSigNames), ncol = 5)
     rownames(multiRun$fivenumMD) <- gtSigNames
     colnames(multiRun$fivenumMD) <- c("min","lower-hinge","median","upperhinge","max")
@@ -452,7 +452,7 @@ SummarizeMultiRuns <-
       multiRun$fivenumMD[gtSigName,] <- stats::fivenum(ManhattanDist[gtSigName,])
     }
 
-    ## Plot boxplot + beeswarm plot for exposure attribution
+    ## Plot boxplot + beeswarm plot for exposure inference
     if(FALSE){
       ggplotList <- list()
       for(gtSigName in gtSigNames){
@@ -701,7 +701,7 @@ SummarizeMultiToolsOneDataset <- function(
 
     ## meanSDMD contains mean and standard deviation
     ## for Scaled Manhattan distance between ground-truth exposures
-    ## and attributed exposures for each ground-truth signature
+    ## and inferred exposures for each ground-truth signature
     {
       meanSDMD <- multiRun$meanSDMD
       colnames(meanSDMD) <- paste0(toolDirName,".", colnames(meanSDMD))
@@ -1406,7 +1406,7 @@ SummarizeMultiToolsMultiDatasets <-
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
-          ggplot2::ggtitle(label = "Scaled Manhattan distance between attributed and grond-truth exposures",
+          ggplot2::ggtitle(label = "Scaled Manhattan distance between inferred and grond-truth exposures",
                            subtitle = "for all software packages, ratios and correlation values.") +
           ## Change axis titles
           ggplot2::labs(x = "Software package",
@@ -2207,7 +2207,7 @@ SummarizeOneToolMultiDatasets <-
           ggplot2::labs(
             ## Add title for value~datasetSubGroup beeswarm plot
             title = paste0(toolName,": Scaled Manhattan distance of ",gtSigName," exposure"),
-            subtitle = "Between ground-truth exposure and attributed exposure",
+            subtitle = "Between ground-truth exposure and inferred exposure",
             ## Change title of y axis (axis.title.y) same as gtSigName info (same as title)
             y = paste0("Scaled Manhattan distance of ",gtSigName," exposure"),
             ## Change title of x axis to "Pearson's R squared"

@@ -13,7 +13,7 @@
 #' This code depends on a conventional directory structure documented
 #' elsewhere. For packages which can do both extraction and attribution,
 #' we expect two files, \code{extracted.signatures.csv}
-#' and \code{attributed.exposures.csv} are in the folder.
+#' and \code{inferred.exposures.csv} are in the folder.
 #'
 #' @param ground.truth.exposure.dir Folder which stores ground-truth exposures.
 #' It defaults to be \code{sub.dir}, i.e. \code{run.dir}/../../../
@@ -40,8 +40,8 @@ SummarizeSigOneExtrAttrSubdir <-
     # Specify the path of extracted signatures in ICAMS csv format.
     extracted.sigs.path <- paste0(inputPath,"/extracted.signatures.csv")
 
-    # Specify the path of attributed exposures in SynSig csv format.
-    attributed.exp.path <- paste0(inputPath,"/attributed.exposures.csv")
+    # Specify the path of inferred exposures in SynSig csv format.
+    inferred.exp.path <- paste0(inputPath,"/inferred.exposures.csv")
 
     # SummarizeSigOneSubdir will generate a "/summary" folder
     # under run.dir. Summarized results are dumped into
@@ -51,7 +51,7 @@ SummarizeSigOneExtrAttrSubdir <-
         run.dir = inputPath,
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = extracted.sigs.path,
-        attributed.exp.path = attributed.exp.path,
+        inferred.exp.path = inferred.exp.path,
         overwrite = overwrite)
 
     invisible(retval) # So we can test without looking at a file.
@@ -79,7 +79,7 @@ SummarizeSigOneExtrAttrSubdir <-
 #' This code depends on a conventional directory structure documented
 #' elsewhere. For packages which can do both extraction and attribution,
 #' we expect two files, \code{ground.truth.signatures.csv}
-#' and \code{attributed.exposures.csv} are in the folder.
+#' and \code{inferred.exposures.csv} are in the folder.
 #'
 #' @param ground.truth.exposure.dir Folder which stores ground-truth exposures.
 #' It defaults to be \code{sub.dir}, i.e. \code{run.dir}/../../
@@ -114,7 +114,7 @@ SummarizeSigOneAttrSubdir <-
         run.dir = inputPath,
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = ground.truth.sigs.path,
-        attributed.exp.path = paste0(inputPath,"/attributed.exposures.csv"),
+        inferred.exp.path = paste0(inputPath,"/inferred.exposures.csv"),
         overwrite = overwrite)
 
     invisible(retval) # So we can test without looking at a file.
