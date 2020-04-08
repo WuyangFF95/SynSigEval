@@ -1205,7 +1205,7 @@ SummarizeMultiToolsMultiDatasets <-
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
-          ggplot2::ggtitle(label = "Cosine similarity between ground-truth and extracted signatures",
+          ggplot2::ggtitle(label = "Average cosine similarity between ground-truth and extracted signatures",
                            subtitle = "for all software packages, ratios and correlation values.") +
           ## Change axis titles
           ggplot2::labs(x = "Software package",
@@ -2018,7 +2018,7 @@ SummarizeOneToolMultiDatasets <-
           ## Add titles
           ggplot2::labs(
             ## Add title for value~datasetSubGroup beeswarm plot
-            title = paste0(toolName,": Cosine similarity between signature ",gtSigName),
+            title = paste0(toolName,": Average cosine similarity between signature ",gtSigName),
             subtitle = paste0("and all extracted signatures resembling ",gtSigName),
             ## Change title of y axis (axis.title.y) into gtSigName info (same as title)
             y = paste0("Cosine similarity to signature ",gtSigName),
