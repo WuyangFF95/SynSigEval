@@ -4,9 +4,14 @@
 \alias{SummarizeSigOneSubdir}
 \title{Assess/evaluate one result subfolder from a software package}
 \usage{
-SummarizeSigOneSubdir(run.dir, ground.truth.exposure.dir,
-  extracted.sigs.path, attributed.exp.path = NULL, overwrite = FALSE,
-  summary.folder.name = "summary")
+SummarizeSigOneSubdir(
+  run.dir,
+  ground.truth.exposure.dir,
+  extracted.sigs.path,
+  inferred.exp.path = NULL,
+  overwrite = FALSE,
+  summary.folder.name = "summary"
+)
 }
 \arguments{
 \item{run.dir}{Lowest level path to result of a run. That is,
@@ -24,7 +29,7 @@ Usually, it refers to \code{sub.dir}, i.e. \code{run.dir}/../../../}
 \item{extracted.sigs.path}{Path to extracted sigs file, e.g.
 \code{<run.dir>/SBS96/Selected_Solution/De_Novo_Solution/signatures.PCAWG.format.csv}.}
 
-\item{attributed.exp.path}{Path to attributed exposures file.}
+\item{inferred.exp.path}{Path to inferred exposures file.}
 
 \item{overwrite}{If TRUE overwrite existing directories and files.}
 

@@ -7,8 +7,7 @@
 We assume that in many cases extraction programs will be run
 outside of R on file inputs and will generate fill outputs.}
 \usage{
-ReadAndAnalyzeSigs(extracted.sigs, ground.truth.sigs,
-  ground.truth.exposures)
+ReadAndAnalyzeSigs(extracted.sigs, ground.truth.sigs, ground.truth.exposures)
 }
 \arguments{
 \item{extracted.sigs}{Path to file containing the extracted signature profiles.}

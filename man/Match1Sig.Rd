@@ -21,8 +21,9 @@ Find the signature in other.sigs that is nearest (by cosine similarity)
 to query.sig.
 }
 \seealso{
-Other signature matching functions: \code{\link{MatchSigs1Direction}},
-  \code{\link{MatchSigs2Directions}},
-  \code{\link{MatchSigsAndRelabel}}
+Other signature matching functions: 
+\code{\link{MatchSigs1Direction}()},
+\code{\link{MatchSigs2Directions}()},
+\code{\link{MatchSigsAndRelabel}()}
 }
 \concept{signature matching functions}

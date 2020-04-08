@@ -4,9 +4,12 @@
 \alias{SummarizeSigOneSASubdir}
 \title{Summarize results (SBS96, DBS, ID or COMPOSITE) from SignatureAnalyzer}
 \usage{
-SummarizeSigOneSASubdir(run.dir,
+SummarizeSigOneSASubdir(
+  run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../"),
-  which.run = "/best.run/", overwrite = FALSE)
+  which.run = "/best.run/",
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{run.dir}{Lowest level path to results, that is

@@ -5,8 +5,11 @@
 \title{Prepare input file for tcsm from a
 tcsm formatted catalog file.}
 \usage{
-CreatetcsmOutput(catalog, out.dir = paste0(dirname(catalog),
-  "/ExtrAttr/tcsm.results"), overwrite = FALSE)
+CreatetcsmOutput(
+  catalog,
+  out.dir = paste0(dirname(catalog), "/ExtrAttr/tcsm.results"),
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{catalog}{a catalog in ICAMS format. It can be

@@ -6,8 +6,11 @@
 directory with the best results and make a copy
 of it as \code{sa.results.dir/best.run/}}
 \usage{
-CopyBestSignatureAnalyzerResult(sa.results.dir, verbose = FALSE,
-  overwrite = FALSE)
+CopyBestSignatureAnalyzerResult(
+  sa.results.dir,
+  verbose = FALSE,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{sa.results.dir}{See \code{\link{BestSignatureAnalyzerResult}}}

@@ -4,8 +4,15 @@
 \alias{SummarizeMultiToolsOneDataset}
 \title{Combine results for a single dataset, from different software packages.}
 \usage{
-SummarizeMultiToolsOneDataset(third.level.dir, toolNames, tool.dirnames,
-  datasetGroup, datasetGroupName, datasetSubGroup, datasetSubGroupName)
+SummarizeMultiToolsOneDataset(
+  third.level.dir,
+  toolNames,
+  tool.dirnames,
+  datasetGroup,
+  datasetGroupName,
+  datasetSubGroup,
+  datasetSubGroupName
+)
 }
 \arguments{
 \item{third.level.dir}{Third level path distinguishing de-novo extraction

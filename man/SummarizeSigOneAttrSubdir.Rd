@@ -5,9 +5,11 @@
 \title{Assess/evaluate results from packages which can
 ONLY do exposure attribution.}
 \usage{
-SummarizeSigOneAttrSubdir(run.dir,
+SummarizeSigOneAttrSubdir(
+  run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
-  overwrite = FALSE)
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{run.dir}{Lowest level path to results, e.g.
@@ -17,7 +19,7 @@ full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
 This code depends on a conventional directory structure documented
 elsewhere. For packages which can do both extraction and attribution,
 we expect two files, \code{ground.truth.signatures.csv}
-and \code{attributed.exposures.csv} are in the folder.}
+and \code{inferred.exposures.csv} are in the folder.}
 
 \item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures.
 It defaults to be \code{sub.dir}, i.e. \code{run.dir}/../../}

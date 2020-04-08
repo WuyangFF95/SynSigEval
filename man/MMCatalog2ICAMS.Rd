@@ -4,8 +4,7 @@
 \alias{MMCatalog2ICAMS}
 \title{Convert Catalogs (File or Matrix) from MM format to ICAMS format}
 \usage{
-MMCatalog2ICAMS(cat, region = "unknown",
-  catalog.type = "counts.signature")
+MMCatalog2ICAMS(cat, region = "unknown", catalog.type = "counts.signature")
 }
 \arguments{
 \item{cat}{Input catalog, can be a tab-delimited file

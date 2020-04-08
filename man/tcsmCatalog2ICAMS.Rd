@@ -4,8 +4,7 @@
 \alias{tcsmCatalog2ICAMS}
 \title{Read Catalog files or matrices in tcsm format.}
 \usage{
-tcsmCatalog2ICAMS(cat, region = "unknown",
-  catalog.type = "counts.signature")
+tcsmCatalog2ICAMS(cat, region = "unknown", catalog.type = "counts.signature")
 }
 \arguments{
 \item{cat}{Input catalog, can be a tab-delimited text

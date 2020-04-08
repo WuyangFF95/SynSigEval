@@ -4,9 +4,17 @@
 \alias{SummarizeOneToolMultiDatasets}
 \title{Combine results for multiple datasets, from one software packages.}
 \usage{
-SummarizeOneToolMultiDatasets(dataset.dirs, datasetGroup = NULL,
-  datasetGroupName, datasetSubGroup = NULL, datasetSubGroupName,
-  toolName, tool.dirname, out.dir, overwrite = FALSE)
+SummarizeOneToolMultiDatasets(
+  dataset.dirs,
+  datasetGroup = NULL,
+  datasetGroupName,
+  datasetSubGroup = NULL,
+  datasetSubGroupName,
+  toolName,
+  tool.dirname,
+  out.dir,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{dataset.dirs}{Paths of top-level dataset directories trees you want

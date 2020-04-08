@@ -28,8 +28,9 @@ Run \code{MatchSigs2Directions}, then
 plot its results and write them as .csv files.
 }
 \seealso{
-Other signature matching functions: \code{\link{Match1Sig}},
-  \code{\link{MatchSigs1Direction}},
-  \code{\link{MatchSigs2Directions}}
+Other signature matching functions: 
+\code{\link{Match1Sig}()},
+\code{\link{MatchSigs1Direction}()},
+\code{\link{MatchSigs2Directions}()}
 }
 \concept{signature matching functions}

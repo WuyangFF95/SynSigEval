@@ -5,8 +5,11 @@
 \title{Prepare input file for EMu from a
 EMu formatted catalog file.}
 \usage{
-CreateEMuOutput(catalog, out.dir = paste0(dirname(catalog),
-  "/ExtrAttr/EMu.results"), overwrite = FALSE)
+CreateEMuOutput(
+  catalog,
+  out.dir = paste0(dirname(catalog), "/ExtrAttr/EMu.results"),
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{catalog}{a catalog in ICAMS format. It can be

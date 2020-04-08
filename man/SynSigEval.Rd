@@ -3,7 +3,6 @@
 \docType{package}
 \name{SynSigEval}
 \alias{SynSigEval}
-\alias{SynSigEval-package}
 \title{SynSigEval: Assess the performance of mutational-signature analysis
 programs Using catalogs of synthetic mutational spectra created
 by package \code{SynSigGen}.}

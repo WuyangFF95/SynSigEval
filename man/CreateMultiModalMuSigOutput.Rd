@@ -5,9 +5,12 @@
 \title{Prepare input file for MultiModalMuSig from a
 MultiModalMuSig formatted catalog file.}
 \usage{
-CreateMultiModalMuSigOutput(catalog, read.catalog.function = NULL,
-  out.dir = paste0(dirname(catalog),
-  "/ExtrAttr/MultiModalMuSig.results"), overwrite = FALSE)
+CreateMultiModalMuSigOutput(
+  catalog,
+  read.catalog.function = NULL,
+  out.dir = paste0(dirname(catalog), "/ExtrAttr/MultiModalMuSig.results"),
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{catalog}{a catalog in ICAMS format. It can be

@@ -7,9 +7,12 @@ SigProFiler-python de novo extraction and attribution package.
 Assessment is restricted to v0.0.5.43+,
 because different version has different folder structure.}
 \usage{
-SummarizeSigOneSigProExtractorSubdir(run.dir,
+SummarizeSigOneSigProExtractorSubdir(
+  run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
-  overwrite = FALSE, hierarchy = FALSE)
+  overwrite = FALSE,
+  hierarchy = FALSE
+)
 }
 \arguments{
 \item{run.dir}{Lowest level path to results, e.g.

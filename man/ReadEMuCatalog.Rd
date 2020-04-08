@@ -4,8 +4,13 @@
 \alias{ReadEMuCatalog}
 \title{Read Catalog files in EMu format.}
 \usage{
-ReadEMuCatalog(cat, mutTypes, sigOrSampleNames, region = "unknown",
-  catalog.type = "counts.signature")
+ReadEMuCatalog(
+  cat,
+  mutTypes,
+  sigOrSampleNames,
+  region = "unknown",
+  catalog.type = "counts.signature"
+)
 }
 \arguments{
 \item{cat}{A tab-delimited catalog text file in EMu format;

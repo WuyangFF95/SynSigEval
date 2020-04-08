@@ -5,9 +5,11 @@
 \title{Assess/evaluate results from sigproSS
 (a.k.a. SigProfiler Python attribution package)}
 \usage{
-SummarizeSigOneSigProSSSubdir(run.dir,
+SummarizeSigOneSigProSSSubdir(
+  run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
-  overwrite = FALSE)
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{run.dir}{Lowest level path to results, e.g.

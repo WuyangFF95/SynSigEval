@@ -4,8 +4,11 @@
 \alias{helmsmanCatalog2ICAMS}
 \title{Read Catalog files or matrices in helmsman format.}
 \usage{
-helmsmanCatalog2ICAMS(cat, region = "unknown",
-  catalog.type = "counts.signature")
+helmsmanCatalog2ICAMS(
+  cat,
+  region = "unknown",
+  catalog.type = "counts.signature"
+)
 }
 \arguments{
 \item{cat}{Input catalog, can be a tab-delimited text
