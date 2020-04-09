@@ -781,7 +781,8 @@ SummarizeMultiToolsMultiDatasets <-
       indexNums <- length(indexes)
     }
 
-    ## Summarizing extraction results.
+    ## Summarizing different measures for extraction performance
+    ## separately into list "FinalExtr".
     ## Showing individual values rather than
     ## only showing mean and standard deviation of multiple runs
     {
@@ -817,9 +818,10 @@ SummarizeMultiToolsMultiDatasets <-
     }
 
 
-    ## Plot general png and pdf for extraction summary
-    ## Plot a general violin + beeswarm plot for multiple indexes
-    ## in all runs and in all datasets.
+    ## For each extraction measures,
+    ## merge values from multiple runs
+    ## into one data.frame plotDFList$<measure_name>
+    ## and software approaches for easier plotting.
     {
       plotDFList <- list()
 
@@ -857,7 +859,7 @@ SummarizeMultiToolsMultiDatasets <-
         ## Average of (1-FDR) in 20 runs +
         ## Average of one-signature cosine similarity in 20 runs +
         ## Proportion of True Positives = Total number of ground-truth signatures.
-	      if(is.null(plotDFList[["compositeMeasure"]])){
+        if(is.null(plotDFList[["compositeMeasure"]])){
           plotDFList[["compositeMeasure"]] <- data.frame()
         }
 
@@ -880,7 +882,7 @@ SummarizeMultiToolsMultiDatasets <-
             ## Calculate the value for mean(one signature cosine similarity) for all runs of each tool on this dataset.
             rowNum <- which(multiTools$truePos[,"toolName"] == toolName)
             currentPropAllExtracted <-
-            sum(multiTools$truePos[rowNum,"value"] == length(multiTools$gtSigNames)) / length(rowNum)
+              sum(multiTools$truePos[rowNum,"value"] == length(multiTools$gtSigNames)) / length(rowNum)
           } else {
             ## Calculate the value for mean(truePos) / total number of ground-truth signatures for all runs of each tool on this dataset.
             rowNum <- which(multiTools$truePos[,"toolName"] == toolName)
@@ -935,9 +937,14 @@ SummarizeMultiToolsMultiDatasets <-
       plotDFList$combined$datasetSubGroup <- factor(
         plotDFList$combined$datasetSubGroup,
         levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
+    }
 
 
 
+    ## Plot general pdf for all extraction measures
+    ## Plot a general violin + beeswarm plot for multiple measures
+    ## in all runs and in all datasets.
+    {
 
       ## Plot a multi-facet ggplot for all measures and all runs.
       {
@@ -1041,10 +1048,6 @@ SummarizeMultiToolsMultiDatasets <-
           ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
-          ## Add title for general violin + beeswarm plot
-          ggplot2::ggtitle(
-            label = paste0("Measures of extraction performance as a function of"),
-            subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
           ## Change axis titles
           ggplot2::labs(x = "Software package") +
           ## Remove axis.title.y (defaults to be "value", meaningless)
@@ -1090,6 +1093,7 @@ SummarizeMultiToolsMultiDatasets <-
       }
       grDevices::dev.off()
     }
+
 
 
     ## Write a table for extraction measures.
@@ -1141,6 +1145,8 @@ SummarizeMultiToolsMultiDatasets <-
                   file = paste0(out.dir,"/onesig.cossim.",gtSigName,".csv"))
       }
     }
+
+
     ## Plot general png and pdf for one-signature cosine similarity summary
     ## Plot a general violin + beeswarm plot for multiple signatures
     ## in all runs and in all datasets.
@@ -1277,7 +1283,7 @@ SummarizeMultiToolsMultiDatasets <-
           ## Add title for general violin + beeswarm plot
           ggplot2::ggtitle(
             label = paste0("Extraction cosine similarity as a function of"),
-            subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
+            subtitle = paste0(byCaption,".")) +
           ## Change axis titles
           ggplot2::labs(x = "Software package",
                         y = "Cosine Similarity") +
@@ -1799,7 +1805,7 @@ SummarizeOneToolMultiDatasets <-
                                        ## Remove differentiated colors for beeswarm dots
                                        ## Set groups for the filling functionalities to differentiate
                                        #ggplot2::aes(color = .data$datasetGroup)
-                                       ) +
+          ) +
           ## Change filling color
           ggplot2::scale_fill_brewer(palette = "Greys") +
           ## Change titles
@@ -2004,7 +2010,7 @@ SummarizeOneToolMultiDatasets <-
                                        ## Remove differentiated colors for beeswarm dots
                                        ## Set groups for the filling functionalities to differentiate
                                        #ggplot2::aes(color = .data$datasetGroup)
-                                       ) +
+          ) +
           ## Change filling color
           ggplot2::scale_fill_brewer(palette = "Greys") +
           ## Change axis.text and tickmarks
@@ -2192,7 +2198,7 @@ SummarizeOneToolMultiDatasets <-
                                        ## Remove differentiated colors for beeswarm dots
                                        ## Set groups for the filling functionalities to differentiate
                                        #ggplot2::aes(color = .data$datasetGroup)
-                                       ) +
+          ) +
           ## Change filling color
           ggplot2::scale_fill_brewer(palette = "Greys") +
           ## Change axis.text and tickmarks
