@@ -2,7 +2,7 @@
 % Please edit documentation in R/SummarizeResults.R
 \name{SummarizeSigOneSubdir}
 \alias{SummarizeSigOneSubdir}
-\title{Assess/evaluate one result subfolder from a software package}
+\title{Assess/evaluate one result subfolder from a software approach}
 \usage{
 SummarizeSigOneSubdir(
   run.dir,
