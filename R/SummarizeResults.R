@@ -389,7 +389,7 @@ SummarizeMultiRuns <-
       }
 
       ## Print extraction indexes into one pdf file
-      grDevices::pdf(paste0(tool.dir,"/boxplot.extraction.indexes.pdf"), pointsize = 1)
+      grDevices::pdf(paste0(tool.dir,"/boxplot.extraction.measures.pdf"), pointsize = 1)
       for (index in indexes) print(ggplotList[[index]])
       grDevices::dev.off()
 
@@ -489,7 +489,7 @@ SummarizeMultiRuns <-
       }
 
       ## Print extraction indexes into one pdf file
-      grDevices::pdf(paste0(tool.dir,"/boxplot.attribution.indexes.pdf"), pointsize = 1)
+      grDevices::pdf(paste0(tool.dir,"/boxplot.attribution.measures.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames) print(ggplotList[[gtSigName]])
       grDevices::dev.off()
     }
@@ -938,9 +938,10 @@ SummarizeMultiToolsMultiDatasets <-
 
 
 
-      ggplotList <- list()
-      ## Plot a multi-facet ggplot for all indexes and all runs.
+
+      ## Plot a multi-facet ggplot for all measures and all runs.
       {
+        ggplotList <- list()
         ## Generate a ggplot object based on plotDFList$combined
         ggplotList$general <- ggplot2::ggplot(
           plotDFList$combined,
@@ -989,7 +990,7 @@ SummarizeMultiToolsMultiDatasets <-
             ## remove legends.
             legend.position = "none") +
           ## Split the plot into multiple facets,
-          ## according to different indexes
+          ## according to different measures
           ggplot2::facet_wrap(
             ggplot2::vars(.data$indexLabel),
             ## Force facet_wrap to have 2 columns
@@ -1002,11 +1003,11 @@ SummarizeMultiToolsMultiDatasets <-
             ## Put facet label to the top
             strip.position = "top"
           ) +
-          ## Restrict the decimal numbers of values of indexes to be 2
+          ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a multi-facet ggplot,
-      ## facets are separated by indexes and datasetGroup
+      ## facets are separated by measures and datasetGroup
       ## (in example, it refers to slope.)
       for(by in c("datasetGroup","datasetSubGroup"))  {
 
@@ -1061,7 +1062,7 @@ SummarizeMultiToolsMultiDatasets <-
             ## remove legends
             legend.position = "none") +
           ## Split the plot into multiple facets,
-          ## according to different indexes
+          ## according to different measures
           ggplot2::facet_grid(
             rows =  ggplot2::vars(.data$indexLabel),
             cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
@@ -1075,7 +1076,7 @@ SummarizeMultiToolsMultiDatasets <-
           ggplot2::ggtitle(
             label = paste0("Measures of extraction performance as a function of"),
             subtitle = paste0(byCaption,".")) +
-          ## Restrict the decimal numbers of values of indexes to be 2
+          ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
       }
       ## Plot violin + beeswarm plots in pdf format
@@ -1092,7 +1093,7 @@ SummarizeMultiToolsMultiDatasets <-
 
 
     ## Write a table for extraction measures.
-    if(FALSE){ ## Remove redundant indexes
+    if(FALSE){ ## Remove redundant measures
       indexes <- c("averCosSim","falseNeg","falsePos",
                    "truePos","TPR","FDR")
       indexLabels <- c("Average cosine similarity of all signatures",
@@ -1230,7 +1231,7 @@ SummarizeMultiToolsMultiDatasets <-
             ## Let facets be plotted vertically
             dir = "v"
           ) +
-          ## Restrict the decimal numbers of values of indexes to be 2
+          ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For one-signature cosine similarity, set ylim from the minimum of cosine similarity value to 1
             limits = c(min(plotDFList$combined$value), 1),
@@ -1295,7 +1296,7 @@ SummarizeMultiToolsMultiDatasets <-
           ggplot2::facet_grid(rows = ggplot2::vars(gtSigName),
                               cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
                               scales = "free") +
-          ## Restrict the decimal numbers of values of indexes to be 2
+          ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For one-signature cosine similarity, set ylim from the minimum of cosine similarity value to 1
             limits = c(min(plotDFList$combined$value), 1),
@@ -1431,7 +1432,7 @@ SummarizeMultiToolsMultiDatasets <-
             ## Let facets be plotted vertically
             dir = "v"
           ) +
-          ## Restrict the decimal numbers of values of indexes to be 2
+          ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
             limits = c(0, max(plotDFList$combined$value)),
@@ -1497,7 +1498,7 @@ SummarizeMultiToolsMultiDatasets <-
           ggplot2::facet_grid(rows =  ggplot2::vars(gtSigName),
                               cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
                               scales = "free") +
-          ## Restrict the decimal numbers of values of indexes to be 2
+          ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
             limits = c(0, max(plotDFList$combined$value)),
@@ -1615,7 +1616,7 @@ SummarizeOneToolMultiDatasets <-
     }
 
     ## Calculate summary tables for measures of extraction performance
-    ## Need to calculate tables for All 6 indexes
+    ## Need to calculate tables for All 6 measures
     {
       indexes <- c("averCosSim","falseNeg","falsePos",
                    "truePos","TPR","FDR")
@@ -1666,9 +1667,9 @@ SummarizeOneToolMultiDatasets <-
 
           rownames(tmp) <- NULL
 
-          ## Create a data.frame for each index,
+          ## Create a data.frame for each measure,
           ## and summarize multi-Run, multiDataset values
-          ## for each index.
+          ## for each measure.
           if(is.null(OneToolSummary[[index]])){
             OneToolSummary[[index]] <- data.frame()
           }
@@ -1676,7 +1677,7 @@ SummarizeOneToolMultiDatasets <-
         }
       }
 
-      ## Combine tables of different measurement for extraction performance
+      ## Combine tables of different measures for extraction performance
       ## into OneToolSummary$extraction.
       OneToolSummary[["extraction"]] <- data.frame()
       for(index in indexes){
@@ -1694,7 +1695,7 @@ SummarizeOneToolMultiDatasets <-
         }
       }
 
-      ## Calculate the stats of each extraction performance measurement.
+      ## Calculate the stats of each extraction performance measure.
       OneToolSummary$stats <- list()
       for(index in indexes){
         currentStats <- summary(OneToolSummary[[index]][,"value"])
@@ -1712,7 +1713,7 @@ SummarizeOneToolMultiDatasets <-
 
     }
 
-    ## Draw boxplot + beeswarm plot for extraction indexes
+    ## Draw boxplot + beeswarm plot for extraction measures
     {
       ## Only average cosine similarity, one-signature cosine similarity and FDR are plotted.
       indexes <- c("averCosSim","FDR")
@@ -1730,7 +1731,7 @@ SummarizeOneToolMultiDatasets <-
 
       ## Create a list to store ggplot2 boxplot + beeswarm plot objects
       ggplotList <- list()
-      ## Plot a general boxplot + beeswarm plot for multiple indexes
+      ## Plot a general boxplot + beeswarm plot for multiple measures
       if(FALSE){
         ggplotList[["general"]] <- ggplot2::ggplot(
           OneToolSummary[["extraction"]],
@@ -1754,14 +1755,14 @@ SummarizeOneToolMultiDatasets <-
           #  values = grDevices::topo.colors(length(indexes)))
           ## Add title for general boxplot + beeswarm plot
           ggplot2::labs(
-            title = paste0(toolName,": Summary plot for extraction indexes")
+            title = paste0(toolName,": Summary plot for extraction measures")
           ) +
-          ## Restrict the decimal numbers of values of indexes to be 2
+          ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             labels =function(x) sprintf("%.2f", x)
           )
       }
-      ## Plot a value~datasetSubGroup beeswarm for each index.
+      ## Plot a value~datasetSubGroup beeswarm for each measure.
       for(index in indexes){
         indexNum <- which(indexes == index)
         ## ggplot2::ggplot() sets coordinates
@@ -1836,7 +1837,7 @@ SummarizeOneToolMultiDatasets <-
       }
 
 
-      ## Output indexes in a png file
+      ## Output measures in a png file
       for(index in indexes){
         ## Need to suppress warning,
         ## because for each facet, there was only one possible x
@@ -1853,8 +1854,8 @@ SummarizeOneToolMultiDatasets <-
         )
       }
 
-      ## Output multiple extraction indexes in a pdf file
-      grDevices::pdf(paste0(out.dir,"/boxplot.onetool.extraction.indexes.pdf"), pointsize = 1)
+      ## Output multiple extraction measures in a pdf file
+      grDevices::pdf(paste0(out.dir,"/boxplot.onetool.extraction.measures.pdf"), pointsize = 1)
       for(index in indexes)
         suppressMessages(suppressWarnings(print(ggplotList[[index]])))
       grDevices::dev.off()
@@ -1889,9 +1890,9 @@ SummarizeOneToolMultiDatasets <-
                             stringsAsFactors = FALSE)
           rownames(tmp) <- NULL
 
-          ## Create a data.frame for each index,
+          ## Create a data.frame for each measure,
           ## and summarize multi-Run, multiDataset values
-          ## for each index.
+          ## for each measure.
           if(is.null(OneToolSummary$cosSim[[gtSigName]])){
             OneToolSummary$cosSim[[gtSigName]] <- data.frame()
           }
@@ -1931,7 +1932,7 @@ SummarizeOneToolMultiDatasets <-
     { ## debug
       ## Create a list to store ggplot2 boxplot + beeswarm plot objects
       ggplotList <- list()
-      ## Plot a general boxplot + beeswarm plot for multiple indexes
+      ## Plot a general boxplot + beeswarm plot for multiple measures
       if(FALSE){
         ggplotList[["general"]] <- ggplot2::ggplot(
           OneToolSummary$cosSim$combined,
@@ -1960,7 +1961,7 @@ SummarizeOneToolMultiDatasets <-
           #  values = grDevices::topo.colors(length(indexes)))
           ## Add title for general boxplot + beeswarm plot
           ggplot2::labs(title = paste0(toolName,": Summary plot for one-signature cosine similarity")) +
-          ## Restrict the decimal numbers of values of indexes to be 2
+          ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For one-signature cosine similarity, set ylim from the minimum of Manhattan distance value to 1.
             limits = c(min(OneToolSummary$cosSim$combined$value),1),
@@ -2050,7 +2051,7 @@ SummarizeOneToolMultiDatasets <-
         )
       }
 
-      ## Output multiple extraction indexes in a pdf file
+      ## Output multiple extraction measures in a pdf file
       grDevices::pdf(paste0(out.dir,"/boxplot.onetool.onesig.cossim.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames)
         suppressMessages(suppressWarnings(print(ggplotList[[gtSigName]])))
@@ -2086,9 +2087,9 @@ SummarizeOneToolMultiDatasets <-
                             stringsAsFactors = FALSE)
           rownames(tmp) <- NULL
 
-          ## Create a data.frame for each index,
+          ## Create a data.frame for each measure,
           ## and summarize multi-Run, multiDataset values
-          ## for each index.
+          ## for each measure.
           if(is.null(OneToolSummary$ManhattanDist[[gtSigName]])){
             OneToolSummary$ManhattanDist[[gtSigName]] <- data.frame()
           }
@@ -2148,7 +2149,7 @@ SummarizeOneToolMultiDatasets <-
           #  values = grDevices::topo.colors(length(indexes)))
           ## Add title for general boxplot + beeswarm plot
           ggplot2::labs(title = paste0(toolName,": Summary plot for Scaled Manhattan distance")) +
-          ## Restrict the decimal numbers of values of indexes to be 2
+          ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
             limits = c(0,max(OneToolSummary$ManhattanDist$combined$value)),
@@ -2239,7 +2240,7 @@ SummarizeOneToolMultiDatasets <-
         )
       }
 
-      ## Output multiple extraction indexes in a pdf file
+      ## Output multiple extraction measures in a pdf file
       grDevices::pdf(paste0(out.dir,"/boxplot.onetool.Manhattan.dist.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames)
         suppressMessages(suppressWarnings(print(ggplotList[[gtSigName]])))
@@ -2247,7 +2248,7 @@ SummarizeOneToolMultiDatasets <-
     }
 
 
-    ## Write Summary tables for indexes
+    ## Write Summary tables for measures
     for(index in indexes){
       write.csv(OneToolSummary[[index]],
                 file = paste0(out.dir,"/",index,".csv"),
