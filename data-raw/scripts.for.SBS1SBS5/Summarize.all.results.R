@@ -19,7 +19,9 @@ for(slope in slopes){
 # R-based tools which can do both extraction and attribution,
 # excluding SignatureAnalyzer (due to special folder structure)
 # and maftools (its seed is hard-coded)
-RBasedExtrAttrToolNames <- c("hdp","MutationalPatterns","sigfit.EMu","sigfit.NMF","signeR")
+RBasedExtrAttrToolNames <- c("hdp","MutationalPatterns",
+                             "sigfit.EMu","sigfit.NMF","signeR",
+                             "tcsm")
 # Python or other language based tools.
 # excluding maftools (seed is fixed) and EMu (cannot designate seed)
 otherExtrAttrToolNames <- c("MultiModalMuSig.CTM","MultiModalMuSig.LDA")

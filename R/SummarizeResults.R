@@ -1180,6 +1180,18 @@ SummarizeMultiToolsMultiDatasets <-
       for(gtSigName in gtSigNames){
         plotDFList$combined <- rbind(plotDFList$combined,plotDFList[[gtSigName]])
       }
+      ## Convert plotDFList$combined$datasetGroup and
+      ## Let their levels follow gtools::mixedsort() fashion
+      ## So that the order of the facet labels will be more reasonable for readers.
+      plotDFList$combined$datasetGroup <- factor(
+        plotDFList$combined$datasetGroup,
+        levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
+
+      plotDFList$combined$datasetSubGroup <- factor(
+        plotDFList$combined$datasetSubGroup,
+        levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
+
+
 
       ggplotList <- list()
       ## Plot a multi-facet ggplot for all gtSigNames and all runs.
@@ -1383,6 +1395,18 @@ SummarizeMultiToolsMultiDatasets <-
       for(gtSigName in gtSigNames){
         plotDFList$combined <- rbind(plotDFList$combined,plotDFList[[gtSigName]])
       }
+
+      ## Convert plotDFList$combined$datasetGroup and
+      ## Let their levels follow gtools::mixedsort() fashion
+      ## So that the order of the facet labels will be more reasonable for readers.
+      plotDFList$combined$datasetGroup <- factor(
+        plotDFList$combined$datasetGroup,
+        levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
+
+      plotDFList$combined$datasetSubGroup <- factor(
+        plotDFList$combined$datasetSubGroup,
+        levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
+
 
       ggplotList <- list()
       ## Plot a multi-facet ggplot for all gtSigNames and all runs.
