@@ -71,7 +71,7 @@ for(datasetName in datasetNames){
       exposureFile = paste0(resultDir,"/",exposureFile),
       sigNames = NULL,
       sampleNames = paste0("TwoCorreSigsGen::",1:500))
-    SynSigEval::WriteExposure(
+    SynSigGen::WriteExposure(
       exposure,
       paste0(resultDir,"/attributed.exposures.csv"))
 

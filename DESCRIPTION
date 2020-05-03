@@ -15,6 +15,7 @@ Imports:
     lsa, 
     data.table, 
     ICAMS, 
+    SynSigGen,
     stats, 
     devtools, 
     utils, 

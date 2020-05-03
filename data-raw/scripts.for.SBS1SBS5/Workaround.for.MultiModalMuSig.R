@@ -60,7 +60,7 @@ for(datasetName in datasetNames){
              "/sp.sp/ExtrAttr/MultiModalMuSig.results/",
              "seed.",seedInUse,
              "/attributed.exposures.tsv"))
-    SynSigEval::WriteExposure(
+    SynSigGen::WriteExposure(
       exposure,
       paste0(datasetName,
              "/sp.sp/ExtrAttr/MultiModalMuSig.results/",

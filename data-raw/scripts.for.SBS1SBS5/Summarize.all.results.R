@@ -56,7 +56,7 @@ for(datasetName in datasetNames){
              "seed.",seedInUse,"/extracted.signatures.csv"))
     expo <- ReadExposureMM(paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.LDA.results/",
                            "seed.",seedInUse,"/attributed.exposures.tsv"))
-    WriteExposure(
+    SynSigGen::WriteExposure(
       expo,
       paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.LDA.results/",
              "seed.",seedInUse,"/attributed.exposures.csv"))
@@ -73,7 +73,7 @@ for(datasetName in datasetNames){
              "seed.",seedInUse,"/extracted.signatures.csv"))
     expo <- ReadExposureMM(paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.CTM.results/",
                                   "seed.",seedInUse,"/attributed.exposures.tsv"))
-    WriteExposure(
+    SynSigGen::WriteExposure(
       expo,
       paste0(datasetName,"/sp.sp/ExtrAttr/MultiModalMuSig.CTM.results/",
              "seed.",seedInUse,"/attributed.exposures.csv"))
