@@ -6,11 +6,6 @@
 \title{SynSigEval: Assess the performance of mutational-signature analysis
 programs Using catalogs of synthetic mutational spectra created
 by package \code{SynSigGen}.}
-\description{
-SynSigEval: Assess the performance of mutational-signature analysis
-programs Using catalogs of synthetic mutational spectra created
-by package \code{SynSigGen}.
-}
 \section{Overview}{
 
 
