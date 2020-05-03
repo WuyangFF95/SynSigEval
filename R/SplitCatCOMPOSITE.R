@@ -1,6 +1,3 @@
-# ReadWriteCOMPOSITECatalogs.R
-
-
 #' Split COMPOSITE (SNS1536+DBS78+ID83) catalogs
 #' in ICAMS format into 3 individual catalogs.
 #' @param catalog Input catalog, can be a .csv file or matrix
