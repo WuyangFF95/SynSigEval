@@ -15,6 +15,7 @@ Imports:
     lsa, 
     data.table, 
     ICAMS,
+    SynSigGen,
     stats, 
     devtools, 
     utils, 
@@ -26,6 +27,7 @@ Imports:
     ggbeeswarm,
     gtools
 Remotes:
+    github::steverozen/ICAMS
     github::steverozen/SynSigGen
 Depends: R (>= 3.5)
 RoxygenNote: 7.1.0
