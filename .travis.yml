@@ -17,7 +17,10 @@ bioc_required: true
 
 # ICAMS should be from GitHub, rather than CRAN.
 # (GitHub contains develop functionalities)
-r_github_packages: steverozen/ICAMS
+r_github_packages:
+  - steverozen/ICAMS
+  - steverozen/SynSigGen
+  - steverozen/PCAWG7
 
 
 
