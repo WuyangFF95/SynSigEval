@@ -38,9 +38,9 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 #' @param summary.folder.name The name of the folder containing summary results.
 #' Usually, it equals to "summary".
 #'
-#' @keywords internal
+#' @importFrom utils write.csv capture.output sessionInfo
 #'
-#' @importFrom utils capture.output sessionInfo
+#' @keywords internal
 
 SummarizeSigOneSubdir <-
   function(run.dir,
@@ -217,7 +217,7 @@ SummarizeSigOneSubdir <-
 #' @details Also writes multiple files into folder \code{tool.dir}:
 #'
 #'
-#' @importFrom utils capture.output sessionInfo
+#' @importFrom utils write.csv capture.output sessionInfo
 #'
 #' @importFrom rlang .data
 #'
@@ -571,9 +571,10 @@ SummarizeMultiRuns <-
 #' True positive rate (TPR, Sensitivity): TP / (TP + FN)
 #' False discovery rate (FDR): FP / (FP + TP)
 #'
+#' @importFrom utils write.csv capture.output sessionInfo
+#'
 #' @export
 #'
-#' @importFrom utils capture.output sessionInfo
 SummarizeMultiToolsOneDataset <- function(
   third.level.dir,
   toolNames,
@@ -750,6 +751,8 @@ SummarizeMultiToolsOneDataset <- function(
 #' it already exists. (Default: FALSE)
 #'
 #' @importFrom rlang .data
+#'
+#' @importFrom utils write.csv
 #'
 #' @export
 #'
@@ -1603,6 +1606,8 @@ SummarizeMultiToolsMultiDatasets <-
 #' it already exists. (Default: FALSE)
 #'
 #' @importFrom rlang .data
+#'
+#' @importFrom utils write.csv
 #'
 #' @export
 #'

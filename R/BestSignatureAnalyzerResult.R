@@ -39,6 +39,8 @@
 #' runs with that number of signatures, we choose the lowest
 #' \code{evidence} (which is the negative posterior probability).
 #'
+#' @importFrom utils read.csv
+#'
 #' @keywords internal
 BestSignatureAnalyzerResult <- function(sa.results.dir,
                                         verbose = FALSE) {

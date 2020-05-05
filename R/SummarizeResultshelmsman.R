@@ -68,8 +68,9 @@ SummarizeSigOnehelmsmanSubdir <-
     }
 
     inferred.exp.path <- paste0(run.dir,"/inferred.exposures.csv")
-    WriteExposure(exposure.matrix = exposureCounts,
-                  file = inferred.exp.path)
+    SynSigGen::WriteExposure(
+      exposure.matrix = exposureCounts,
+      file = inferred.exp.path)
 
 
     # SummarizeSigOneSubdir will generate a "/summary" folder
