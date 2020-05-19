@@ -25,7 +25,8 @@ test_that("SignatureAnalyzer.sa.sa.96.out", {
       ground.truth.exposure.dir = "./test.sa.sa.96/",
       which.run = "1.run.sa.sa.96",
       overwrite = TRUE),
-    SignatureAnalyzer.sa.sa.96.out)
+    SignatureAnalyzer.sa.sa.96.out,
+    check.attributes = FALSE)
   if (TRUE) # Set this to FALSE to inspect the file and directory output
   {
     # Clean up
@@ -39,6 +40,7 @@ test_that("SignatureAnalyzer.sa.sa.96.out", {
 })
 
 test_that("SummarizeSigOneSigProExtractorSubdir (SBS96)", {
+
   load("./SigProExtractor.sp.SBS96.out.Rdata")
 
   # Warning, do not change t1 to a longer name,
@@ -49,7 +51,8 @@ test_that("SummarizeSigOneSigProExtractorSubdir (SBS96)", {
       run.dir = tdir.res,
       overwrite = T,
       ground.truth.exposure.dir = "../SBS96.ground.truth/"),
-    SigProExtractor.sp.SBS96.out)
+    SigProExtractor.sp.SBS96.out,
+    check.attributes = FALSE)
   if (TRUE) # Set this to FALSE to inspect the file and directory output
   {
     # Clean up
