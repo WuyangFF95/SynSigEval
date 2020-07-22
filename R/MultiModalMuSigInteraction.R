@@ -115,9 +115,6 @@ ReadExposureMM <- function(exposureFile){
 #' a .csv file, or a matrix or data.frame.
 #' Usually, it refers to \code{"ground.truth.syn.catalog.csv"}.
 #'
-#' @param read.catalog.function Function taking a file path as
-#' its only argument and returning a catalog as a numeric matrix.
-#'
 #' @param out.dir Directory that will be created for the output;
 #' abort if it already exists. Usually, the \code{out.dir} will
 #' be a \code{MultiModalMuSig.results} folder directly under the
@@ -140,14 +137,13 @@ ReadExposureMM <- function(exposureFile){
 #' @importFrom utils capture.output
 CreateMultiModalMuSigOutput <-
   function(catalog,
-           read.catalog.function = NULL,
            out.dir = paste0(dirname(catalog),"/ExtrAttr/MultiModalMuSig.results"),
            overwrite = FALSE) {
 
   ## If catalog is a string of file path
   if(is.character(catalog)){
-    ## Read in catalog matrix using read.catalog.function.
-    catMatrix <- read.catalog.function(catalog, strict = FALSE)
+    ## Read in catalog matrix using ICAMS::ReadCatalog.
+    catMatrix <- ICAMS::ReadCatalog(catalog, strict = FALSE)
     ## Convert catalog to MM format
     catMatrix <- ICAMSCatalog2MM(catMatrix)
     ## Fetch the name of catalog file without extension
