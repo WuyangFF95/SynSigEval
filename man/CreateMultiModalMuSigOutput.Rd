@@ -7,7 +7,6 @@ MultiModalMuSig formatted catalog file.}
 \usage{
 CreateMultiModalMuSigOutput(
   catalog,
-  read.catalog.function = NULL,
   out.dir = paste0(dirname(catalog), "/ExtrAttr/MultiModalMuSig.results"),
   overwrite = FALSE
 )
@@ -16,9 +15,6 @@ CreateMultiModalMuSigOutput(
 \item{catalog}{a catalog in ICAMS format. It can be
 a .csv file, or a matrix or data.frame.
 Usually, it refers to \code{"ground.truth.syn.catalog.csv"}.}
-
-\item{read.catalog.function}{Function taking a file path as
-its only argument and returning a catalog as a numeric matrix.}
 
 \item{out.dir}{Directory that will be created for the output;
 abort if it already exists. Usually, the \code{out.dir} will

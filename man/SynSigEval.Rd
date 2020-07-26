@@ -43,7 +43,8 @@ synthetic.spectra <- CreateAndWRiteCatalog(S, synthetic.exposures, ...)
 
 In \code{SynSigEval}:
 
-T <- Signatures extracted by SignatureAnalzer or SigProfiler on synthetic.spectra
+T <- Signatures extracted by SignatureAnalzer, SigProfiler,
+or othercomputational approaches on synthetic.spectra
 
 SummarizeResults(T, S, synthetic.exposures, ...)
 
@@ -66,6 +67,10 @@ Relevant functions are: \enumerate{
 \item \code{\link{SummarizeSigProExtractor}}
 \item \code{\link{SignatureAnalyzerSummarizeTopLevel}}
 \item \code{\link{SignatureAnalyzerSummarizeSBS1SBS5}}
+\item \code{\link{SummarizeSigOneExtrAttrSubdir}}
+\item \code{\link{SummarizeSigOneAttrSubdir}}
+\item \code{\link{SummarizeSigOnehelmsmanSubdir}}
+\item \code{\link{SummarizeSigOneSigProSSSubdir}}
 
 }
 }
