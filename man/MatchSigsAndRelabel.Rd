@@ -2,7 +2,7 @@
 % Please edit documentation in R/MatchSigsAndRelabel.R
 \name{MatchSigsAndRelabel}
 \alias{MatchSigsAndRelabel}
-\title{Run \code{MatchSigs2Directions}, then
+\title{Run \code{\link[SynSigGen]{MatchSigs2Directions}}, then
 plot its results and write them as .csv files.}
 \usage{
 MatchSigsAndRelabel(ex.sigs, gt.sigs, exposure = NULL)
@@ -21,21 +21,15 @@ match to ground-truth signatures to that were not in the ground
 truth exposure.}
 }
 \value{
-A list with the elements \code{averCosSim}, \code{match1},
-\code{match2} as for \code{SigSetSimilarity}, with \code{match1}
- being matches for the the extracted signatures (\code{ex.sigs})
- and \code{match2} being the
- matches for the ground truth signatures (\code{gt.sigs}). The return list
- also echos the input arguments \code{ex.sigs} and \code{gt.sigs}.
+A list with the elements \code{avg}, \code{match1},
+\code{match2} as for \code{\link[SynSigGen]{MatchSigs2Directions}},
+with \code{match1} being matches for the the extracted signatures
+(\code{ex.sigs}) and \code{match2} being the matches for
+the ground truth signatures (\code{gt.sigs}). The return list
+also echos the input arguments \code{ex.sigs} and \code{gt.sigs}.
 }
 \description{
-Run \code{MatchSigs2Directions}, then
+Run \code{\link[SynSigGen]{MatchSigs2Directions}}, then
 plot its results and write them as .csv files.
-}
-\seealso{
-Other signature matching functions: 
-\code{\link{Match1Sig}()},
-\code{\link{MatchSigs1Direction}()},
-\code{\link{MatchSigs2Directions}()}
 }
 \concept{signature matching functions}

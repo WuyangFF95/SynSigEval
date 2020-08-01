@@ -73,7 +73,7 @@ for(datasetName in datasetNames){
       sampleNames = paste0("TwoCorreSigsGen::",1:500))
     SynSigGen::WriteExposure(
       exposure,
-      paste0(resultDir,"/attributed.exposures.csv"))
+      paste0(resultDir,"/inferred.exposures.csv"))
 
   }
 }

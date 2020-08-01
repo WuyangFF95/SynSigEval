@@ -1,4 +1,4 @@
-#' Run \code{MatchSigs2Directions}, then
+#' Run \code{\link[SynSigGen]{MatchSigs2Directions}}, then
 #' plot its results and write them as .csv files.
 #'
 #' @param ex.sigs Newly extracted signatures to be compared to gt.sigs
@@ -14,14 +14,15 @@
 #'   match to ground-truth signatures to that were not in the ground
 #'   truth exposure.
 #'
-#' @return A list with the elements \code{averCosSim}, \code{match1},
-#' \code{match2} as for \code{SigSetSimilarity}, with \code{match1}
-#'  being matches for the the extracted signatures (\code{ex.sigs})
-#'  and \code{match2} being the
-#'  matches for the ground truth signatures (\code{gt.sigs}). The return list
-#'  also echos the input arguments \code{ex.sigs} and \code{gt.sigs}.
-#
+#' @return A list with the elements \code{avg}, \code{match1},
+#' \code{match2} as for \code{\link[SynSigGen]{MatchSigs2Directions}},
+#' with \code{match1} being matches for the the extracted signatures
+#' (\code{ex.sigs}) and \code{match2} being the matches for
+#' the ground truth signatures (\code{gt.sigs}). The return list
+#' also echos the input arguments \code{ex.sigs} and \code{gt.sigs}.
+#'
 #' @export
+#'
 #' @family signature matching functions
 
 MatchSigsAndRelabel <-
@@ -43,7 +44,7 @@ MatchSigsAndRelabel <-
       gt.sigs <- gt.sigs[  , exposed.sig.names]
     }
 
-    sim <- MatchSigs2Directions(ex.sigs, gt.sigs)
+    sim <- SynSigGen::MatchSigs2Directions(ex.sigs, gt.sigs)
 
     ## Software-reported signatures with a best cosine similarity lower than 0.90
     ## is not considered an "extracted signature", it will rather be regarded as
@@ -67,7 +68,7 @@ MatchSigsAndRelabel <-
     # with setting up plotting that is easy(?) to interpret.
     labels <- character(ncol(ex.sigs))
     names(labels) <- colnames(ex.sigs)
-    nums <- NumFromId(sim$match1$to)
+    nums <- SynSigGen::NumFromId(sim$match1$to)
     reordered.ex <- colnames(ex.sigs)[order(nums)]
     ex.sigs.x <- ex.sigs[ , order(nums),drop = FALSE]
     bestmatch.id <- sim$match1[reordered.ex, "to"]
