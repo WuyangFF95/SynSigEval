@@ -117,10 +117,10 @@ ReadEMuCatalog <-
     ## add rownames and colnames.
     catalog <- t(catalog)
     rownames(catalog) <- mutTypes
-    if(is.null(sampleOrSigNames)){
-      sampleOrSigNames <- paste0("EMu.",1:ncol(catalog))
+    if(is.null(sigOrSampleNames)){
+      sigOrSampleNames <- paste0("EMu.",1:ncol(catalog))
     }
-    colnames(catalog) <- sampleOrSigNames
+    colnames(catalog) <- sigOrSampleNames
     ## Convert to ICAMS-formatted catalog
     catalog <-
       ICAMS::as.catalog(object = catalog,

@@ -14,7 +14,7 @@
 #'   match to ground-truth signatures to that were not in the ground
 #'   truth exposure.
 #'
-#' @return A list with the elements \code{avg}, \code{match1},
+#' @return A list with the elements \code{averCosSim}, \code{match1},
 #' \code{match2} as for \code{\link[SynSigGen]{MatchSigs2Directions}},
 #' with \code{match1} being matches for the the extracted signatures
 #' (\code{ex.sigs}) and \code{match2} being the matches for
