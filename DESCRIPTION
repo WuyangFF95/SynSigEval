@@ -28,7 +28,7 @@ Imports:
 Remotes:
     github::steverozen/SynSigGen
 Depends: R (>= 3.5)
-RoxygenNote: 7.1.0
+RoxygenNote: 7.1.1
 Suggests: 
     testthat,
     knitr,

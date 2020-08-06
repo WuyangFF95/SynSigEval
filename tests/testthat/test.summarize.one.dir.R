@@ -2,12 +2,13 @@ context("Test summarizing extraction results in one directory")
 
 test_that("SignatureAnalyzer.sa.sa.COMPOSITE.out", {
   load("SignatureAnalyzer.sa.sa.COMPOSITE.out.RData")
+  res1 <- SummarizeSigOneSASubdir(
+    run.dir = "./test.sa.COMPOSITE/sa.results/",
+    ground.truth.exposure.dir = "./test.sa.COMPOSITE/",
+    which.run = "1.run",
+    overwrite = TRUE)
   expect_equal(
-    SummarizeSigOneSASubdir(
-      run.dir = "./test.sa.COMPOSITE/sa.results/",
-      ground.truth.exposure.dir = "./test.sa.COMPOSITE/",
-      which.run = "1.run",
-      overwrite = TRUE),
+    res1,
     SignatureAnalyzer.sa.sa.COMPOSITE.out)
   if (TRUE) # Set this to FALSE to inspect the file and directory output
   {

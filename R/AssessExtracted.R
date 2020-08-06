@@ -37,29 +37,28 @@ ReadAndAnalyzeSigs <-
     # Rows are signatures, columns are samples.
 
     retval <- MatchSigsAndRelabel(ex.sigs, gt.sigs, exposure)
-    gt <- retval$gt.sigs
-    ctype <- attr(gt, "catalog.type")
-    if (is.null(ctype)) {
-      catalog.type <- attr(ground.truth.sigs, "catalog.type")
-      region       <- attr(ground.truth.sigs, "region")
-      ref.genome   <- attr(ground.truth.sigs, "ref.genome")
-      abundance    <- attr(ground.truth.sigs, "abundance")
-      gt <-
-        as.catalog(gt,
-                   target.catalog.type = catalog.type,
-                   target.region       = region,
-                   target.ref.genome   = ref.genome,
-                   target.abundance    = abundance)
+
+    catalog.type <- attr(gt.sigs, "catalog.type")
+    region       <- attr(gt.sigs, "region")
+    ref.genome   <- attr(gt.sigs, "ref.genome")
+    abundance    <- attr(gt.sigs, "abundance")
+
+    if (is.null(attr(retval$gt.sigs, "catalog.types"))) {
+      retval$gt.sigs <-
+        ICAMS::as.catalog(retval$gt.sigs,
+                          catalog.type = catalog.type,
+                          region       = region,
+                          ref.genome   = ref.genome,
+                          abundance    = abundance)
       stopifnot(is.null(attr(retval$ex.sigs.x, "catalog.type")))
-      retval$gt.sigs <- gt
-      retval$ex.sigs.x <-
-        as.catalog(retval$ex.sigs.x,
-                   target.catalog.type = catalog.type,
-                   target.region       = region,
-                   target.ref.genome   = ref.genome,
-                   target.abundance    = abundance)
-    } else {
-      stopifnot(!is.null(attr(retval$ex.sigs.x, "catalog.type")))
+    }
+    if (is.null(attr(retval$ex.sigs, "catalog.type"))) {
+      retval$ex.sigs <-
+        ICAMS::as.catalog(retval$ex.sigs,
+                          catalog.type = catalog.type,
+                          region       = region,
+                          ref.genome   = ref.genome,
+                          abundance    = abundance)
     }
     return(retval)
   }
