@@ -25,18 +25,43 @@ ReadAndAnalyzeSigs <-
            ground.truth.sigs,
            ground.truth.exposures) {
     ex.sigs <- ICAMS::ReadCatalog(extracted.sigs,
-                                  region = "genome",
+                                  region = "unknown",
                                   catalog.type = "counts.signature")
     # read.extracted.sigs.fn(extracted.sigs)
-    gt.sigs <- ICAMS::ReadCatalog(ground.truth.sigs, region = "genome",
+    gt.sigs <- ICAMS::ReadCatalog(ground.truth.sigs,
+                                  region = "unknown",
                                   catalog.type = "counts.signature")
     # read.ground.truth.sigs.fn(ground.truth.sigs)
     exposure <- SynSigGen::ReadExposure(
       ground.truth.exposures,check.names = F)
     # Rows are signatures, columns are samples.
 
-    return(
-      MatchSigsAndRelabel(ex.sigs, gt.sigs, exposure))
+    retval <- MatchSigsAndRelabel(ex.sigs, gt.sigs, exposure)
+    gt <- retval$gt.sigs
+    ctype <- attr(gt, "catalog.type")
+    if (is.null(ctype)) {
+      catalog.type <- attr(ground.truth.sigs, "catalog.type")
+      region       <- attr(ground.truth.sigs, "region")
+      ref.genome   <- attr(ground.truth.sigs, "ref.genome")
+      abundance    <- attr(ground.truth.sigs, "abundance")
+      gt <-
+        as.catalog(gt,
+                   target.catalog.type = catalog.type,
+                   target.region       = region,
+                   target.ref.genome   = ref.genome,
+                   target.abundance    = abundance)
+      stopifnot(is.null(attr(retval$ex.sigs.x, "catalog.type")))
+      retval$gt.sigs <- gt
+      retval$ex.sigs.x <-
+        as.catalog(retval$ex.sigs.x,
+                   target.catalog.type = catalog.type,
+                   target.region       = region,
+                   target.ref.genome   = ref.genome,
+                   target.abundance    = abundance)
+    } else {
+      stopifnot(!is.null(attr(retval$ex.sigs.x, "catalog.type")))
+    }
+    return(retval)
   }
 
 
