@@ -20,9 +20,4 @@ bioc_required: true
 r_github_packages:
   - steverozen/SynSigGen
   - steverozen/PCAWG7
-
-
-
-
-
-
+  - steverozen/ICAMSxtra
