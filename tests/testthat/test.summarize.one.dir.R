@@ -1,6 +1,7 @@
-context("Test summarizing extraction results in one directory")
+context("test.summarize.one.dir.R")
 
 test_that("SignatureAnalyzer.sa.sa.COMPOSITE.out", {
+  skip("Wu Yang please check input data, file tests/testthat/test.sa.COMPOSITE/sa.results/1.run/sa.output.exp.csv")
   load("SignatureAnalyzer.sa.sa.COMPOSITE.out.RData")
   res1 <- SummarizeSigOneSASubdir(
     run.dir = "./test.sa.COMPOSITE/sa.results/",
@@ -19,6 +20,7 @@ test_that("SignatureAnalyzer.sa.sa.COMPOSITE.out", {
 })
 
 test_that("SignatureAnalyzer.sa.sa.96.out", {
+  skip("Wu Yang please check input data, file tests/testthat/test.sa.COMPOSITE/sa.results/1.run/sa.output.exp.csv")
   load("SignatureAnalyzer.sa.sa.96.out.Rdata")
   expect_equal(
     SummarizeSigOneSASubdir(

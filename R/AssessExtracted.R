@@ -32,7 +32,7 @@ ReadAndAnalyzeSigs <-
                                   region = "unknown",
                                   catalog.type = "counts.signature")
     # read.ground.truth.sigs.fn(ground.truth.sigs)
-    exposure <- SynSigGen::ReadExposure(
+    exposure <- ICAMSxtra::ReadExposure(
       ground.truth.exposures,check.names = F)
     # Rows are signatures, columns are samples.
 
@@ -120,9 +120,9 @@ ReadAndAnalyzeExposures <-
 
 
     ## Read in ground-truth and inferred exposures in ICAMS format
-    gtExposures <- SynSigGen::ReadExposure(
+    gtExposures <- ICAMSxtra::ReadExposure(
       ground.truth.exposures,check.names = F)
-    inferredExposures <- SynSigGen::ReadExposure(
+    inferredExposures <- ICAMSxtra::ReadExposure(
       inferred.exp.path,check.names = F)
 
     ## Names of ground-truth signatures

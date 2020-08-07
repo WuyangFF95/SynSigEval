@@ -68,7 +68,7 @@ SummarizeSigOnehelmsmanSubdir <-
     }
 
     inferred.exp.path <- paste0(run.dir,"/inferred.exposures.csv")
-    SynSigGen::WriteExposure(
+    ICAMSxtra::WriteExposure(
       exposure.matrix = exposureCounts,
       file = inferred.exp.path)
 

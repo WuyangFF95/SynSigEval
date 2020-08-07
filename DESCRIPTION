@@ -35,4 +35,5 @@ Suggests:
     rmarkdown,
     DelayedArray,
     BiocManager,
-    ggpubr
+    ggpubr,
+    ICAMSxtra
