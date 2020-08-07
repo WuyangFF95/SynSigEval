@@ -66,7 +66,7 @@ SummarizeSigOneSASubdir <-
 #' \item \code{sp.sa.COMPOSITE/sa.results/}
 #' }
 #' Each of the directories must contain
-#' additonal subdirectories, one for each SignatureAnalyzer
+#' additional subdirectories, one for each SignatureAnalyzer
 #' run, names \code{sa.run.<n>}, where <n> is an integer
 #' (string of digits).
 #'
