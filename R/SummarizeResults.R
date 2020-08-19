@@ -1344,7 +1344,7 @@ SummarizeMultiToolsMultiDatasets <-
         multiTools <- NULL
         load(paste0(thirdLevelDir,"/multiTools.RDa"))
 
-        gtSigNames <- rownames(multiTools$combMeanSDMD)
+        gtSigNames <- multiTools$gtSigNames
         sigNums <- length(gtSigNames)
 
         if(length(FinalAttr) == 0){
@@ -1354,12 +1354,13 @@ SummarizeMultiToolsMultiDatasets <-
         }
 
         ## Combine Scaled Manhattan distance
-        current <- list()
         for(gtSigName in gtSigNames){
-          current[[gtSigName]] <- multiTools$combMeanSDMD[gtSigName,,drop = F]
-          FinalAttr[[gtSigName]] <- rbind(FinalAttr[[gtSigName]],current[[gtSigName]])
+          FinalAttr[[gtSigName]] <- rbind(
+            FinalAttr[[gtSigName]],
+            multiTools$ManhattanDist[[gtSigName]])
         }
       }
+
       for(gtSigName in gtSigNames){
         write.csv(FinalAttr[[gtSigName]],
                   file = paste0(out.dir,"/ManhattanDist.",gtSigName,".csv"))
