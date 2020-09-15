@@ -37,29 +37,44 @@ ReadAndAnalyzeSigs <-
     # Rows are signatures, columns are samples.
 
     retval <- MatchSigsAndRelabel(ex.sigs, gt.sigs, exposure)
+    
+    ## If input gt.sigs is a ICAMS catalog, 
+    ## Move all the attributes of gt.sigs to retval::gt.sigs.
+    ## Otherwise (e.g. gt.sigs is a matrix), do nothing.
+    if(!is.null(attr(gt.sigs, "catalog.type"))){
 
-    catalog.type <- attr(gt.sigs, "catalog.type")
-    region       <- attr(gt.sigs, "region")
-    ref.genome   <- attr(gt.sigs, "ref.genome")
-    abundance    <- attr(gt.sigs, "abundance")
-
-    if (is.null(attr(retval$gt.sigs, "catalog.types"))) {
+      catalog.type <- attr(gt.sigs, "catalog.type")
+      region       <- attr(gt.sigs, "region")
+      ref.genome   <- attr(gt.sigs, "ref.genome")
+      abundance    <- attr(gt.sigs, "abundance")
+      
       retval$gt.sigs <-
         ICAMS::as.catalog(retval$gt.sigs,
                           catalog.type = catalog.type,
                           region       = region,
                           ref.genome   = ref.genome,
                           abundance    = abundance)
-      stopifnot(is.null(attr(retval$ex.sigs.x, "catalog.type")))
-    }
-    if (is.null(attr(retval$ex.sigs, "catalog.type"))) {
+   }
+
+
+    ## If input ex.sigs is a ICAMS catalog, 
+    ## Move all the attributes of ex.sigs to retval::ex.sigs.
+    ## Otherwise (e.g. ex.sigs is a matrix), do nothing.
+    if(!is.null(attr(ex.sigs, "catalog.type"))){
+
+      catalog.type <- attr(ex.sigs, "catalog.type")
+      region       <- attr(ex.sigs, "region")
+      ref.genome   <- attr(ex.sigs, "ref.genome")
+      abundance    <- attr(ex.sigs, "abundance")
+      
       retval$ex.sigs <-
         ICAMS::as.catalog(retval$ex.sigs,
                           catalog.type = catalog.type,
                           region       = region,
                           ref.genome   = ref.genome,
                           abundance    = abundance)
-    }
+   }
+    
     return(retval)
   }
 
