@@ -3,7 +3,7 @@
 \name{SummarizeSigOneSigProExtractorSubdir}
 \alias{SummarizeSigOneSigProExtractorSubdir}
 \title{Assess/evaluate results from SigProExtractor
-SigProFiler-python de novo extraction and attribution package.
+SigProfiler-python de novo extraction and attribution package.
 Assessment is restricted to v0.0.5.43+,
 because different version has different folder structure.}
 \usage{
@@ -37,7 +37,7 @@ to generate different folder structure. (Default: \code{FALSE})}
 }
 \description{
 Assess/evaluate results from SigProExtractor
-SigProFiler-python de novo extraction and attribution package.
+SigProfiler-python de novo extraction and attribution package.
 Assessment is restricted to v0.0.5.43+,
 because different version has different folder structure.
 }

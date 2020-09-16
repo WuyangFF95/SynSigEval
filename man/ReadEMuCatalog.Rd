@@ -28,7 +28,7 @@ If input file is a counts spectra file
 names of samples should be provided.}
 
 \item{region}{Catalog region. Can be a specific genomic
-or exonic region, or "unknown".
+or exomic region, or "unknown".
 Default: "unknown"}
 
 \item{catalog.type}{Is the catalog a signature catalog,

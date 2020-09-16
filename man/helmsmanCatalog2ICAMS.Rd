@@ -15,7 +15,7 @@ helmsmanCatalog2ICAMS(
 file in helmsman format, or a matrix/data.frame object.}
 
 \item{region}{Catalog region. Can be a specific genomic
-or exonic region, or "unknown".
+or exomic region, or "unknown".
 Default: "unknown"}
 
 \item{catalog.type}{Is the catalog a signature catalog,

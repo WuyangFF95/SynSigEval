@@ -10,7 +10,7 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 }
 
 
-#' Assess/evaluate one result subfolder from a software approach
+#' Assess/evaluate one result sub-folder from a software approach
 #'
 #' Note: For summarizing sigproextractor or SignatureAnalyzer,
 #' users should use sigproextractor(SigProfiler-Python) v0.0.5.43+
@@ -519,7 +519,7 @@ SummarizeMultiRuns <-
 #' combine them into \code{third.level.dir}.
 #'
 #'
-#' @param third.level.dir Third level path distinguishing de-novo extraction
+#' @param third.level.dir Third level path distinguishing de novo extraction
 #' + attribution packages from attribution-only packages.
 #' Examples:
 #' \code{top.dir}/sp.sp/ExtrAttr/

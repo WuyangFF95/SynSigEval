@@ -27,5 +27,5 @@ run, names \code{sa.run.<n>}, where <n> is an integer
 This function depends on a particular directory structure: see
 argument \code{top.level.dir}. This function finds the
 best of multiple SignatureAnalyzer extraction runs and summarizes
-the comparision of the best run with the ground truth.
+the comparison of the best run with the ground truth.
 }

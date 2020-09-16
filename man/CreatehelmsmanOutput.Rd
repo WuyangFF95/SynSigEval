@@ -36,6 +36,6 @@ Creates folder named \code{helmsman.results} containing catalogs
 in helmsman-formatted catalogs: Rows are signatures;
 the first column is the name of the mutation type, while the remaining
 columns are samples (tumors).
-These helmsman-formated catalogs will the input when running helmsman program
+These helmsman-formatted catalogs will the input when running helmsman program
 later on Python platform.
 }

@@ -15,7 +15,7 @@ SummarizeMultiToolsOneDataset(
 )
 }
 \arguments{
-\item{third.level.dir}{Third level path distinguishing de-novo extraction
+\item{third.level.dir}{Third level path distinguishing de novo extraction
 + attribution packages from attribution-only packages.
 Examples:
 \code{top.dir}/sp.sp/ExtrAttr/

@@ -29,6 +29,6 @@ It defaults to be \code{sub.dir}, i.e. \code{run.dir}/../../../}
 }
 \description{
 Packages including but not limited to:
-HDP, MutationalPatterns, sigfit,
-SigneR, SomaticSignatures.
+hdp, MutationalPatterns, sigfit,
+signeR, SomaticSignatures.
 }

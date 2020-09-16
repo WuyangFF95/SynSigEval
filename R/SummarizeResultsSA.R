@@ -55,7 +55,7 @@ SummarizeSigOneSASubdir <-
 #' This function depends on a particular directory structure: see
 #' argument \code{top.level.dir}. This function finds the
 #' best of multiple SignatureAnalyzer extraction runs and summarizes
-#' the comparision of the best run with the ground truth.
+#' the comparison of the best run with the ground truth.
 #'
 #' @param top.level.dir Path to top level directory, which
 #' must contain the following subdirectories:
@@ -116,7 +116,7 @@ SignatureAnalyzerSummarizeTopLevel <-
     invisible(retval)
   }
 
-#' Summarize all subdirectories of Signatureanalyzer results
+#' Summarize all subdirectories of SignatureAnalyzer results
 #' on the correlated SBS1 / SBS5.
 #'
 #' This is special-purpose function to summarize results

@@ -75,7 +75,7 @@ ReadhelmsmanExposure <- function(exposure, check.names = TRUE){
 #' file in helmsman format, or a matrix/data.frame object.
 #'
 #' @param region Catalog region. Can be a specific genomic
-#' or exonic region, or "unknown".
+#' or exomic region, or "unknown".
 #' Default: "unknown"
 #'
 #' @param catalog.type Is the catalog a signature catalog,
@@ -143,7 +143,7 @@ helmsmanCatalog2ICAMS <- function(
 #' in helmsman-formatted catalogs: Rows are signatures;
 #' the first column is the name of the mutation type, while the remaining
 #' columns are samples (tumors).
-#' These helmsman-formated catalogs will the input when running helmsman program
+#' These helmsman-formatted catalogs will the input when running helmsman program
 #' later on Python platform.
 #'
 #' @export
