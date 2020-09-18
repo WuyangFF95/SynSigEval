@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Travis build
-status](https://travis-ci.org/WuyangFF95/SynSigEval.svg?branch=master)](https://travis-ci.org/WuyangFF95/SynSigEval)
+status](https://travis-ci.com/WuyangFF95/SynSigEval.svg?branch=master)](https://travis-ci.com/WuyangFF95/SynSigEval)
 
 <!-- badges: end -->
 
