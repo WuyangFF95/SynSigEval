@@ -116,7 +116,7 @@ SignatureAnalyzerSummarizeTopLevel <-
     invisible(retval)
   }
 
-#' Summarize all subdirectories of SignatureAnalyzer results
+#' Summarize all sub-directories of SignatureAnalyzer results
 #' on the correlated SBS1 / SBS5.
 #'
 #' This is special-purpose function to summarize results

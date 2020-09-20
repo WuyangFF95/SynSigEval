@@ -1,4 +1,4 @@
-context("test.summarize.one.dir.R")
+context("Test summarizing extraction results in one directory")
 
 test_that("SignatureAnalyzer.sa.sa.COMPOSITE.out", {
   skip("Wu Yang please check input data, file tests/testthat/test.sa.COMPOSITE/sa.results/1.run/sa.output.exp.csv")
