@@ -80,7 +80,7 @@ ReadEMuExposureFile <-
 #' names of samples should be provided.
 #'
 #' @param region Catalog region. Can be a specific genomic
-#' or exonic region, or "unknown".
+#' or exomic region, or "unknown".
 #' Default: "unknown"
 #'
 #' @param catalog.type Is the catalog a signature catalog,
@@ -151,7 +151,7 @@ ReadEMuCatalog <-
 #' in EMu-formatted catalogs: Rows are signatures;
 #' the first column is the name of the mutation type, while the remaining
 #' columns are samples (tumors).
-#' These EMu-formated catalogs will the input when running EMu program
+#' These EMu-formatted catalogs will the input when running EMu program
 #' later on compiled binary.
 #'
 #' @importFrom utils capture.output

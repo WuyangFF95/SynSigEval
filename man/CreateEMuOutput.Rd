@@ -36,6 +36,6 @@ Creates folder named \code{EMu.results} containing catalogs
 in EMu-formatted catalogs: Rows are signatures;
 the first column is the name of the mutation type, while the remaining
 columns are samples (tumors).
-These EMu-formated catalogs will the input when running EMu program
+These EMu-formatted catalogs will the input when running EMu program
 later on compiled binary.
 }

@@ -3,8 +3,8 @@
 #' excluding SigProfiler-Python and SignatureAnalyzer.
 #'
 #' Packages including but not limited to:
-#' HDP, MutationalPatterns, sigfit,
-#' SigneR, SomaticSignatures.
+#' hdp, MutationalPatterns, sigfit,
+#' signeR, SomaticSignatures.
 #'
 #' @param run.dir Lowest level path to result of a run. E.g.
 #' \code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SomaticSignatures.results/seed.1/}

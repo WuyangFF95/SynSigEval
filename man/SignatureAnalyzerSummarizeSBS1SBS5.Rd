@@ -2,7 +2,7 @@
 % Please edit documentation in R/SummarizeResultsSA.R
 \name{SignatureAnalyzerSummarizeSBS1SBS5}
 \alias{SignatureAnalyzerSummarizeSBS1SBS5}
-\title{Summarize all subdirectories of Signatureanalyzer results
+\title{Summarize all sub-directories of SignatureAnalyzer results
 on the correlated SBS1 / SBS5.}
 \usage{
 SignatureAnalyzerSummarizeSBS1SBS5(top.level.dir, overwrite = FALSE)

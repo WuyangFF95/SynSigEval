@@ -48,7 +48,7 @@ SignatureAnalyzerPrepHyper1Secondary <-
   ### best.sigs not proportions, but rather are
   ### arbitrarily scaled. However, the total number of mutations
   ### in best.sigs %*% diag(exp.sums) should still approximate
-  ### the orignal catalog.
+  ### the original catalog.
   stopifnot(ncol(best.sigs) == nrow(best.exp))
 
   # names = TRUE handles the case where exp.sums is a scalar,

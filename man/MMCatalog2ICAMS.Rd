@@ -11,7 +11,7 @@ MMCatalog2ICAMS(cat, region = "unknown", catalog.type = "counts.signature")
 or matrix in MultiModalMuSig format.}
 
 \item{region}{Catalog region. Can be a specific genomic
-or exonic region, or "unknown".
+or exomic region, or "unknown".
 Default: "unknown"}
 
 \item{catalog.type}{Is the catalog a signature catalog,

@@ -36,6 +36,6 @@ Creates folder named \code{MultiModalMuSig.results} containing catalogs
 in MultiModalMuSig-formatted catalogs: Rows are signatures;
 the first column is the name of the mutation type, while the remaining
 columns are samples (tumors).
-These MM-formated catalogs will the input when running MultiModalMuSig program
+These MM-formatted catalogs will the input when running MultiModalMuSig program
 later on Julia platform.
 }
