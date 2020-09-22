@@ -37,8 +37,8 @@ Usually, it refers to \code{sub.dir}, i.e. \code{run.dir}/../../../}
 Usually, it equals to "summary".}
 }
 \description{
-Note: For summarizing sigproextractor or SignatureAnalyzer,
-users should use sigproextractor(SigProfiler-Python) v0.0.5.43+
+Note: For summarizing SigProExtractor or SignatureAnalyzer,
+users should use SigProExtractor(SigProfiler-Python) v0.0.5.43+
 and SignatureAnalyzer 2018-Apr-18.
 }
 \keyword{internal}
