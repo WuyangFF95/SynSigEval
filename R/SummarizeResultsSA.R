@@ -33,7 +33,7 @@ SummarizeSigOneSASubdir <-
            which.run = "/best.run/",
            overwrite = FALSE) {
     # Location of SigProfiler output, which is our input
-    # inputPath may change if sigproextractor updates!
+    # inputPath may change if SigProExtractor updates!
     inputPath <- paste0(run.dir, "/", which.run)
 
     if (!dir.exists(inputPath)) stop(inputPath, "does not exist")

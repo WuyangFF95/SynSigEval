@@ -16,7 +16,7 @@ SummarizeSigOneSigProExtractorSubdir(
 }
 \arguments{
 \item{run.dir}{Lowest level path to results, e.g.
-\code{<top.dir>}\code{/sa.sa.96/ExtrAttr/sigproextractor.results/seed.1/}
+\code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SigProExtractor.results/seed.1/}
 Here, \code{<top.dir>} refers to a top-level directory which contains the
 full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
 This code depends on a conventional directory structure documented
@@ -31,8 +31,8 @@ This file can be found in the \code{sub.dir}, i.e. \code{<run.dir>/../../../}}
 
 \item{overwrite}{If TRUE overwrite existing directories and files.}
 
-\item{hierarchy}{Whether the user have enabled hierarchy = True when running sigproextractor.
-specifying True or False into sigproextractor will cause the program
+\item{hierarchy}{Whether the user have enabled hierarchy = True when running SigProExtractor.
+specifying True or False into SigProExtractor will cause the program
 to generate different folder structure. (Default: \code{FALSE})}
 }
 \description{

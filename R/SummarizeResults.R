@@ -12,8 +12,8 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 
 #' Assess/evaluate one result sub-folder from a computational approach
 #'
-#' Note: For summarizing sigproextractor or SignatureAnalyzer,
-#' users should use sigproextractor(SigProfiler-Python) v0.0.5.43+
+#' Note: For summarizing SigProExtractor or SignatureAnalyzer,
+#' users should use SigProExtractor(SigProfiler-Python) v0.0.5.43+
 #' and SignatureAnalyzer 2018-Apr-18.
 #'
 #' @param run.dir Lowest level path to result of a run. That is,

@@ -107,7 +107,7 @@ it can also be ("ExtrAttr"), folder to store results of software packages which
 can do de-novo extraction and following attribution.
 
 Fourth Level - \code{tool.dir}: The results of a software package
-(e.g. "sigproextractor.results","SignatureEstimation.QP.results").
+(e.g. "SigProExtractor.results","SignatureEstimation.QP.results").
 Under this level, \code{tool.dir} may contain multiple \code{run.dir},
 each is a run of the software package using a specific number of seed.
 
