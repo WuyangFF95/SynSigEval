@@ -1,9 +1,9 @@
-#' Assess/evaluate results from SigProfiler-python (a.k.a. sigproextractor)
+#' Assess/evaluate results from SigProfiler-python (a.k.a. SigProExtractor)
 #' Assessment is restricted to v0.0.5.43,
 #' because different version has different folder structure.
 #'
 #' @param run.dir Lowest level path to results, e.g.
-#' \code{<top.dir>}\code{/sa.sa.96/ExtrAttr/sigproextractor.results/seed.1/}
+#' \code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SigProExtractor.results/seed.1/}
 #' Here, \code{<top.dir>} refers to a top-level directory which contains the
 #' full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
 #' This code depends on a conventional directory structure documented
@@ -17,8 +17,8 @@
 #' @param overwrite If TRUE overwrite existing directories and files.
 #'
 #' @param hierarchy Whether the user have enabled hierarchy = True
-#' when running sigproextractor.
-#' specifying True or False into sigproextractor will cause the program
+#' when running SigProExtractor.
+#' specifying True or False into SigProExtractor will cause the program
 #' to generate different folder structure. (Default: \code{FALSE})
 #'
 #' @export
@@ -35,11 +35,11 @@ SummarizeSigOnehelmsmanSubdir <-
            hierarchy = FALSE) {
 
     # Location of SigProfiler output, which is our input
-    # inputPath may change if sigproextractor updates!
+    # inputPath may change if SigProExtractor updates!
     inputPath <- paste0(run.dir)
     stopifnot(dir.exists(inputPath))
 
-    # Read in extracted signatures in sigproextractor txt format,
+    # Read in extracted signatures in SigProExtractor txt format,
     # and convert it to ICAMS csv format.
     # Need special function to read in extracted signatures
     # Converted signatures will be included in the /summary folder.

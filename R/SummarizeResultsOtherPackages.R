@@ -33,7 +33,7 @@ SummarizeSigOneExtrAttrSubdir <-
            overwrite = FALSE) {
 
     # Location of SigProfiler output, which is our input
-    # inputPath may change if sigproextractor updates!
+    # inputPath may change if SigProExtractor updates!
     inputPath <- run.dir
     stopifnot(dir.exists(inputPath))
 
@@ -99,7 +99,7 @@ SummarizeSigOneAttrSubdir <-
            overwrite = FALSE) {
 
     # Location of SigProfiler output, which is our input
-    # inputPath may change if sigproextractor updates!
+    # inputPath may change if SigProExtractor updates!
     inputPath <- run.dir
     stopifnot(dir.exists(inputPath))
 

@@ -13,7 +13,7 @@ SummarizeSigOneSigProSSSubdir(
 }
 \arguments{
 \item{run.dir}{Lowest level path to results, e.g.
-\code{<top.dir>}\code{/sa.sa.96/ExtrAttr/sigproextractor.results/seed.1/}
+\code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SigProExtractor.results/seed.1/}
 Here, \code{<top.dir>} refers to a top-level directory which contains the
 full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
 This code depends on a conventional directory structure documented
