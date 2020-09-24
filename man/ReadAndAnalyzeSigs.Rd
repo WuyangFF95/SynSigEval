@@ -31,5 +31,5 @@ outside of R on file inputs and will generate fill outputs.
 }
 \details{
 Generates output files by calling
-\code{\link{[ICAMSxtra]MatchSigsAndRelabel}}
+\code{\link[ICAMSxtra]{MatchSigsAndRelabel}}
 }
