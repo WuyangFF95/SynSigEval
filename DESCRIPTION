@@ -13,7 +13,7 @@ LazyData: true
 Imports: 
     data.table, 
     ICAMS,
-    SynSigGen,
+    ICAMSxtra (>= 0.0.2),
     stats, 
     devtools, 
     utils, 
@@ -29,7 +29,6 @@ Depends: R (>= 3.5)
 RoxygenNote: 7.1.1
 Suggests: 
     testthat,
-    ICAMSxtra (>= 0.0.2),
     knitr,
     lsa,
     rmarkdown,

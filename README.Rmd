@@ -26,7 +26,16 @@ by package [SynSigGen](https://github.com/steverozen/SynSigGen).
 
 ## Installation
 
-Install the development version of SynSigRun from [GitHub](https://github.com/) with the R command line:
+Before installation, prerequisites in 
+[Bioconductor](https://www.bioconductor.org/)
+needs to be installed:
+
+```r
+install.packages("BiocManager")
+BiocManager::install(c("Biostrings","BSgenome","GenomeInfoDb","GenomicRanges"))
+```
+
+Install the development version of SynsigEval from [GitHub](https://github.com/) with the R command line:
 
 ``` r
 install.packages("devtools")
