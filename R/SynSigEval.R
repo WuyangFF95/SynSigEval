@@ -1,67 +1,30 @@
 #' @title SynSigEval
 #'
-#' @description Assess the performance of mutational-signature analysis
-#' programs Using catalogs of synthetic mutational spectra created
-#' by package \code{SynSigGen}.
+#' @description Assess the performance of two steps in mutational signature
+#' analysis: \itemize{
+#' \item signature extraction
+#' \item exposure inferrence (a.k.a. signature attribution)
+#' } by computational approaches, using catalogs of synthetic mutational
+#' spectra created by package \code{SynSigGen}.
 #'
-#' @section Overview:
 #'
-#' The main focus is generating synthetic catalogs of mutational
-#' spectra (mutations in tumors) based on known mutational signature
-#' profiles and attributions (assignment of exposures to tumors) in
-#' the PCAWG7 data. We call this kind of synthetic
-#' data broadly "reality-based" synthetic
-#' data.  The package also has a set of functions that
-#' generate random mutational signature profiles and then create
-#' synthetic catalogs based on these random signature profiles. We
-#' call this kind of synthetic data "random" synthetic data, while
-#' pointing out that much depends on the distributions from which
-#' the random signature profiles and attributions are generated.
+#' @section Input:
 #'
-#' Typical workflow for generating catalogs of "reality-based" synthetic
-#' mutational spectra is as follows.
+#' \code{SynSigEval} requires the input data listed below: \enumerate{
+#' \item E, matrix of synthetic exposures (signatures x samples)
 #'
-#' \preformatted{
+#' \item S, mutational signature profiles (mutation type x signature)
 #'
-#' In \code{SynSigGen}:
+#' \item synthetic.spectra, synthetic mutational spectra with known
+#' ground-truth mutational signature profiles (S) and exposures
+#' (synthetic.exposures). It can be created from \code{SynSigGen}.
 #'
-#' Input (based on SignatureAnalyzer or SigProfiler analysis of PCAWG tumors)
-#'   A, matrix of attributions (signatures x samples)
-#'   S, mutational signature profiles (mutation type x signature)
+#' \item T, signatures extracted by SignatureAnalzer, SigProfiler,
+#' or other computational approaches on \code{synthetic.spectra}.
+#' For attribution-only approaches, T=S.
 #'
-#' P <- GetSynSigParamsFromExposures(A, ...)
-#'
-#' synthetic.exposures <- GenerateSyntheticExposures(P, ...)
-#'
-#' synthetic.spectra <- CreateAndWRiteCatalog(S, synthetic.exposures, ...)
-#'
-#' In \code{SynSigEval}:
-#'
-#' T <- Signatures extracted by SignatureAnalzer, SigProfiler,
-#' or othercomputational approaches on synthetic.spectra
-#'
-#' SummarizeResults(T, S, synthetic.exposures, ...)
-#'
-#' }
-#'
-#' @section (In SynSigGen) Creating Synthetic Mutational Catalogs:
-#'
-#' These functions create synthetic mutational catalogs based
-#' on parameters derived from signature profiles
-#' and attributions (exposures).
-#'
-#' @section Summarize results (of signature extraction):
-#'
-#' Relevant functions are: \enumerate{
-#'
-#' \item \code{\link{SummarizeSigProExtractor}}
-#' \item \code{\link{SignatureAnalyzerSummarizeTopLevel}}
-#' \item \code{\link{SignatureAnalyzerSummarizeSBS1SBS5}}
-#' \item \code{\link{SummarizeSigOneExtrAttrSubdir}}
-#' \item \code{\link{SummarizeSigOneAttrSubdir}}
-#' \item \code{\link{SummarizeSigOnehelmsmanSubdir}}
-#' \item \code{\link{SummarizeSigOneSigProSSSubdir}}
-#'
+#' \item F, exposures inferred by computational approaches on
+#' \code{synthetic.spectra}.
 #' }
 #'
 #' @section Folder structure for SynSigEval v0.2:
@@ -88,6 +51,37 @@
 #' Fifth level - \code{run.dir}: contains results from a run of the software package
 #' using a specific number of seed. (e.g. "seed.1")
 #'
+#' @section Summarize results:
+#'
+#' \enumerate{
+#'
+#' \item Summarize results in fifth-level \code{run.dir}:
+#'
+#' Relevant functions are: \itemize{
+#'
+#' \item \code{\link{SummarizeSigProExtractor}}
+#' \item \code{\link{SignatureAnalyzerSummarizeTopLevel}}
+#' \item \code{\link{SignatureAnalyzerSummarizeSBS1SBS5}}
+#' \item \code{\link{SummarizeSigOneExtrAttrSubdir}}
+#' \item \code{\link{SummarizeSigOneAttrSubdir}}
+#' \item \code{\link{SummarizeSigOnehelmsmanSubdir}}
+#' \item \code{\link{SummarizeSigOneSigProSSSubdir}}
+#'
+#' }
+#'
+#' \item Summarize results of multiple runs by a computational approach on one spectra data set:
+#'
+#' \code{SummarizeMultiRuns}
+#'
+#' \item Summarize results of multiple computational approaches on one spectra data set:
+#'
+#' \code{SummarizeMultiToolsOneDataset}
+#'
+#' \item Summarize results of multiple computational approaches on multiple spectra data sets:
+#'
+#' \code{SummarizeMultiToolsMultiDatasets}
+#'
+#' }
 #'
 #' @docType package
 #' @name SynSigEval

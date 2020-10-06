@@ -21,7 +21,7 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 Assess the performance of mutational-signature analysis
-programs Using catalogs of synthetic mutational spectra created
+programs using catalogs of synthetic mutational spectra created
 by package [SynSigGen](https://github.com/steverozen/SynSigGen).
 
 ## Installation
@@ -44,4 +44,4 @@ devtools::install_github("WuyangFF95/SynSigEval")
 
 ## Reference manual
 
-https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.0.4.9001.pdf
+https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.1.2.pdf

@@ -1,3 +1,6 @@
+# SinSigEval 0.1.2
+## Updated package documentation and README. 
+
 # SinSigEval 0.1.1
 ## Removed
 * MatchSigsAndRelable.R (functionality was moved to ICAMSxtra) and
