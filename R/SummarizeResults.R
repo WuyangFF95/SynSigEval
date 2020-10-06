@@ -616,7 +616,7 @@ SummarizeMultiToolsOneDataset <- function(
                        "False discovery rate")
       for(index in indexes){
         indexNum <- which(index == indexes)
-        tmp <- data.frame(seed = names(multiRun[[index]]),
+        measure4OneTool <- data.frame(seed = names(multiRun[[index]]),
                           index = index,
                           indexLabel = indexLabels[indexNum],
                           value = multiRun[[index]],
@@ -627,14 +627,14 @@ SummarizeMultiToolsOneDataset <- function(
                           datasetSubGroup = datasetSubGroup,
                           datasetSubGroupName = datasetSubGroupName,
                           stringsAsFactors = FALSE)
-        rownames(tmp) <- NULL
+        rownames(measure4OneTool) <- NULL
         ## Create a data.frame for each index,
         ## and summarize multi-Run, multiDataset values
         ## for each index.
         if(is.null(multiTools[[index]])){
           multiTools[[index]] <- data.frame()
         }
-        multiTools[[index]] <- rbind(multiTools[[index]],tmp)
+        multiTools[[index]] <- rbind(multiTools[[index]],measure4OneTool)
       }
     }
 
@@ -646,7 +646,7 @@ SummarizeMultiToolsOneDataset <- function(
       if(is.null(multiTools$cosSim)) multiTools$cosSim <- list()
 
       for(gtSigName in gtSigNames){
-        tmp <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
+        gtMeanCosSim4OneTool <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
                           gtSigName = gtSigName,
                           label = paste0("Cosine similarity to signature ",gtSigName),
                           value = multiRun$cosSim[[gtSigName]],
@@ -657,14 +657,14 @@ SummarizeMultiToolsOneDataset <- function(
                           datasetSubGroup = datasetSubGroup,
                           datasetSubGroupName = datasetSubGroupName,
                           stringsAsFactors = FALSE)
-        rownames(tmp) <- NULL
+        rownames(gtMeanCosSim4OneTool) <- NULL
         ## Create a data.frame for each ground-truth signature,
         ## and summarize multi-Run, multiDataset values
         ## for each ground-truth signature.
         if(is.null(multiTools$cosSim[[gtSigName]])){
           multiTools$cosSim[[gtSigName]] <- data.frame()
         }
-        multiTools$cosSim[[gtSigName]] <- rbind(multiTools$cosSim[[gtSigName]],tmp)
+        multiTools$cosSim[[gtSigName]] <- rbind(multiTools$cosSim[[gtSigName]],gtMeanCosSim4OneTool)
       }
     }
 
@@ -674,7 +674,7 @@ SummarizeMultiToolsOneDataset <- function(
     {
       if(is.null(multiTools$ManhattanDist)) multiTools$ManhattanDist <- list()
       for(gtSigName in gtSigNames){
-        tmp <- data.frame(seed = colnames(multiRun$ManhattanDist),
+        gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
                           gtSigName = gtSigName,
                           value = multiRun$ManhattanDist[gtSigName,],
                           toolName = toolName,
@@ -684,14 +684,14 @@ SummarizeMultiToolsOneDataset <- function(
                           datasetSubGroup = datasetSubGroup,
                           datasetSubGroupName = datasetSubGroupName,
                           stringsAsFactors = FALSE)
-        rownames(tmp) <- NULL
+        rownames(gtScaledManhattanDist4OneTool) <- NULL
         ## Create a data.frame for each ground-truth signature,
         ## and summarize multi-Run, multiDataset values
         ## for each ground-truth signature.
         if(is.null(multiTools$ManhattanDist[[gtSigName]])){
           multiTools$ManhattanDist[[gtSigName]] <- data.frame()
         }
-        multiTools$ManhattanDist[[gtSigName]] <- rbind(multiTools$ManhattanDist[[gtSigName]],tmp)
+        multiTools$ManhattanDist[[gtSigName]] <- rbind(multiTools$ManhattanDist[[gtSigName]],gtScaledManhattanDist4OneTool)
       }
     }
 
@@ -1700,7 +1700,7 @@ SummarizeOneToolMultiDatasets <-
         }
         datasetName <- basename(datasetDir)
         for(index in indexes){
-          tmp <- data.frame(seed = names(multiRun[[index]]),
+          measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
                             index = index,
                             value = multiRun[[index]],
                             toolName = toolName,
@@ -1711,7 +1711,7 @@ SummarizeOneToolMultiDatasets <-
                             datasetSubGroupName = datasetSubGroupName,
                             stringsAsFactors = FALSE)
 
-          rownames(tmp) <- NULL
+          rownames(measure4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
           ## and summarize multi-Run, multiDataset values
@@ -1719,7 +1719,7 @@ SummarizeOneToolMultiDatasets <-
           if(is.null(OneToolSummary[[index]])){
             OneToolSummary[[index]] <- data.frame()
           }
-          OneToolSummary[[index]] <- rbind(OneToolSummary[[index]],tmp)
+          OneToolSummary[[index]] <- rbind(OneToolSummary[[index]],measure4OneDataset)
         }
       }
 
@@ -1727,17 +1727,17 @@ SummarizeOneToolMultiDatasets <-
       ## into OneToolSummary$extraction.
       OneToolSummary[["extraction"]] <- data.frame()
       for(index in indexes){
-        tmp <- data.frame(OneToolSummary[[index]],
+        measure4AllDatasets <- data.frame(OneToolSummary[[index]],
                           stringsAsFactors = FALSE)
-        rownames(tmp) <- NULL
+        rownames(measure4AllDatasets) <- NULL
 
         if(nrow(OneToolSummary[["extraction"]]) == 0 |
            ncol(OneToolSummary[["extraction"]]) == 0 |
            is.null(dim(OneToolSummary[["extraction"]])) ) {
-          OneToolSummary[["extraction"]] <- tmp
+          OneToolSummary[["extraction"]] <- measure4AllDatasets
         } else {
           OneToolSummary[["extraction"]] <-
-            rbind(OneToolSummary[["extraction"]],tmp)
+            rbind(OneToolSummary[["extraction"]],measure4AllDatasets)
         }
       }
 
@@ -1924,7 +1924,7 @@ SummarizeOneToolMultiDatasets <-
         datasetName <- basename(datasetDir)
 
         for(gtSigName in gtSigNames){
-          tmp <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
+          gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
                             gtSigName = gtSigName,
                             value = multiRun$cosSim[[gtSigName]],
                             toolName = toolName,
@@ -1934,7 +1934,7 @@ SummarizeOneToolMultiDatasets <-
                             datasetSubGroup = datasetSubGroup[datasetName],
                             datasetSubGroupName = datasetSubGroupName,
                             stringsAsFactors = FALSE)
-          rownames(tmp) <- NULL
+          rownames(gtMeanCosSim4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
           ## and summarize multi-Run, multiDataset values
@@ -1942,7 +1942,7 @@ SummarizeOneToolMultiDatasets <-
           if(is.null(OneToolSummary$cosSim[[gtSigName]])){
             OneToolSummary$cosSim[[gtSigName]] <- data.frame()
           }
-          OneToolSummary$cosSim[[gtSigName]] <- rbind(OneToolSummary$cosSim[[gtSigName]],tmp)
+          OneToolSummary$cosSim[[gtSigName]] <- rbind(OneToolSummary$cosSim[[gtSigName]],gtMeanCosSim4OneDataset)
         }
       }
 
@@ -1959,17 +1959,17 @@ SummarizeOneToolMultiDatasets <-
       ## into OneToolSummary$cosSim$combined
       OneToolSummary$cosSim$combined <- data.frame()
       for(gtSigName in gtSigNames){
-        tmp <- data.frame(OneToolSummary$cosSim[[gtSigName]],
+        gtMeanCosSim4AllDatasets <- data.frame(OneToolSummary$cosSim[[gtSigName]],
                           stringsAsFactors = FALSE)
-        rownames(tmp) <- NULL
+        rownames(gtMeanCosSim4AllDatasets) <- NULL
 
         if(nrow(OneToolSummary$cosSim$combined) == 0 |
            ncol(OneToolSummary$cosSim$combined) == 0 |
            is.null(dim(OneToolSummary$cosSim$combined)) ) {
-          OneToolSummary$cosSim$combined <- tmp
+          OneToolSummary$cosSim$combined <- gtMeanCosSim4AllDatasets
         } else {
           OneToolSummary$cosSim$combined <-
-            rbind(OneToolSummary$cosSim$combined,tmp)
+            rbind(OneToolSummary$cosSim$combined,gtMeanCosSim4AllDatasets)
         }
       }
 
@@ -2121,7 +2121,7 @@ SummarizeOneToolMultiDatasets <-
         datasetName <- basename(datasetDir)
 
         for(gtSigName in gtSigNames){
-          tmp <- data.frame(seed = colnames(multiRun$ManhattanDist),
+          gtScaledManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
                             gtSigName = gtSigName,
                             value = multiRun$ManhattanDist[gtSigName,],
                             toolName = toolName,
@@ -2131,7 +2131,7 @@ SummarizeOneToolMultiDatasets <-
                             datasetSubGroup = datasetSubGroup[datasetName],
                             datasetSubGroupName = datasetSubGroupName,
                             stringsAsFactors = FALSE)
-          rownames(tmp) <- NULL
+          rownames(gtScaledManhattanDist4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
           ## and summarize multi-Run, multiDataset values
@@ -2139,7 +2139,7 @@ SummarizeOneToolMultiDatasets <-
           if(is.null(OneToolSummary$ManhattanDist[[gtSigName]])){
             OneToolSummary$ManhattanDist[[gtSigName]] <- data.frame()
           }
-          OneToolSummary$ManhattanDist[[gtSigName]] <- rbind(OneToolSummary$ManhattanDist[[gtSigName]],tmp)
+          OneToolSummary$ManhattanDist[[gtSigName]] <- rbind(OneToolSummary$ManhattanDist[[gtSigName]],gtScaledManhattanDist4OneDataset)
         }
       }
 
@@ -2147,17 +2147,17 @@ SummarizeOneToolMultiDatasets <-
       ## into OneToolSummary$ManhattanDist$combined.
       OneToolSummary$ManhattanDist$combined <- data.frame()
       for(gtSigName in gtSigNames){
-        tmp <- data.frame(OneToolSummary$ManhattanDist[[gtSigName]],
+        gtScaledManhattanDist4AllDatasets <- data.frame(OneToolSummary$ManhattanDist[[gtSigName]],
                           stringsAsFactors = FALSE)
-        rownames(tmp) <- NULL
+        rownames(gtScaledManhattanDist4AllDatasets) <- NULL
 
         if(nrow(OneToolSummary$ManhattanDist$combined) == 0 |
            ncol(OneToolSummary$ManhattanDist$combined) == 0 |
            is.null(dim(OneToolSummary$ManhattanDist$combined)) ) {
-          OneToolSummary$ManhattanDist$combined <- tmp
+          OneToolSummary$ManhattanDist$combined <- gtScaledManhattanDist4AllDatasets
         } else {
           OneToolSummary$ManhattanDist$combined <-
-            rbind(OneToolSummary$ManhattanDist$combined,tmp)
+            rbind(OneToolSummary$ManhattanDist$combined,gtScaledManhattanDist4AllDatasets)
         }
       }
 
