@@ -65,6 +65,10 @@ SummarizeSigOneSubdir <-
           paste0(ground.truth.exposure.dir,"/ground.truth.syn.exposures.csv")
       )
 
+    ## Workout for not breaking the downstream summarizing code
+    sigAnalysis$cosSim <- sigAnalysis$gt.mean.cos.sim
+    sigAnalysis$gt.mean.cos.sim <- NULL
+
     if (dir.exists(outputPath)) {
       if (!overwrite) stop(outputPath, " already exists")
     }
