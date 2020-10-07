@@ -10,8 +10,8 @@ SummarizeMultiToolsOneDataset(
   tool.dirnames,
   datasetGroup,
   datasetGroupName,
-  datasetSubGroup,
-  datasetSubGroupName
+  datasetSubGroup = NULL,
+  datasetSubGroupName = NULL
 )
 }
 \arguments{
@@ -46,14 +46,14 @@ Default: "Default"}
 E.g. For SBS1-SBS5 correlated datasets, we can consider \code{"SBS1:SBS5 mutation count ratio"}
 as the label of the \code{datasetGroup} slope.}
 
-\item{datasetSubGroup}{Numeric or character vector differentiating
+\item{datasetSubGroup}{Optional. Numeric or character vector differentiating
 datasets within each group.
 E.g. For SBS1-SBS5 correlated datasets, we can consider Pearson's R^2
 as the subgroup:
 c("Rsq=0.1","Rsq=0.2","Rsq=0.3","Rsq=0.6")
 Default: Names of datasets, which are \code{basename(dataset.dirs)}}
 
-\item{datasetSubGroupName}{Meaning or label of all datasetSubGroup.
+\item{datasetSubGroupName}{Optional. Meaning or label of all datasetSubGroup.
 E.g. For SBS1-SBS5 correlated datasets, we can consider \code{"Pearson's R squared"}
 as the label of the \code{datasetSubGroup} Pearson's R^2.}
 }

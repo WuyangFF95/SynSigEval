@@ -554,14 +554,14 @@ SummarizeMultiRuns <-
 #' E.g. For SBS1-SBS5 correlated datasets, we can consider \code{"SBS1:SBS5 mutation count ratio"}
 #' as the label of the \code{datasetGroup} slope.
 #'
-#' @param datasetSubGroup Numeric or character vector differentiating
+#' @param datasetSubGroup Optional. Numeric or character vector differentiating
 #' datasets within each group.
 #' E.g. For SBS1-SBS5 correlated datasets, we can consider Pearson's R^2
 #' as the subgroup:
 #' c("Rsq=0.1","Rsq=0.2","Rsq=0.3","Rsq=0.6")
 #' Default: Names of datasets, which are \code{basename(dataset.dirs)}
 #'
-#' @param datasetSubGroupName Meaning or label of all datasetSubGroup.
+#' @param datasetSubGroupName Optional. Meaning or label of all datasetSubGroup.
 #' E.g. For SBS1-SBS5 correlated datasets, we can consider \code{"Pearson's R squared"}
 #' as the label of the \code{datasetSubGroup} Pearson's R^2.
 #'
@@ -588,8 +588,8 @@ SummarizeMultiToolsOneDataset <- function(
   tool.dirnames,
   datasetGroup,
   datasetGroupName,
-  datasetSubGroup,
-  datasetSubGroupName){
+  datasetSubGroup = NULL,
+  datasetSubGroupName = NULL){
 
   multiTools <- list()
   combMeanSD <- NULL
@@ -616,17 +616,29 @@ SummarizeMultiToolsOneDataset <- function(
                        "False discovery rate")
       for(index in indexes){
         indexNum <- which(index == indexes)
-        measure4OneTool <- data.frame(seed = names(multiRun[[index]]),
-                          index = index,
-                          indexLabel = indexLabels[indexNum],
-                          value = multiRun[[index]],
-                          toolName = toolName,
-                          datasetName = multiRun$datasetName,
-                          datasetGroup = datasetGroup,
-                          datasetGroupName = datasetGroupName,
-                          datasetSubGroup = datasetSubGroup,
-                          datasetSubGroupName = datasetSubGroupName,
-                          stringsAsFactors = FALSE)
+        if(is.null(datasetSubGroup) | is.null(datasetSubGroupName)) {
+          measure4OneTool <- data.frame(seed = names(multiRun[[index]]),
+                            index = index,
+                            indexLabel = indexLabels[indexNum],
+                            value = multiRun[[index]],
+                            toolName = toolName,
+                            datasetName = multiRun$datasetName,
+                            datasetGroup = datasetGroup,
+                            datasetGroupName = datasetGroupName,
+                            stringsAsFactors = FALSE)          
+        } else {
+          measure4OneTool <- data.frame(seed = names(multiRun[[index]]),
+                            index = index,
+                            indexLabel = indexLabels[indexNum],
+                            value = multiRun[[index]],
+                            toolName = toolName,
+                            datasetName = multiRun$datasetName,
+                            datasetGroup = datasetGroup,
+                            datasetGroupName = datasetGroupName,
+                            datasetSubGroup = datasetSubGroup,
+                            datasetSubGroupName = datasetSubGroupName,
+                            stringsAsFactors = FALSE)
+        }
         rownames(measure4OneTool) <- NULL
         ## Create a data.frame for each index,
         ## and summarize multi-Run, multiDataset values
@@ -646,6 +658,17 @@ SummarizeMultiToolsOneDataset <- function(
       if(is.null(multiTools$cosSim)) multiTools$cosSim <- list()
 
       for(gtSigName in gtSigNames){
+	    if(is.null(datasetSubGroup) | is.null(datasetSubGroupName)) {
+          gtMeanCosSim4OneTool <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
+                            gtSigName = gtSigName,
+                            label = paste0("Cosine similarity to signature ",gtSigName),
+                            value = multiRun$cosSim[[gtSigName]],
+                            toolName = toolName,
+                            datasetName = multiRun$datasetName,
+                            datasetGroup = datasetGroup,
+                            datasetGroupName = datasetGroupName,
+                            stringsAsFactors = FALSE)         
+        } else {
         gtMeanCosSim4OneTool <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
                           gtSigName = gtSigName,
                           label = paste0("Cosine similarity to signature ",gtSigName),
@@ -657,6 +680,7 @@ SummarizeMultiToolsOneDataset <- function(
                           datasetSubGroup = datasetSubGroup,
                           datasetSubGroupName = datasetSubGroupName,
                           stringsAsFactors = FALSE)
+        }
         rownames(gtMeanCosSim4OneTool) <- NULL
         ## Create a data.frame for each ground-truth signature,
         ## and summarize multi-Run, multiDataset values
@@ -674,6 +698,16 @@ SummarizeMultiToolsOneDataset <- function(
     {
       if(is.null(multiTools$ManhattanDist)) multiTools$ManhattanDist <- list()
       for(gtSigName in gtSigNames){
+	    if(is.null(datasetSubGroup) | is.null(datasetSubGroupName)) {
+        gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
+                          gtSigName = gtSigName,
+                          value = multiRun$ManhattanDist[gtSigName,],
+                          toolName = toolName,
+                          datasetName = multiRun$datasetName,
+                          datasetGroup = datasetGroup,
+                          datasetGroupName = datasetGroupName,
+                          stringsAsFactors = FALSE)		
+		} else{
         gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
                           gtSigName = gtSigName,
                           value = multiRun$ManhattanDist[gtSigName,],
@@ -684,6 +718,7 @@ SummarizeMultiToolsOneDataset <- function(
                           datasetSubGroup = datasetSubGroup,
                           datasetSubGroupName = datasetSubGroupName,
                           stringsAsFactors = FALSE)
+		}
         rownames(gtScaledManhattanDist4OneTool) <- NULL
         ## Create a data.frame for each ground-truth signature,
         ## and summarize multi-Run, multiDataset values
