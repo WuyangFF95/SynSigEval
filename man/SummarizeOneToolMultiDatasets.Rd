@@ -6,10 +6,10 @@
 \usage{
 SummarizeOneToolMultiDatasets(
   dataset.dirs,
-  datasetGroup = NULL,
+  datasetGroup,
   datasetGroupName,
   datasetSubGroup = NULL,
-  datasetSubGroupName,
+  datasetSubGroupName = NULL,
   toolName,
   tool.dirname,
   out.dir,

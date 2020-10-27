@@ -216,7 +216,7 @@ SummarizeSigOneSubdir <-
 #' False Positives(FP): Signatures wrongly extracted, not resembling
 #' any ground-truth signatures.
 #' True positive rate (TPR, Sensitivity): TP / (TP + FN)
-#' False discovery rate (FDR): FP / (FP + TP)
+#' Positive predictive value (PPV): TP / (FP + TP)
 #'
 #' @details Also writes multiple files into folder \code{tool.dir}:
 #'
@@ -234,7 +234,7 @@ SummarizeMultiRuns <-
 
     ## Indexes for signature extraction in multiple runs
     indexes <- c("averCosSim","falseNeg","falsePos",
-                 "truePos","TPR","FDR")
+                 "truePos","TPR","PPV")
     for(index in indexes) assign(index,numeric(0))
     cosSim <- list()
 
@@ -264,11 +264,11 @@ SummarizeMultiRuns <-
       falsePos <- c(falsePos,length(falsePosNames))
       truePos <- c(truePos, length(truePosNames))
 
-      ## Concatenate TPR (True positive rate) and FDR (False discovery rate)
+      ## Concatenate TPR (True positive rate) and PPV (Positive predictive value)
       currentTPR <- length(truePosNames) / length(gtSigNames)
-      currentFDR <- length(falsePosNames) / (length(truePosNames) + length(falsePosNames))
+      currentPPV <- length(truePosNames) / (length(truePosNames) + length(falsePosNames))
       TPR <- c(TPR, currentTPR)
-      FDR <- c(FDR, currentFDR)
+      PPV <- c(PPV, currentPPV)
 
       ## Concatenating one-signature cosine similarity
       for(gtSigName in gtSigNames) {
@@ -284,7 +284,7 @@ SummarizeMultiRuns <-
     names(falsePos) <- run.names
     names(truePos) <- run.names
     names(TPR) <- run.names
-    names(FDR) <- run.names
+    names(PPV) <- run.names
     for(gtSigName in gtSigNames)
       names(cosSim[[gtSigName]]) <- run.names
 
@@ -299,7 +299,7 @@ SummarizeMultiRuns <-
     multiRun$falsePos <- falsePos
     multiRun$truePos <- truePos
     multiRun$TPR <- TPR
-    multiRun$FDR <- FDR
+    multiRun$PPV <- PPV
     ## Save one-signature cosine similarity on multiple runs
     multiRun$cosSim <- cosSim
 
@@ -308,7 +308,7 @@ SummarizeMultiRuns <-
     ## Calculate mean and SD for indexes of signature extraction
     multiRun$meanSD <- matrix(nrow = 6, ncol = 2)
     indexes <- c("averCosSim","falseNeg","falsePos",
-                 "truePos","TPR","FDR")
+                 "truePos","TPR","PPV")
     rownames(multiRun$meanSD) <- indexes
     colnames(multiRun$meanSD) <- c("mean","stdev")
     for(index in indexes){
@@ -320,7 +320,7 @@ SummarizeMultiRuns <-
     ## Calculate fivenums for signature extraction
     multiRun$fivenum <- matrix(nrow = 6, ncol = 5)
     indexes <- c("averCosSim","falseNeg","falsePos",
-                 "truePos","TPR","FDR")
+                 "truePos","TPR","PPV")
     rownames(multiRun$fivenum) <- indexes
     colnames(multiRun$fivenum) <- c("min","lower-hinge","median","upperhinge","max")
     for(index in indexes){
@@ -335,12 +335,12 @@ SummarizeMultiRuns <-
                   "False positives",
                   "True positives",
                   "True positive rate (sensitivity)",
-                  "False discovery rate (FDR)")
+                  "Positive predictive value (PPV)")
       subtitles <- c("","Number of ground-truth signatures not extracted",
                      "Number of signatures extracted, but different from ground-truth signatures",
                      "Number of ground-truth signatures extracted",
-                     "True Positives / (True Positives + False Negatives)",
-                     "False Positives / (True Positives + False Positives)")
+                     "#True Positives / (#True Positives + #False Negatives)",
+                     "#True Positives / (#True Positives + #False Positives)")
 
       ## ggplot2 boxplot + beeswarm plot
       ggplotList <- list()
@@ -573,7 +573,7 @@ SummarizeMultiRuns <-
 #' False Positives(FP): Signatures wrongly extracted, not resembling
 #' any ground-truth signatures.
 #' True positive rate (TPR, Sensitivity): TP / (TP + FN)
-#' False discovery rate (FDR): FP / (FP + TP)
+#' Positive predictive value (PPV, Precision): TP / (FP + TP)
 #'
 #' @details This function generates \code{multiTools.RDa} under
 #' \code{third.level.dir}
@@ -607,13 +607,13 @@ SummarizeMultiToolsOneDataset <- function(
     ## Combine multi-runs and multi-tools for each index
     {
       indexes <- c("averCosSim","falseNeg","falsePos",
-                   "truePos","TPR","FDR")
+                   "truePos","TPR","PPV")
       indexLabels <- c("Average cosine similarity of all signatures",
                        "Number of False negatives",
                        "Number of False positives",
                        "Number of True positives",
                        "True positive rate",
-                       "False discovery rate")
+                       "Positive predictive value")
       for(index in indexes){
         indexNum <- which(index == indexes)
         if(!exists("datasetSubGroup") | !exists("datasetSubGroupName")) {
@@ -819,13 +819,13 @@ SummarizeMultiToolsMultiDatasets <-
     ## all runs and for all datasets
     {
       indexes <- c("averCosSim","falseNeg","falsePos",
-                   "truePos","TPR","FDR")
+                   "truePos","TPR","PPV")
       indexLabels <- c("Average cosine similarity of all signatures",
                        "False negatives",
                        "False positives",
                        "True positives",
                        "True positive rate (TPR, sensitivity)",
-                       "False discovery rate (FDR)")
+                       "Positive predictive value (PPV, precision)")
       indexNums <- length(indexes)
     }
 
@@ -873,10 +873,10 @@ SummarizeMultiToolsMultiDatasets <-
     {
       plotDFList <- list()
 
-      ## The first index to plot are truePos and FDR.
-      indexes <- c("truePos","FDR")
+      ## The first index to plot are truePos and PPV
+      indexes <- c("truePos","PPV")
       indexLabels<- c("Number of true positives",
-                      "False discovery rate")
+                      "Positive predictive value")
       for(index in indexes){
         plotDFList[[index]] <- data.frame()
       }
@@ -904,7 +904,7 @@ SummarizeMultiToolsMultiDatasets <-
 
         ## The third to plot is the overall one-dimension measure
         ## equals to:
-        ## Average of (1-FDR) in 20 runs +
+        ## Average of PPV in 20 runs +
         ## Average of one-signature cosine similarity in 20 runs +
         ## Proportion of True Positives = Total number of ground-truth signatures.
         if(is.null(plotDFList[["compositeMeasure"]])){
@@ -915,13 +915,13 @@ SummarizeMultiToolsMultiDatasets <-
         toolNames <- unique(multiTools$averCosSim$toolName)
         for(toolName in toolNames){
 
-          ## Calculate the value for mean(1 - FDR) for all runs of each tool on this dataset.
-          rowNum <- which(multiTools$FDR[,"toolName"] == toolName)
-          currentAver1MinusFDR <- 1 - mean(multiTools$FDR[rowNum,"value"])
+          ## Calculate the value for mean(PPV) for all runs of each tool on this dataset.
+          rowNum <- which(multiTools$PPV[,"toolName"] == toolName)
+          currentAverPPV <- mean(multiTools$PPV[rowNum,"value"])
 
           ## Calculate the value for mean(one signature cosine similarity) for all runs of each tool on this dataset.
           currentAverOneSigCosSim <- list()
-          for(gtSigName in gtSigNames){
+          for(gtSigName      in gtSigNames){
             rowNum <- which(multiTools$cosSim[[gtSigName]][,"toolName"] == toolName)
             currentAverOneSigCosSim[[gtSigName]] <- mean(multiTools$cosSim[[gtSigName]][rowNum,"value"])
           }
@@ -940,23 +940,13 @@ SummarizeMultiToolsMultiDatasets <-
 
           ## Sum up all the measurements, as the overall measurement
           if(FALSE){
-            currentMeasureValue <- sum(c(currentAver1MinusFDR , unlist(currentAverOneSigCosSim) , currentPropAllExtracted))
+            currentMeasureValue <- sum(c(currentAverPPV , unlist(currentAverOneSigCosSim) , currentPropAllExtracted))
           } else{
-            currentMeasureValue <- sum(c(currentAver1MinusFDR , unlist(currentAverOneSigCosSim) , currentAverTruePosProp))
+            currentMeasureValue <- sum(c(currentAverPPV , unlist(currentAverOneSigCosSim) , currentAverTruePosProp))
           }
 
           ## Add current composite measure to the plotDFList$compositeMeasure
-          if(!exists("datasetSubGroup") | !exists("datasetSubGroupName")) {
-            currentMeasureDF <- data.frame(
-              "seed" = "all",
-              "index" = "compositeMeasure",
-              "indexLabel" = "Composite measure",
-              "value" = currentMeasureValue,
-              "toolName" = toolName,
-              "datasetName" = multiTools$averCosSim$datasetName[1],
-              "datasetGroup" = multiTools$averCosSim$datasetGroup[1],
-              "datasetGroupName" = multiTools$datasetGroupName)
-          }else{
+          if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
             currentMeasureDF <- data.frame(
               "seed" = "all",
               "index" = "compositeMeasure",
@@ -968,6 +958,16 @@ SummarizeMultiToolsMultiDatasets <-
               "datasetGroupName" = multiTools$datasetGroupName,
               "datasetSubGroup" = multiTools$averCosSim$datasetSubGroup[1],
               "datasetSubGroupName" = multiTools$datasetSubGroupName)
+          } else {
+            currentMeasureDF <- data.frame(
+              "seed" = "all",
+              "index" = "compositeMeasure",
+              "indexLabel" = "Composite measure",
+              "value" = currentMeasureValue,
+              "toolName" = toolName,
+              "datasetName" = multiTools$averCosSim$datasetName[1],
+              "datasetGroup" = multiTools$averCosSim$datasetGroup[1],
+              "datasetGroupName" = multiTools$datasetGroupName)
           }
           plotDFList$compositeMeasure <- rbind(plotDFList$compositeMeasure,currentMeasureDF)
         }
@@ -993,7 +993,7 @@ SummarizeMultiToolsMultiDatasets <-
         plotDFList$combined$datasetGroup,
         levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
 
-      if(exists("datasetSubGroup") & exists("datasetSubGroupName")) {
+      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
         plotDFList$combined$datasetSubGroup <- factor(
           plotDFList$combined$datasetSubGroup,
           levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
@@ -1077,10 +1077,10 @@ SummarizeMultiToolsMultiDatasets <-
       ## Plot a multi-facet ggplot,
       ## facets are separated by measures and datasetGroup
       ## (in example, it refers to slope.)
-      if(!exists("datasetSubGroup") | !exists("datasetSubGroupName")) {
-        bys <- c("datasetGroup")
-      } else{
+      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
         bys <- c("datasetGroup","datasetSubGroup")
+      } else{
+        bys <- c("datasetGroup")
       }
 
       for(by in bys)  {
@@ -1166,17 +1166,17 @@ SummarizeMultiToolsMultiDatasets <-
     ## Write a table for extraction measures.
     if(FALSE){ ## Remove redundant measures
       indexes <- c("averCosSim","falseNeg","falsePos",
-                   "truePos","TPR","FDR")
+                   "truePos","TPR","PPV")
       indexLabels <- c("Average cosine similarity of all signatures",
                        "False negatives",
                        "False positives",
                        "True positives",
                        "True positive Rate (TPR, sensitivity)",
-                       "False discovery Rate (FDR)")
+                       "Positive predictive value (PPV, precision)")
     } else{
-      indexes <- c("averCosSim","FDR")
+      indexes <- c("averCosSim","PPV")
       indexLabels <- c("Average cosine similarity of all signatures",
-                       "False discovery rate (FDR)")
+                       "Positive predictive value (PPV)")
     }
 
 
@@ -1254,7 +1254,7 @@ SummarizeMultiToolsMultiDatasets <-
         plotDFList$combined$datasetGroup,
         levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
 
-      if(exists("datasetSubGroup") & exists("datasetSubGroupName")) {
+      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
         plotDFList$combined$datasetSubGroup <- factor(
           plotDFList$combined$datasetSubGroup,
           levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
@@ -1326,7 +1326,8 @@ SummarizeMultiToolsMultiDatasets <-
       ## Plot a multi-facet ggplot,
       ## facets are separated by gtSigNames and datasetGroup
       ## (in example, it refers to slope.)
-      if(exists("datasetSubGroup") & exists("datasetSubGroupName")) {
+      multiTools$datasetSubGroup
+      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
         bys <- c("datasetGroup","datasetSubGroup")
       } else {
         bys <- c("datasetGroup")
@@ -1478,7 +1479,7 @@ SummarizeMultiToolsMultiDatasets <-
         plotDFList$combined$datasetGroup,
         levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
 
-      if(exists("datasetSubGroup") & exists("datasetSubGroupName")) {
+      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
         plotDFList$combined$datasetSubGroup <- factor(
           plotDFList$combined$datasetSubGroup,
           levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
@@ -1547,7 +1548,7 @@ SummarizeMultiToolsMultiDatasets <-
       ## Plot a multi-facet ggplot,
       ## facets are separated by gtSigNames and datasetGroup
       ## (in example, it refers to slope.)
-      if(exists("datasetSubGroup") & exists("datasetSubGroupName")) {
+      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
         bys <- c("datasetGroup","datasetSubGroup")
       } else {
         bys <- c("datasetGroup")
@@ -1692,10 +1693,10 @@ SummarizeMultiToolsMultiDatasets <-
 #'
 SummarizeOneToolMultiDatasets <-
   function(dataset.dirs,
-           datasetGroup = NULL,
+           datasetGroup,
            datasetGroupName,
            datasetSubGroup = NULL,
-           datasetSubGroupName,
+           datasetSubGroupName = NULL,
            toolName,
            tool.dirname,
            out.dir,
@@ -1733,19 +1734,19 @@ SummarizeOneToolMultiDatasets <-
     ## Need to calculate tables for All 6 measures
     {
       indexes <- c("averCosSim","falseNeg","falsePos",
-                   "truePos","TPR","FDR")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "False negatives",
-                       "False positives",
-                       "True positives",
-                       "True positive rate (TPR, sensitivity)",
-                       "False discovery rate (FDR)")
-      subtitles <- c("",
-                     "Number of missing ground-truth signatures",
-                     "Number of artefact signatures extracted, but different from ground-truth signatures",
-                     "Number of extracted ground-truth signatures",
-                     "True Positives / (True Positives + False Negatives)",
-                     "False Positives / (True Positives + False Positives)")
+                   "truePos","TPR","PPV")
+      indexLabels <- c("averCosSim" = "Average cosine similarity of all signatures",
+                       "falseNeg" = "False negatives",
+                       "falsePos" = "False positives",
+                       "truePos" = "True positives",
+                       "TPR" = "True positive rate (TPR, sensitivity)",
+                       "PPV" = "Positive predictive value (PPV, precision)")
+      subtitles <- c("averCosSim" = "",
+                     "falseNeg" = "Number of missing ground-truth signatures",
+                     "falsePos" = "Number of artefact signatures extracted, but different from ground-truth signatures",
+                     "truePos" = "Number of extracted ground-truth signatures",
+                     "TPR" = "True Positives / (True Positives + False Negatives)",
+                     "PPV" = "True Positives / (True Positives + False Positives)")
       names(indexLabels) <- indexes
       names(subtitles) <- indexes
       indexNums <- length(indexes)
@@ -1819,7 +1820,7 @@ SummarizeOneToolMultiDatasets <-
       ## For TPR (sensitivity) and Number of False Negatives,
       ## calculate the proportion of 1.
       OneToolSummary$prop1 <- list()
-      for(index in c("TPR","falseNeg")){
+      for(index in c("TPR","PPV","falseNeg")){
         currentProp <- length(which(OneToolSummary[[index]][,"value"] == 1)) / length(OneToolSummary[[index]][,"value"])
         OneToolSummary$prop1[[index]] <- currentProp
       }
@@ -1829,12 +1830,12 @@ SummarizeOneToolMultiDatasets <-
 
     ## Draw boxplot + beeswarm plot for extraction measures
     {
-      ## Only average cosine similarity, one-signature cosine similarity and FDR are plotted.
-      indexes <- c("averCosSim","FDR")
+      ## Only average cosine similarity, one-signature cosine similarity and PPV are plotted.
+      indexes <- c("averCosSim","PPV")
       indexLabels <- c("Average cosine similarity of all signatures",
-                       "False discovery rate (FDR)")
+                       "Positive predictive value (PPV, precision)")
       subtitles <- c("",
-                     "False Positives / (True Positives + False Positives)")
+                     "True Positives / (True Positives + False Positives)")
 
       ## Designate titles and subtitles for each page
       titles <- indexLabels

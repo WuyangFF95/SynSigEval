@@ -37,7 +37,7 @@ False Negatives(FN): Ground-truth signatures not extracted.
 False Positives(FP): Signatures wrongly extracted, not resembling
 any ground-truth signatures.
 True positive rate (TPR, Sensitivity): TP / (TP + FN)
-False discovery rate (FDR): FP / (FP + TP)
+Positive predictive value (PPV): TP / (FP + TP)
 }
 \description{
 Summarize results from each computational approach in \code{tool.dir}/\code{run.names}
