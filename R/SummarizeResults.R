@@ -1761,8 +1761,8 @@ SummarizeOneToolMultiDatasets <-
           measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
                                            value = multiRun[[index]],
                                            toolName = toolName,
-                                           datasetGroup[datasetName],
-                                           datasetSubGroup[datasetName],
+                                           datasetGroup = datasetGroup[datasetName],
+                                           datasetSubGroup = datasetSubGroup[datasetName],
                                            stringsAsFactors = FALSE)
           colnames(measure4OneDataset)[5] <- datasetGroupName
           colnames(measure4OneDataset)[6] <- datasetSubGroupName
@@ -1799,20 +1799,6 @@ SummarizeOneToolMultiDatasets <-
 
     ## Draw boxplot + beeswarm plot for extraction measures
     {
-      ## Only average cosine similarity, one-signature cosine similarity and PPV are plotted.
-      indexes <- c("averCosSim","PPV")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "Positive predictive value (PPV, precision)")
-      subtitles <- c("",
-                     "True Positives / (True Positives + False Positives)")
-
-      ## Designate titles and subtitles for each page
-      titles <- indexLabels
-      names(titles) <- indexes
-      names(subtitles) <- indexes
-      ylabels <- titles
-
-
       ## Create a list to store ggplot2 boxplot + beeswarm plot objects
       ggplotList <- list()
       ## Plot a value~datasetSubGroup beeswarm for each measure.
@@ -1860,10 +1846,10 @@ SummarizeOneToolMultiDatasets <-
           ## ggplot2::labs() has stronger function than ggplo2::ggtitle.
           ggplot2::labs(
             ## Add title for value~datasetSubGroup beeswarm plot,
-            title = paste0(toolName,": ",titles[index]),
+            title = paste0(toolName,": ",indexLabels[index]),
             subtitle = subtitles[index],
             ## Change title of y axis (axis.title.y) into measure info (same as title)
-            y = titles[index],
+            y = indexLabels[index],
             ## Change title of x axis to "Pearson's R squared"
             x = "Pearson's R squared") +
           ## Change title of legend to datasetGroupName
@@ -1914,6 +1900,8 @@ SummarizeOneToolMultiDatasets <-
         datasetName <- basename(datasetDir)
 
         for(gtSigName in gtSigNames){
+		
+		if(TRUE){ # debug
           gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
                                                 gtSigName = gtSigName,
                                                 value = multiRun$cosSim[[gtSigName]],
@@ -1924,6 +1912,15 @@ SummarizeOneToolMultiDatasets <-
                                                 datasetSubGroup = datasetSubGroup[datasetName],
                                                 datasetSubGroupName = datasetSubGroupName,
                                                 stringsAsFactors = FALSE)
+		} else {
+		  gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
+                                                gtSigName = gtSigName,
+                                                value = multiRun$cosSim[[gtSigName]],
+                                                toolName = toolName,
+                                                datasetGroup = datasetGroup[datasetName],
+                                                datasetSubGroup = datasetSubGroup[datasetName],
+                                                stringsAsFactors = FALSE)
+		}
           rownames(gtMeanCosSim4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
@@ -1967,18 +1964,18 @@ SummarizeOneToolMultiDatasets <-
     ## Plot one-signature cosine similarity boxplot + beeswarm plot for one tool
     { ## debug
       ## Create a list to store ggplot2 boxplot + beeswarm plot objects
-      ggplotList <- list()
+      ggplotList$cosSim <- list()
       ## Plot a value~datasetSubGroup beeswarm plot for each signature.
       for(gtSigName in gtSigNames){
         sigNum <- which(gtSigNames == gtSigName)
-        ggplotList[[gtSigName]] <- ggplot2::ggplot(
+        ggplotList$cosSim[[gtSigName]] <- ggplot2::ggplot(
           OneToolSummary$cosSim[[gtSigName]],
           ## Make sure that only one x-label is shown in one small facet.
           #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
           ggplot2::aes(x = .data$toolName, y = .data$value)
         )
         ## Add facets
-        ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
+        ggplotList$cosSim[[gtSigName]] <- ggplotList$cosSim[[gtSigName]] +
           ggplot2::facet_grid(
             rows = ggplot2::vars(datasetSubGroup),
             cols = ggplot2::vars(datasetGroup),
@@ -2045,7 +2042,7 @@ SummarizeOneToolMultiDatasets <-
       ## Output multiple extraction measures in a pdf file
       grDevices::pdf(paste0(out.dir,"/boxplot.onetool.onesig.cossim.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames)
-        suppressMessages(suppressWarnings(print(ggplotList[[gtSigName]])))
+        suppressMessages(suppressWarnings(print(ggplotList$cosSim[[gtSigName]])))
       grDevices::dev.off()
     }
 
@@ -2066,6 +2063,7 @@ SummarizeOneToolMultiDatasets <-
         datasetName <- basename(datasetDir)
 
         for(gtSigName in gtSigNames){
+		if(TRUE) { # debug
           gtScaledManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
                                                          gtSigName = gtSigName,
                                                          value = multiRun$ManhattanDist[gtSigName,],
@@ -2076,6 +2074,15 @@ SummarizeOneToolMultiDatasets <-
                                                          datasetSubGroup = datasetSubGroup[datasetName],
                                                          datasetSubGroupName = datasetSubGroupName,
                                                          stringsAsFactors = FALSE)
+	      } else {
+		  gtMeanCosSim4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
+                                                gtSigName = gtSigName,
+                                                value = multiRun$ManhattanDist[gtSigName,],
+                                                toolName = toolName,
+                                                datasetGroup = datasetGroup[datasetName],
+                                                datasetSubGroup = datasetSubGroup[datasetName],
+                                                stringsAsFactors = FALSE)
+		}
           rownames(gtScaledManhattanDist4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
@@ -2110,18 +2117,18 @@ SummarizeOneToolMultiDatasets <-
     ## Plot normalized Manhattan distance violin plot + beeswarm plot for one tool
     { ## debug
       ## Create a list to store ggplot2 boxplot + beeswarm plot objects
-      ggplotList <- list()
+      ggplotList$ManhattanDist <- list()
       ## Plot a value~datasetSubGroup beeswarm plot for each signature.
       for(gtSigName in gtSigNames){
         sigNum <- which(gtSigNames == gtSigName)
-        ggplotList[[gtSigName]] <- ggplot2::ggplot(
+        ggplotList$ManhattanDist[[gtSigName]] <- ggplot2::ggplot(
           OneToolSummary$ManhattanDist[[gtSigName]],
           ## Make sure that only one x-label is shown in one small facet.
           #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
           ggplot2::aes(x = .data$toolName, y = .data$value)
         )
         ## Add facets
-        ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
+        ggplotList$ManhattanDist[[gtSigName]] <- ggplotList$ManhattanDist[[gtSigName]] +
           ggplot2::facet_grid(
             rows = ggplot2::vars(datasetSubGroup),
             cols = ggplot2::vars(datasetGroup),
@@ -2189,7 +2196,7 @@ SummarizeOneToolMultiDatasets <-
       ## Output multiple extraction measures in a pdf file
       grDevices::pdf(paste0(out.dir,"/boxplot.onetool.Manhattan.dist.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames)
-        suppressMessages(suppressWarnings(print(ggplotList[[gtSigName]])))
+        suppressMessages(suppressWarnings(print(ggplotList$ManhattanDist[[gtSigName]])))
       grDevices::dev.off()
     }
 
