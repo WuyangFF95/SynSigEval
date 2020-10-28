@@ -29,15 +29,26 @@ or fifth level directories from the dataset top-level folder.
 E.g., c("seed.1","seed.691")}
 }
 \value{
-A list contain c(\code{mean},\code{sd}) of multiple runs:
-Cosine similarity
-True Positives(TP): Ground-truth signatures which are active in
+A list contain values of measures measures in multiple runs: \itemize{
+\item $averCosSim Cosine similarity
+\item $truePos True Positives(TP): Ground-truth signatures which are active in
 the spectra, and extracted.
-False Negatives(FN): Ground-truth signatures not extracted.
-False Positives(FP): Signatures wrongly extracted, not resembling
+\item $falseNeg False Negatives(FN): Ground-truth signatures not extracted.
+\item $falsePos False Positives(FP): Signatures wrongly extracted, not resembling
 any ground-truth signatures.
-True positive rate (TPR, Sensitivity): TP / (TP + FN)
-Positive predictive value (PPV): TP / (FP + TP)
+\item $TPR True positive rate (TPR, Sensitivity): TP / (TP + FN)
+\item $PPV Positive predictive value (PPV): TP / (FP + TP)
+\item $cosSim Average cosine similarity to each of the ground-truth signatures.
+\item $ManhattanDist Scaled Manhattan distance between ground-truth and inferred
+exposures to each of the ground-truth signatures.
+}
+This list also contains \code{mean} and \code{sd}, and other 
+statistics of these measures in \itemize{ 
+\item $fivenum
+\item $fivenumMD
+\item $meanSD
+\item $meanSDMD
+}
 }
 \description{
 Summarize results from each computational approach in \code{tool.dir}/\code{run.names}
@@ -45,5 +56,5 @@ Summarize results from each computational approach in \code{tool.dir}/\code{run.
 combine them into \code{tool.dir}.
 }
 \details{
-Also writes multiple files into folder \code{tool.dir}:
+Also writes multiple files into folder \code{tool.dir}.
 }

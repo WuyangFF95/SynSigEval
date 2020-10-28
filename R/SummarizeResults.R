@@ -208,18 +208,28 @@ SummarizeSigOneSubdir <-
 #' or fifth level directories from the dataset top-level folder.
 #' E.g., c("seed.1","seed.691")
 #'
-#' @return A list contain c(\code{mean},\code{sd}) of multiple runs:
-#' Cosine similarity
-#' True Positives(TP): Ground-truth signatures which are active in
+#' @return A list contain values of measures measures in multiple runs: \itemize{
+#' \item $averCosSim Cosine similarity
+#' \item $truePos True Positives(TP): Ground-truth signatures which are active in
 #' the spectra, and extracted.
-#' False Negatives(FN): Ground-truth signatures not extracted.
-#' False Positives(FP): Signatures wrongly extracted, not resembling
+#' \item $falseNeg False Negatives(FN): Ground-truth signatures not extracted.
+#' \item $falsePos False Positives(FP): Signatures wrongly extracted, not resembling
 #' any ground-truth signatures.
-#' True positive rate (TPR, Sensitivity): TP / (TP + FN)
-#' Positive predictive value (PPV): TP / (FP + TP)
+#' \item $TPR True positive rate (TPR, Sensitivity): TP / (TP + FN)
+#' \item $PPV Positive predictive value (PPV): TP / (FP + TP)
+#' \item $cosSim Average cosine similarity to each of the ground-truth signatures.
+#' \item $ManhattanDist Scaled Manhattan distance between ground-truth and inferred
+#' exposures to each of the ground-truth signatures.
+#' }
+#' This list also contains \code{mean} and \code{sd}, and other 
+#' statistics of these measures in \itemize{ 
+#' \item $fivenum
+#' \item $fivenumMD
+#' \item $meanSD
+#' \item $meanSDMD
+#' }
 #'
-#' @details Also writes multiple files into folder \code{tool.dir}:
-#'
+#' @details Also writes multiple files into folder \code{tool.dir}.
 #'
 #' @importFrom utils write.csv capture.output sessionInfo
 #'
@@ -330,17 +340,19 @@ SummarizeMultiRuns <-
 
     ## Plot boxplot + beeswarm plot for signature extraction
     if(FALSE){
-      titles <- c("Average cosine similarity",
-                  "False negatives",
-                  "False positives",
-                  "True positives",
-                  "True positive rate (sensitivity)",
-                  "Positive predictive value (PPV)")
-      subtitles <- c("","Number of ground-truth signatures not extracted",
-                     "Number of signatures extracted, but different from ground-truth signatures",
-                     "Number of ground-truth signatures extracted",
-                     "#True Positives / (#True Positives + #False Negatives)",
-                     "#True Positives / (#True Positives + #False Positives)")
+    
+      titles <- c("averCosSim" = "Average cosine similarity",
+                  "falseNeg" = "False negatives",
+                  "falsePos" = "False positives",
+                  "truePos" = "True positives",
+                  "TPR" = "True positive rate (sensitivity)",
+                  "PPV" = "Positive predictive value (PPV)")
+      subtitles <- c("averCosSim" = "",
+                     "falseNeg" = "Number of ground-truth signatures not extracted",
+                     "falsePos" = "Number of signatures extracted, but different from ground-truth signatures",
+                     "truePos" = "Number of ground-truth signatures extracted",
+                     "TPR" = "#True Positives / (#True Positives + #False Negatives)",
+                     "PPV" = "#True Positives / (#True Positives + #False Positives)")
 
       ## ggplot2 boxplot + beeswarm plot
       ggplotList <- list()
@@ -590,12 +602,12 @@ SummarizeMultiToolsOneDataset <- function(
     {
       indexes <- c("averCosSim","falseNeg","falsePos",
                    "truePos","TPR","PPV")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "Number of False negatives",
-                       "Number of False positives",
-                       "Number of True positives",
-                       "True positive rate",
-                       "Positive predictive value")
+      indexLabels <- c("averCosSim" = "Average cosine similarity of all signatures",
+                       "falseNeg" = "Number of False negatives",
+                       "falsePos" = "Number of False positives",
+                       "truePos" = "Number of True positives",
+                       "TPR" = "True positive rate",
+                       "PPV" = "Positive predictive value")
       for(index in indexes){
         indexNum <- which(index == indexes)
         if(!exists("datasetSubGroup") | !exists("datasetSubGroupName")) {
@@ -796,18 +808,18 @@ SummarizeMultiToolsMultiDatasets <-
       dir.create(out.dir, recursive = T)
     }
 
-    ## For each index,
+    ## For each measure,
     ## Create a data.frame integrating results of
     ## all runs and for all datasets
     {
       indexes <- c("averCosSim","falseNeg","falsePos",
                    "truePos","TPR","PPV")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "False negatives",
-                       "False positives",
-                       "True positives",
-                       "True positive rate (TPR, sensitivity)",
-                       "Positive predictive value (PPV, precision)")
+      indexLabels <- c("averCosSim" = "Average cosine similarity of all signatures",
+                       "falseNeg" = "False negatives",
+                       "falsePos" = "False positives",
+                       "truePos" = "True positives",
+                       "TPR" = "True positive rate (TPR, sensitivity)",
+                       "PPV" = "Positive predictive value (PPV, precision)")
       indexNums <- length(indexes)
     }
 
@@ -2213,8 +2225,8 @@ SummarizeOneToolMultiDatasets <-
                 quote = F, row.names = F)
     }
     
-	## Write Summary tables for signature cosine similarity.
-	for(gtSigName in gtSigNames){
+    ## Write Summary tables for signature cosine similarity.
+    for(gtSigName in gtSigNames){
       output <- OneToolSummary[[index]]
      
       ## Change "value” to label of measure.
@@ -2228,7 +2240,7 @@ SummarizeOneToolMultiDatasets <-
                 file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"),
                 quote = F, row.names = F)
     }
-	
+    
     ## Write stat summary information into a text file.
     utils::capture.output(OneToolSummary$stats,file = paste0(out.dir,"/stats.txt"))
     utils::capture.output(OneToolSummary$prop1,file = paste0(out.dir,"/prop1.txt"))
