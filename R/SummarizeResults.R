@@ -474,24 +474,6 @@ SummarizeMultiRuns <-
       }
 
 
-      ## Print high-resolution extraction indexes into one single png file
-      if(FALSE){
-        tempPlotList <- list()
-        for(gtSigName in gtSigNames) {
-          tempPlotList[[gtSigName]] <- ggplotList[[gtSigName]]
-        }
-
-        suppressMessages(
-          ggplot2::ggsave(
-            filename = paste0(tool.dir,"/boxplot.Manhattan.Dist.png"),
-            plot = ggpubr::ggarrange(plotlist = tempPlotList),
-            device = "png",
-            dpi = 1000,
-            limitsize = FALSE
-          )
-        )
-      }
-
       ## Print extraction indexes into one pdf file
       grDevices::pdf(paste0(tool.dir,"/boxplot.attribution.measures.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames) print(ggplotList[[gtSigName]])
@@ -1762,13 +1744,9 @@ SummarizeOneToolMultiDatasets <-
         ## Add multiRun <- NULL to please R check
         multiRun <- NULL
         load(paste0(thirdLevelDir,"/multiRun.RDa"))
-        ## Omit redundant measures
-        if(FALSE){
-          indexes <- rownames(multiRun$meanSD)
-          indexNums <- length(indexes)
-        }
         datasetName <- basename(datasetDir)
         for(index in indexes){
+        if(TRUE){ ## debug
           measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
                                            index = index,
                                            value = multiRun[[index]],
@@ -1779,7 +1757,16 @@ SummarizeOneToolMultiDatasets <-
                                            datasetSubGroup = datasetSubGroup[datasetName],
                                            datasetSubGroupName = datasetSubGroupName,
                                            stringsAsFactors = FALSE)
-
+        } else {
+          measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
+                                           value = multiRun[[index]],
+                                           toolName = toolName,
+                                           datasetGroup[datasetName],
+                                           datasetSubGroup[datasetName],
+                                           stringsAsFactors = FALSE)
+          colnames(measure4OneDataset)[5] <- datasetGroupName
+          colnames(measure4OneDataset)[6] <- datasetSubGroupName
+        }
           rownames(measure4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
@@ -1792,32 +1779,14 @@ SummarizeOneToolMultiDatasets <-
         }
       }
 
-      ## Combine tables of different measures for extraction performance
-      ## into OneToolSummary$extraction.
-      OneToolSummary[["extraction"]] <- data.frame()
-      for(index in indexes){
-        measure4AllDatasets <- data.frame(OneToolSummary[[index]],
-                                          stringsAsFactors = FALSE)
-        rownames(measure4AllDatasets) <- NULL
-
-        if(nrow(OneToolSummary[["extraction"]]) == 0 |
-           ncol(OneToolSummary[["extraction"]]) == 0 |
-           is.null(dim(OneToolSummary[["extraction"]])) ) {
-          OneToolSummary[["extraction"]] <- measure4AllDatasets
-        } else {
-          OneToolSummary[["extraction"]] <-
-            rbind(OneToolSummary[["extraction"]],measure4AllDatasets)
-        }
-      }
-
-      ## Calculate the stats of each extraction performance measure.
+      ## Calculate the stats (returned by summary()) of each extraction performance measure.
       OneToolSummary$stats <- list()
       for(index in indexes){
         currentStats <- summary(OneToolSummary[[index]][,"value"])
         OneToolSummary$stats[[index]] <- currentStats
       }
 
-      ## For TPR (sensitivity) and Number of False Negatives,
+      ## For TPR (sensitivity), PPV and Number of False Negatives,
       ## calculate the proportion of 1.
       OneToolSummary$prop1 <- list()
       for(index in c("TPR","PPV","falseNeg")){
@@ -1846,37 +1815,6 @@ SummarizeOneToolMultiDatasets <-
 
       ## Create a list to store ggplot2 boxplot + beeswarm plot objects
       ggplotList <- list()
-      ## Plot a general boxplot + beeswarm plot for multiple measures
-      if(FALSE){
-        ggplotList[["general"]] <- ggplot2::ggplot(
-          OneToolSummary[["extraction"]],
-          ggplot2::aes(x = .data$toolName, y = .data$value))
-        ggplotList[["general"]] <- ggplotList[["general"]] +
-          ## Draw boxplot
-          ggplot2::geom_boxplot(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            ## Maximize the violin plot width
-            scale = "width"
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          ## Draw beeswarm plot
-          ggbeeswarm::geom_quasirandom(groupOnX = TRUE, ## Make repetitive points with the same Y to dodge on X axis
-                                       size = 0.3, ## Make dot size smaller
-          ) +
-          ## If fill is set to single color, disable scale_fill_manual
-          #ggplot2::scale_fill_manual(
-          #  values = grDevices::topo.colors(length(indexes)))
-          ## Add title for general boxplot + beeswarm plot
-          ggplot2::labs(
-            title = paste0(toolName,": Summary plot for extraction measures")
-          ) +
-          ## Restrict the decimal numbers of values of measures to be 2
-          ggplot2::scale_y_continuous(
-            labels =function(x) sprintf("%.2f", x)
-          )
-      }
       ## Plot a value~datasetSubGroup beeswarm for each measure.
       for(index in indexes){
         indexNum <- which(indexes == index)
@@ -1952,23 +1890,6 @@ SummarizeOneToolMultiDatasets <-
       }
 
 
-      ## Output measures in a png file
-      for(index in indexes){
-        ## Need to suppress warning,
-        ## because for each facet, there was only one possible x
-        ## and the layout$ in ggplot2:::build.ggplot() will throw a warning:
-        ##  Warning in min(x) : no non-missing arguments to min; returning Inf
-        ##  Warning in max(x) : no non-missing arguments to max; returning -Inf
-        ##
-        ## This warning is not an error, but it is annoying.
-        suppressMessages(
-          suppressWarnings(
-            ggplot2::ggsave(paste0(out.dir,"/boxplot.onetool.extraction.",index,".png"),
-                            plot = ggplotList[[index]], device = "png", dpi = 1000,limitsize = FALSE)
-          )
-        )
-      }
-
       ## Output multiple extraction measures in a pdf file
       grDevices::pdf(paste0(out.dir,"/boxplot.onetool.extraction.measures.pdf"), pointsize = 1)
       for(index in indexes)
@@ -2015,7 +1936,7 @@ SummarizeOneToolMultiDatasets <-
         }
       }
 
-      ## Calculate the stats of one-signature cosine similarity.
+      ## Calculate the stats (returned by summary()) of one-signature cosine similarity.
       OneToolSummary$stats$cosSim <- list()
       for(gtSigName in gtSigNames){
         currentStats <- summary(OneToolSummary$cosSim[[gtSigName]][,"value"])
@@ -2047,41 +1968,6 @@ SummarizeOneToolMultiDatasets <-
     { ## debug
       ## Create a list to store ggplot2 boxplot + beeswarm plot objects
       ggplotList <- list()
-      ## Plot a general boxplot + beeswarm plot for multiple measures
-      if(FALSE){
-        ggplotList[["general"]] <- ggplot2::ggplot(
-          OneToolSummary$cosSim$combined,
-          ggplot2::aes(x = .data$toolName, y = .data$value))
-        ## Draw boxplot + beeswarm plot
-        ggplotList[["general"]] <- ggplotList[["general"]] +
-          ## Draw geom_violin
-          ggplot2::geom_violin(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            ## Maximize the violin plot width
-            scale = "width"
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
-          ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
-                                       size = 0.3, ## Make dot size smaller
-                                       #position = ggplot2::position_dodge(0.9),
-          ) +
-          ## Change filling colors
-          ## If fill is set to single color, disable scale_fill_manual
-          #ggplot2::scale_fill_manual(
-          #  values = grDevices::topo.colors(length(indexes)))
-          ## Add title for general boxplot + beeswarm plot
-          ggplot2::labs(title = paste0(toolName,": Summary plot for one-signature cosine similarity")) +
-          ## Restrict the decimal numbers of values of measures to be 2
-          ggplot2::scale_y_continuous(
-            ## For one-signature cosine similarity, set ylim from the minimum of Manhattan distance value to 1.
-            limits = c(min(OneToolSummary$cosSim$combined$value),1),
-            labels =function(x) sprintf("%.2f", x))
-      }
       ## Plot a value~datasetSubGroup beeswarm plot for each signature.
       for(gtSigName in gtSigNames){
         sigNum <- which(gtSigNames == gtSigName)
@@ -2156,16 +2042,6 @@ SummarizeOneToolMultiDatasets <-
       }
 
 
-      ## Output average cosine similarity in high resolution png file
-      for(gtSigName in gtSigNames){
-        suppressMessages(
-          suppressWarnings(
-            ggplot2::ggsave(filename = paste0(out.dir,"/boxplot.onetool.",gtSigName,".onesig.cossim.png"),
-                            plot = ggplotList[[gtSigName]], device = "png", dpi = 1000,limitsize = FALSE)
-          )
-        )
-      }
-
       ## Output multiple extraction measures in a pdf file
       grDevices::pdf(paste0(out.dir,"/boxplot.onetool.onesig.cossim.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames)
@@ -2235,41 +2111,6 @@ SummarizeOneToolMultiDatasets <-
     { ## debug
       ## Create a list to store ggplot2 boxplot + beeswarm plot objects
       ggplotList <- list()
-      ## Plot a general boxplot + beeswarm plot for Manhttan distance of multiple signatures
-      if(FALSE){
-        ggplotList[["general"]] <- ggplot2::ggplot(
-          OneToolSummary$ManhattanDist$combined,
-          ggplot2::aes(x = .data$toolName, y = .data$value))
-        ## Draw boxplot + beeswarm plot
-        ggplotList[["general"]] <- ggplotList[["general"]] +
-          ## Draw geom_violin
-          ggplot2::geom_violin(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            ## Maximize the violin plot width
-            scale = "width"
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
-          ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
-                                       size = 0.3, ## Make dot size smaller
-                                       #position = ggplot2::position_dodge(0.9),
-          ) +
-          ## Change filling colors
-          ## If fill is set to single color, disable scale_fill_manual
-          #ggplot2::scale_fill_manual(
-          #  values = grDevices::topo.colors(length(indexes)))
-          ## Add title for general boxplot + beeswarm plot
-          ggplot2::labs(title = paste0(toolName,": Summary plot for Scaled Manhattan distance")) +
-          ## Restrict the decimal numbers of values of measures to be 2
-          ggplot2::scale_y_continuous(
-            ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-            limits = c(0,max(OneToolSummary$ManhattanDist$combined$value)),
-            labels =function(x) sprintf("%.2f", x))
-      }
       ## Plot a value~datasetSubGroup beeswarm plot for each signature.
       for(gtSigName in gtSigNames){
         sigNum <- which(gtSigNames == gtSigName)
@@ -2344,16 +2185,6 @@ SummarizeOneToolMultiDatasets <-
               name = "SBS1:SBS5 mutation count ratio"))
       }
 
-
-      ## Output average cosine similarity in high resolution png file
-      for(gtSigName in gtSigNames){
-        suppressMessages(
-          suppressWarnings(
-            ggplot2::ggsave(filename = paste0(out.dir,"/boxplot.onetool.",gtSigName,".Manhattan.dist.png"),
-                            plot = ggplotList[[gtSigName]], device = "png", dpi = 1000,limitsize = FALSE)
-          )
-        )
-      }
 
       ## Output multiple extraction measures in a pdf file
       grDevices::pdf(paste0(out.dir,"/boxplot.onetool.Manhattan.dist.pdf"), pointsize = 1)
