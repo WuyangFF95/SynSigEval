@@ -2197,21 +2197,44 @@ SummarizeOneToolMultiDatasets <-
     }
 
 
-    ## Write Summary tables for measures
+    ## Write Summary tables for extraction measures
     for(index in indexes){
-	  output <- OneToolSummary[[index]]
-	  
-	  
-	
-      write.csv(OneToolSummary[[index]],
+      output <- OneToolSummary[[index]]
+     
+      ## Change "value” to label of measure.
+      colnames(output)[1] <- "Seed or run number"
+      colnames(output)[2] <- indexLabels[index]
+      colnames(output)[3] <- "Name of computational approach"
+      colnames(output)[4] <- datasetGroupName
+      colnames(output)[5] <- datasetSubGroupName    
+    
+      write.csv(output,
                 file = paste0(out.dir,"/",index,".csv"),
                 quote = F, row.names = F)
     }
-
+    
+	## Write Summary tables for signature cosine similarity.
+	for(gtSigName in gtSigNames){
+      output <- OneToolSummary[[index]]
+     
+      ## Change "value” to label of measure.
+      colnames(output)[1] <- "Seed or run number"
+      colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
+      colnames(output)[3] <- "Name of computational approach"
+      colnames(output)[4] <- datasetGroupName
+      colnames(output)[5] <- datasetSubGroupName    
+    
+      write.csv(output,
+                file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"),
+                quote = F, row.names = F)
+    }
+	
     ## Write stat summary information into a text file.
     utils::capture.output(OneToolSummary$stats,file = paste0(out.dir,"/stats.txt"))
     utils::capture.output(OneToolSummary$prop1,file = paste0(out.dir,"/prop1.txt"))
+    
 
+    ## Add datasetGroupName and datasetSubGroupName into OneToolSummary
     OneToolSummary$datasetGroupName <- datasetGroupName
     OneToolSummary$datasetSubGroupName <- datasetSubGroupName
 
