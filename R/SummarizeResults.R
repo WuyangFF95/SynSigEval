@@ -1746,7 +1746,7 @@ SummarizeOneToolMultiDatasets <-
         load(paste0(thirdLevelDir,"/multiRun.RDa"))
         datasetName <- basename(datasetDir)
         for(index in indexes){
-        if(TRUE){ ## debug
+        if(FALSE){ ## debug
           measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
                                            index = index,
                                            value = multiRun[[index]],
@@ -1764,8 +1764,6 @@ SummarizeOneToolMultiDatasets <-
                                            datasetGroup = datasetGroup[datasetName],
                                            datasetSubGroup = datasetSubGroup[datasetName],
                                            stringsAsFactors = FALSE)
-          colnames(measure4OneDataset)[5] <- datasetGroupName
-          colnames(measure4OneDataset)[6] <- datasetSubGroupName
         }
           rownames(measure4OneDataset) <- NULL
 
@@ -1900,8 +1898,8 @@ SummarizeOneToolMultiDatasets <-
         datasetName <- basename(datasetDir)
 
         for(gtSigName in gtSigNames){
-		
-		if(TRUE){ # debug
+
+        if(FALSE){ # debug
           gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
                                                 gtSigName = gtSigName,
                                                 value = multiRun$cosSim[[gtSigName]],
@@ -1912,15 +1910,14 @@ SummarizeOneToolMultiDatasets <-
                                                 datasetSubGroup = datasetSubGroup[datasetName],
                                                 datasetSubGroupName = datasetSubGroupName,
                                                 stringsAsFactors = FALSE)
-		} else {
-		  gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
-                                                gtSigName = gtSigName,
+        } else {
+          gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
                                                 value = multiRun$cosSim[[gtSigName]],
                                                 toolName = toolName,
                                                 datasetGroup = datasetGroup[datasetName],
                                                 datasetSubGroup = datasetSubGroup[datasetName],
                                                 stringsAsFactors = FALSE)
-		}
+        }
           rownames(gtMeanCosSim4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
@@ -2063,7 +2060,7 @@ SummarizeOneToolMultiDatasets <-
         datasetName <- basename(datasetDir)
 
         for(gtSigName in gtSigNames){
-		if(TRUE) { # debug
+        if(FALSE) { # debug
           gtScaledManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
                                                          gtSigName = gtSigName,
                                                          value = multiRun$ManhattanDist[gtSigName,],
@@ -2074,15 +2071,14 @@ SummarizeOneToolMultiDatasets <-
                                                          datasetSubGroup = datasetSubGroup[datasetName],
                                                          datasetSubGroupName = datasetSubGroupName,
                                                          stringsAsFactors = FALSE)
-	      } else {
-		  gtMeanCosSim4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
-                                                gtSigName = gtSigName,
+          } else {
+          gtScaledManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
                                                 value = multiRun$ManhattanDist[gtSigName,],
                                                 toolName = toolName,
                                                 datasetGroup = datasetGroup[datasetName],
                                                 datasetSubGroup = datasetSubGroup[datasetName],
                                                 stringsAsFactors = FALSE)
-		}
+        }
           rownames(gtScaledManhattanDist4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
@@ -2203,6 +2199,10 @@ SummarizeOneToolMultiDatasets <-
 
     ## Write Summary tables for measures
     for(index in indexes){
+	  output <- OneToolSummary[[index]]
+	  
+	  
+	
       write.csv(OneToolSummary[[index]],
                 file = paste0(out.dir,"/",index,".csv"),
                 quote = F, row.names = F)
