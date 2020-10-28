@@ -595,8 +595,11 @@ SummarizeMultiToolsOneDataset <- function(
     toolPath <- paste0(third.level.dir,"/",toolDirName)
     ## Add multiRun <- NULL to please the R check
     multiRun <- NULL
-    datasetName <- NULL
+	datasetName <- NULL
     load(paste0(toolPath,"/multiRun.RDa"))
+	if(!is.null(datasetName) & datasetName != multiRun$datasetName) 
+	  stop("Must provide results of different approaches on the SAME dataset.\n")
+    datasetName <- multiRun$datasetName
 
     ## Combine multi-runs and multi-tools for each index
     {
@@ -610,15 +613,13 @@ SummarizeMultiToolsOneDataset <- function(
                        "PPV" = "Positive predictive value")
       for(index in indexes){
         indexNum <- which(index == indexes)
-        if(!exists("datasetSubGroup") | !exists("datasetSubGroupName")) {
+        if(!exists("datasetSubGroup")) {
           measure4OneTool <- data.frame(seed = names(multiRun[[index]]),
                                         index = index,
                                         indexLabel = indexLabels[indexNum],
                                         value = multiRun[[index]],
                                         toolName = toolName,
-                                        datasetName = multiRun$datasetName,
                                         datasetGroup = datasetGroup,
-                                        datasetGroupName = datasetGroupName,
                                         stringsAsFactors = FALSE)
         } else {
           measure4OneTool <- data.frame(seed = names(multiRun[[index]]),
@@ -628,9 +629,7 @@ SummarizeMultiToolsOneDataset <- function(
                                         toolName = toolName,
                                         datasetName = multiRun$datasetName,
                                         datasetGroup = datasetGroup,
-                                        datasetGroupName = datasetGroupName,
                                         datasetSubGroup = datasetSubGroup,
-                                        datasetSubGroupName = datasetSubGroupName,
                                         stringsAsFactors = FALSE)
         }
         rownames(measure4OneTool) <- NULL
@@ -652,7 +651,7 @@ SummarizeMultiToolsOneDataset <- function(
       if(is.null(multiTools$cosSim)) multiTools$cosSim <- list()
 
       for(gtSigName in gtSigNames){
-        if(!exists("datasetSubGroup") | !exists("datasetSubGroupName")) {
+        if(!exists("datasetSubGroup")) {
           gtMeanCosSim4OneTool <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
                                              gtSigName = gtSigName,
                                              label = paste0("Cosine similarity to signature ",gtSigName),
@@ -660,7 +659,6 @@ SummarizeMultiToolsOneDataset <- function(
                                              toolName = toolName,
                                              datasetName = multiRun$datasetName,
                                              datasetGroup = datasetGroup,
-                                             datasetGroupName = datasetGroupName,
                                              stringsAsFactors = FALSE)
         } else {
           gtMeanCosSim4OneTool <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
@@ -670,9 +668,7 @@ SummarizeMultiToolsOneDataset <- function(
                                              toolName = toolName,
                                              datasetName = multiRun$datasetName,
                                              datasetGroup = datasetGroup,
-                                             datasetGroupName = datasetGroupName,
                                              datasetSubGroup = datasetSubGroup,
-                                             datasetSubGroupName = datasetSubGroupName,
                                              stringsAsFactors = FALSE)
         }
         rownames(gtMeanCosSim4OneTool) <- NULL
@@ -692,14 +688,13 @@ SummarizeMultiToolsOneDataset <- function(
     {
       if(is.null(multiTools$ManhattanDist)) multiTools$ManhattanDist <- list()
       for(gtSigName in gtSigNames){
-        if(!exists("datasetSubGroup") | !exists("datasetSubGroupName")) {
+        if(!exists("datasetSubGroup")) {
           gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
                                                       gtSigName = gtSigName,
                                                       value = multiRun$ManhattanDist[gtSigName,],
                                                       toolName = toolName,
                                                       datasetName = multiRun$datasetName,
                                                       datasetGroup = datasetGroup,
-                                                      datasetGroupName = datasetGroupName,
                                                       stringsAsFactors = FALSE)
         } else{
           gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
@@ -708,9 +703,7 @@ SummarizeMultiToolsOneDataset <- function(
                                                       toolName = toolName,
                                                       datasetName = multiRun$datasetName,
                                                       datasetGroup = datasetGroup,
-                                                      datasetGroupName = datasetGroupName,
                                                       datasetSubGroup = datasetSubGroup,
-                                                      datasetSubGroupName = datasetSubGroupName,
                                                       stringsAsFactors = FALSE)
         }
         rownames(gtScaledManhattanDist4OneTool) <- NULL
@@ -752,6 +745,7 @@ SummarizeMultiToolsOneDataset <- function(
 
   multiTools$combMeanSD <- combMeanSD
   multiTools$combMeanSDMD <- combMeanSDMD
+  multiTools$datasetName <- datasetName
   multiTools$datasetGroupName <- datasetGroupName
   multiTools$datasetSubGroupName <- datasetSubGroupName
 
