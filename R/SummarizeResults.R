@@ -221,8 +221,8 @@ SummarizeSigOneSubdir <-
 #' \item $ManhattanDist Scaled Manhattan distance between ground-truth and inferred
 #' exposures to each of the ground-truth signatures.
 #' }
-#' This list also contains \code{mean} and \code{sd}, and other 
-#' statistics of these measures in \itemize{ 
+#' This list also contains \code{mean} and \code{sd}, and other
+#' statistics of these measures in \itemize{
 #' \item $fivenum
 #' \item $fivenumMD
 #' \item $meanSD
@@ -340,7 +340,7 @@ SummarizeMultiRuns <-
 
     ## Plot boxplot + beeswarm plot for signature extraction
     if(FALSE){
-    
+
       titles <- c("averCosSim" = "Average cosine similarity",
                   "falseNeg" = "False negatives",
                   "falsePos" = "False positives",
@@ -538,7 +538,7 @@ SummarizeMultiRuns <-
 #' elsewhere. However there should be a directory within the \code{tool.names}
 #' which stores the software output.
 #'
-#' @param datasetGroup Numeric or character vector specifying the group
+#' @param datasetGroup Numeric or character vector specifying the groups
 #' each dataset belong to.
 #' E.g. For SBS1-SBS5 correlated datasets, we can consider slope as the group:
 #' c("slope=0.1","slope=0.5","slope=1","slope=2","slope=5","slope=10")
@@ -597,9 +597,12 @@ SummarizeMultiToolsOneDataset <- function(
     multiRun <- NULL
 	datasetName <- NULL
     load(paste0(toolPath,"/multiRun.RDa"))
-	if(!is.null(datasetName) & datasetName != multiRun$datasetName) 
-	  stop("Must provide results of different approaches on the SAME dataset.\n")
-    datasetName <- multiRun$datasetName
+	if(!is.null(datasetName)) {
+	  if(datasetName != multiRun$datasetName) {
+	    stop("Must provide results of different approaches on the SAME dataset.\n")
+      }
+	}
+	datasetName <- multiRun$datasetName
 
     ## Combine multi-runs and multi-tools for each index
     {
@@ -613,18 +616,15 @@ SummarizeMultiToolsOneDataset <- function(
                        "PPV" = "Positive predictive value")
       for(index in indexes){
         indexNum <- which(index == indexes)
-        if(!exists("datasetSubGroup")) {
+        if(!exists("datasetSubGroup")) { # datasetSubGroup is not provided
           measure4OneTool <- data.frame(seed = names(multiRun[[index]]),
-                                        index = index,
-                                        indexLabel = indexLabels[indexNum],
                                         value = multiRun[[index]],
                                         toolName = toolName,
+                                        datasetName = multiRun$datasetName,
                                         datasetGroup = datasetGroup,
                                         stringsAsFactors = FALSE)
         } else {
           measure4OneTool <- data.frame(seed = names(multiRun[[index]]),
-                                        index = index,
-                                        indexLabel = indexLabels[indexNum],
                                         value = multiRun[[index]],
                                         toolName = toolName,
                                         datasetName = multiRun$datasetName,
@@ -653,8 +653,6 @@ SummarizeMultiToolsOneDataset <- function(
       for(gtSigName in gtSigNames){
         if(!exists("datasetSubGroup")) {
           gtMeanCosSim4OneTool <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
-                                             gtSigName = gtSigName,
-                                             label = paste0("Cosine similarity to signature ",gtSigName),
                                              value = multiRun$cosSim[[gtSigName]],
                                              toolName = toolName,
                                              datasetName = multiRun$datasetName,
@@ -662,8 +660,6 @@ SummarizeMultiToolsOneDataset <- function(
                                              stringsAsFactors = FALSE)
         } else {
           gtMeanCosSim4OneTool <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
-                                             gtSigName = gtSigName,
-                                             label = paste0("Cosine similarity to signature ",gtSigName),
                                              value = multiRun$cosSim[[gtSigName]],
                                              toolName = toolName,
                                              datasetName = multiRun$datasetName,
@@ -690,7 +686,6 @@ SummarizeMultiToolsOneDataset <- function(
       for(gtSigName in gtSigNames){
         if(!exists("datasetSubGroup")) {
           gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
-                                                      gtSigName = gtSigName,
                                                       value = multiRun$ManhattanDist[gtSigName,],
                                                       toolName = toolName,
                                                       datasetName = multiRun$datasetName,
@@ -698,7 +693,6 @@ SummarizeMultiToolsOneDataset <- function(
                                                       stringsAsFactors = FALSE)
         } else{
           gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
-                                                      gtSigName = gtSigName,
                                                       value = multiRun$ManhattanDist[gtSigName,],
                                                       toolName = toolName,
                                                       datasetName = multiRun$datasetName,
@@ -861,7 +855,7 @@ SummarizeMultiToolsMultiDatasets <-
     {
       plotDFList <- list()
 
-      ## The first index to plot are truePos and PPV
+      ## The measures to be plotted are truePos and PPV
       indexes <- c("truePos","PPV")
       indexLabels<- c("Number of true positives",
                       "Positive predictive value")
@@ -934,7 +928,7 @@ SummarizeMultiToolsMultiDatasets <-
           }
 
           ## Add current composite measure to the plotDFList$compositeMeasure
-          if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
+          if(!is.null(multiTools$datasetSubGroupName)) {
             currentMeasureDF <- data.frame(
               "seed" = "all",
               "index" = "compositeMeasure",
@@ -981,7 +975,7 @@ SummarizeMultiToolsMultiDatasets <-
         plotDFList$combined$datasetGroup,
         levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
 
-      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
+      if(!is.null(multiTools$datasetSubGroupName)) {
         plotDFList$combined$datasetSubGroup <- factor(
           plotDFList$combined$datasetSubGroup,
           levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
@@ -1065,7 +1059,7 @@ SummarizeMultiToolsMultiDatasets <-
       ## Plot a multi-facet ggplot,
       ## facets are separated by measures and datasetGroup
       ## (in example, it refers to slope.)
-      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
+      if(!is.null(multiTools$datasetSubGroupName)) {
         bys <- c("datasetGroup","datasetSubGroup")
       } else{
         bys <- c("datasetGroup")
@@ -1242,7 +1236,7 @@ SummarizeMultiToolsMultiDatasets <-
         plotDFList$combined$datasetGroup,
         levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
 
-      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
+      if(!is.null(multiTools$datasetSubGroupName)) {
         plotDFList$combined$datasetSubGroup <- factor(
           plotDFList$combined$datasetSubGroup,
           levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
@@ -1315,7 +1309,7 @@ SummarizeMultiToolsMultiDatasets <-
       ## facets are separated by gtSigNames and datasetGroup
       ## (in example, it refers to slope.)
       multiTools$datasetSubGroup
-      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
+      if(!is.null(multiTools$datasetSubGroupName)) {
         bys <- c("datasetGroup","datasetSubGroup")
       } else {
         bys <- c("datasetGroup")
@@ -1467,7 +1461,7 @@ SummarizeMultiToolsMultiDatasets <-
         plotDFList$combined$datasetGroup,
         levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
 
-      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
+      if(!is.null(multiTools$datasetSubGroupName)) {
         plotDFList$combined$datasetSubGroup <- factor(
           plotDFList$combined$datasetSubGroup,
           levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
@@ -1536,7 +1530,7 @@ SummarizeMultiToolsMultiDatasets <-
       ## Plot a multi-facet ggplot,
       ## facets are separated by gtSigNames and datasetGroup
       ## (in example, it refers to slope.)
-      if(!is.null(multiTools$datasetSubGroup) & !is.null(multiTools$datasetSubGroupName)) {
+      if(!is.null(multiTools$datasetSubGroupName)) {
         bys <- c("datasetGroup","datasetSubGroup")
       } else {
         bys <- c("datasetGroup")
@@ -2206,39 +2200,39 @@ SummarizeOneToolMultiDatasets <-
     ## Write Summary tables for extraction measures
     for(index in indexes){
       output <- OneToolSummary[[index]]
-     
+
       ## Change "value” to label of measure.
       colnames(output)[1] <- "Seed or run number"
       colnames(output)[2] <- indexLabels[index]
       colnames(output)[3] <- "Name of computational approach"
       colnames(output)[4] <- datasetGroupName
-      colnames(output)[5] <- datasetSubGroupName    
-    
+      colnames(output)[5] <- datasetSubGroupName
+
       write.csv(output,
                 file = paste0(out.dir,"/",index,".csv"),
                 quote = F, row.names = F)
     }
-    
+
     ## Write Summary tables for signature cosine similarity.
     for(gtSigName in gtSigNames){
       output <- OneToolSummary[[index]]
-     
+
       ## Change "value” to label of measure.
       colnames(output)[1] <- "Seed or run number"
       colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
       colnames(output)[3] <- "Name of computational approach"
       colnames(output)[4] <- datasetGroupName
-      colnames(output)[5] <- datasetSubGroupName    
-    
+      colnames(output)[5] <- datasetSubGroupName
+
       write.csv(output,
                 file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"),
                 quote = F, row.names = F)
     }
-    
+
     ## Write stat summary information into a text file.
     utils::capture.output(OneToolSummary$stats,file = paste0(out.dir,"/stats.txt"))
     utils::capture.output(OneToolSummary$prop1,file = paste0(out.dir,"/prop1.txt"))
-    
+
 
     ## Add datasetGroupName and datasetSubGroupName into OneToolSummary
     OneToolSummary$datasetGroupName <- datasetGroupName
