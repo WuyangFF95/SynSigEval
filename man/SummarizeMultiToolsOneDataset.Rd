@@ -36,7 +36,7 @@ This code depends on a conventional directory structure documented
 elsewhere. However there should be a directory within the \code{tool.names}
 which stores the software output.}
 
-\item{datasetGroup}{Numeric or character vector specifying the group
+\item{datasetGroup}{Numeric or character vector specifying the groups
 each dataset belong to.
 E.g. For SBS1-SBS5 correlated datasets, we can consider slope as the group:
 c("slope=0.1","slope=0.5","slope=1","slope=2","slope=5","slope=10")

@@ -595,14 +595,14 @@ SummarizeMultiToolsOneDataset <- function(
     toolPath <- paste0(third.level.dir,"/",toolDirName)
     ## Add multiRun <- NULL to please the R check
     multiRun <- NULL
-	datasetName <- NULL
+    datasetName <- NULL
     load(paste0(toolPath,"/multiRun.RDa"))
-	if(!is.null(datasetName)) {
-	  if(datasetName != multiRun$datasetName) {
-	    stop("Must provide results of different approaches on the SAME dataset.\n")
+    if(!is.null(datasetName)) {
+      if(datasetName != multiRun$datasetName) {
+        stop("Must provide results of different approaches on the SAME dataset.\n")
       }
-	}
-	datasetName <- multiRun$datasetName
+    }
+    datasetName <- multiRun$datasetName
 
     ## Combine multi-runs and multi-tools for each index
     {
@@ -818,167 +818,127 @@ SummarizeMultiToolsMultiDatasets <-
     {
       FinalExtr <- list()
       toolNames <- character(0)
+      for(index in indexes) {
+        FinalExtr[[index]] <- data.frame()
+      }  
+      FinalExtr$cosSim <- list()
 
-      ## Combine extraction assessment onto 7 sheets:
+
+      ## Combine extraction measures of different datasets:
       for(datasetDir in dataset.dirs){
         thirdLevelDir <- paste0(datasetDir,"/",second.third.level.dirname)
         ## Add multiTools <- NULL to please R check
         multiTools <- NULL
         load(paste0(thirdLevelDir,"/multiTools.RDa"))
+        
+        datasetGroupName <- multiTools$datasetGroupName
+        datasetSubGroupName <- multiTools$datasetSubGroupName
+        
 
         ## Find tool names
         toolNames <- unique(multiTools[["averCosSim"]][,"toolName"])
 
-        if(length(FinalExtr) == 0){
-          for(index in indexes) {
-            FinalExtr[[index]] <- data.frame()
+        ## Bind values of measures in multiTools into FinalExtr.
+        for(index in indexes){
+          FinalExtr[[index]] <- rbind(FinalExtr[[index]],multiTools[[index]])
+        }
+        
+        ## Bind values of cosine similarity in multiTools$cosSim into FinalExtr$cosSim
+        gtSigNames <- multiTools$gtSigNames
+        if(length(FinalExtr$cosSim) == 0){
+          for(gtSigName in gtSigNames) {
+            FinalExtr$cosSim[[gtSigName]] <- data.frame()
           }
         }
-        current <- list()
-        for(index in indexes){
-          current[[index]] <- multiTools[[index]]
-          #rownames(current[[index]]) <- datasetDir
-          FinalExtr[[index]] <- rbind(FinalExtr[[index]],current[[index]])
+        for(gtSigName in gtSigNames){
+          FinalExtr$cosSim[[gtSigName]] <- rbind(FinalExtr$cosSim[[gtSigName]],multiTools$cosSim[[gtSigName]])
         }
       }
-      for(index in indexes){
-        write.csv(FinalExtr[[index]],
+
+      ## Calculate composite measure for each datasetDir.
+      ## It equals to:
+      ## True Positive Rate (TPR) + Positive Predictive Value (PPV)
+      ## Cosine similarity to each of signature (SBS1 and SBS5 in SBS1-SBS5 paper)
+      FinalExtr$compositeMeasure <- FinalExtr$TPR
+      FinalExtr$compositeMeasure$value <- FinalExtr$TPR$value + FinalExtr$PPV$value
+      for(gtSigName in gtSigNames){
+        FinalExtr$compositeMeasure$value <- FinalExtr$compositeMeasure$value + FinalExtr$cosSim[[gtSigName]]$value
+      }
+
+    }
+
+    ## Generating csv tables for extraction performance measure
+    ## and cosine similarities.
+    {
+          
+      ## Output combined extraction 
+      for(index in c(indexes,"compositeMeasure")){
+      
+        output <- FinalExtr[[index]]
+      
+        output <- output[,-4]
+        colnames(output)[1] <- "Seed or run number"
+        colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
+        colnames(output)[3] <- "Name of computational approach"
+        colnames(output)[4] <- datasetGroupName
+        colnames(output)[5] <- datasetSubGroupName
+      
+      
+        write.csv(output,
                   file = paste0(out.dir,"/",index,".csv"))
+      }
+    
+
+      for(gtSigName in gtSigNames){
+      
+        output <- FinalExtr$cosSim[[gtSigName]]
+        
+        output <- output[,-4]
+        colnames(output)[1] <- "Seed or run number"
+        colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
+        colnames(output)[3] <- "Name of computational approach"
+        colnames(output)[4] <- datasetGroupName
+        colnames(output)[5] <- datasetSubGroupName
+      
+        write.csv(output,
+                  file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"))
       }
     }
 
 
     ## For each extraction measures,
     ## merge values from multiple runs
-    ## into one data.frame plotDFList$<measure_name>
+    ## into one data.frame FinalExtr$<measure_name>
     ## and computational approaches for easier plotting.
     {
-      plotDFList <- list()
-
-      ## The measures to be plotted are truePos and PPV
-      indexes <- c("truePos","PPV")
-      indexLabels<- c("Number of true positives",
-                      "Positive predictive value")
-      for(index in indexes){
-        plotDFList[[index]] <- data.frame()
+      ## Combine all extraction measurements, FinalExtr[[index]] into FinalExtr$Combined
+      ## combined all one-signature cosine similarity, FinalExtr[[gtSigName]] into FinalExtr$Combined
+      FinalExtr$combined <- data.frame()
+      for(index in c("TPR","PPV")){
+        plotDFOneMeasure <- data.frame(FinalExtr[[index]], indexLabel = indexLabels[index])
+        FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
       }
-
-      ## For each dataset, combine the index values into plotDFList[[index]]
-      for(datasetDir in dataset.dirs){
-        thirdLevelDir <- paste0(datasetDir,"/",second.third.level.dirname)
-        ## Add multiTools <- NULL to please R check
-        multiTools <- NULL
-        load(paste0(thirdLevelDir,"/multiTools.RDa"))
-
-        for(index in indexes){
-          plotDFList[[index]] <- rbind(plotDFList[[index]],multiTools[[index]])
-        }
-
-        ## The next to plot are one-signature cosine similarity into plotDFList.
-        ## In SBS1-SBS5-correlation study, refer to average SBS1 and average SBS5 similarity.
-        gtSigNames <- names(multiTools$cosSim)
-        for(gtSigName in gtSigNames){
-          if(is.null(plotDFList[[gtSigName]])){
-            plotDFList[[gtSigName]] <- data.frame()
-          }
-          plotDFList[[gtSigName]] <- rbind(plotDFList[[gtSigName]],multiTools$cosSim[[gtSigName]])
-        }
-
-        ## The third to plot is the overall one-dimension measure
-        ## equals to:
-        ## Average of PPV in 20 runs +
-        ## Average of one-signature cosine similarity in 20 runs +
-        ## Proportion of True Positives = Total number of ground-truth signatures.
-        if(is.null(plotDFList[["compositeMeasure"]])){
-          plotDFList[["compositeMeasure"]] <- data.frame()
-        }
-
-        ## Calculate values for each tool/computational approach.
-        toolNames <- unique(multiTools$averCosSim$toolName)
-        for(toolName in toolNames){
-
-          ## Calculate the value for mean(PPV) for all runs of each tool on this dataset.
-          rowNum <- which(multiTools$PPV[,"toolName"] == toolName)
-          currentAverPPV <- mean(multiTools$PPV[rowNum,"value"])
-
-          ## Calculate the value for mean(one signature cosine similarity) for all runs of each tool on this dataset.
-          currentAverOneSigCosSim <- list()
-          for(gtSigName      in gtSigNames){
-            rowNum <- which(multiTools$cosSim[[gtSigName]][,"toolName"] == toolName)
-            currentAverOneSigCosSim[[gtSigName]] <- mean(multiTools$cosSim[[gtSigName]][rowNum,"value"])
-          }
-
-          if(FALSE){ ## Considering whether to calculate all-extracted-proportion, or the mean of .
-            ## Calculate the value for mean(one signature cosine similarity) for all runs of each tool on this dataset.
-            rowNum <- which(multiTools$truePos[,"toolName"] == toolName)
-            currentPropAllExtracted <-
-              sum(multiTools$truePos[rowNum,"value"] == length(multiTools$gtSigNames)) / length(rowNum)
-          } else {
-            ## Calculate the value for mean(truePos) / total number of ground-truth signatures for all runs of each tool on this dataset.
-            rowNum <- which(multiTools$truePos[,"toolName"] == toolName)
-            currentAverTruePosProp <-   mean(multiTools$truePos[rowNum,"value"]) / length(multiTools$gtSigNames)
-
-          }
-
-          ## Sum up all the measurements, as the overall measurement
-          if(FALSE){
-            currentMeasureValue <- sum(c(currentAverPPV , unlist(currentAverOneSigCosSim) , currentPropAllExtracted))
-          } else{
-            currentMeasureValue <- sum(c(currentAverPPV , unlist(currentAverOneSigCosSim) , currentAverTruePosProp))
-          }
-
-          ## Add current composite measure to the plotDFList$compositeMeasure
-          if(!is.null(multiTools$datasetSubGroupName)) {
-            currentMeasureDF <- data.frame(
-              "seed" = "all",
-              "index" = "compositeMeasure",
-              "indexLabel" = "Composite measure",
-              "value" = currentMeasureValue,
-              "toolName" = toolName,
-              "datasetName" = multiTools$averCosSim$datasetName[1],
-              "datasetGroup" = multiTools$averCosSim$datasetGroup[1],
-              "datasetGroupName" = multiTools$datasetGroupName,
-              "datasetSubGroup" = multiTools$averCosSim$datasetSubGroup[1],
-              "datasetSubGroupName" = multiTools$datasetSubGroupName)
-          } else {
-            currentMeasureDF <- data.frame(
-              "seed" = "all",
-              "index" = "compositeMeasure",
-              "indexLabel" = "Composite measure",
-              "value" = currentMeasureValue,
-              "toolName" = toolName,
-              "datasetName" = multiTools$averCosSim$datasetName[1],
-              "datasetGroup" = multiTools$averCosSim$datasetGroup[1],
-              "datasetGroupName" = multiTools$datasetGroupName)
-          }
-          plotDFList$compositeMeasure <- rbind(plotDFList$compositeMeasure,currentMeasureDF)
-        }
-      }
-
-      ## Change column names of plotDFList[[gtSigName]] (one-signature cosine similarity DFs)
+      
+      plotDFOneMeasure <- data.frame(FinalExtr$compositeMeasure, indexLabel = "Composite measure")
+      FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
+      
       for(gtSigName in gtSigNames){
-        colnames(plotDFList[[gtSigName]])[2] <- "index"
-        colnames(plotDFList[[gtSigName]])[3] <- "indexLabel"
+        plotDFOneMeasure <- data.frame(FinalExtr$cosSim[[gtSigName]], indexLabel = paste0("Cosine similarity to ",gtSigName))
+        FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
       }
 
-      ## Combine all extraction measurements, plotDFList[[index]] into plotDFList$Combined
-      ## combined all one-signature cosine similarity, plotDFList[[gtSigName]] into plotDFList$Combined
-      plotDFList$combined <- data.frame()
-      for(index in c(indexes,gtSigNames,"compositeMeasure")){
-        plotDFList$combined <- rbind(plotDFList$combined,plotDFList[[index]])
-      }
 
-      ## Convert plotDFList$combined$datasetGroup and
+      ## Convert FinalExtr$combined$datasetGroup and
       ## Let their levels follow gtools::mixedsort() fashion
       ## So that the order of the facet labels will be more reasonable for readers.
-      plotDFList$combined$datasetGroup <- factor(
-        plotDFList$combined$datasetGroup,
-        levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
+      FinalExtr$combined$datasetGroup <- factor(
+        FinalExtr$combined$datasetGroup,
+        levels = gtools::mixedsort(unique(FinalExtr$combined$datasetGroup)))
 
       if(!is.null(multiTools$datasetSubGroupName)) {
-        plotDFList$combined$datasetSubGroup <- factor(
-          plotDFList$combined$datasetSubGroup,
-          levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
+        FinalExtr$combined$datasetSubGroup <- factor(
+          FinalExtr$combined$datasetSubGroup,
+          levels = gtools::mixedsort(unique(FinalExtr$combined$datasetSubGroup)))
       }
     }
 
@@ -992,9 +952,9 @@ SummarizeMultiToolsMultiDatasets <-
       ## Plot a multi-facet ggplot for all measures and all runs.
       {
         ggplotList <- list()
-        ## Generate a ggplot object based on plotDFList$combined
+        ## Generate a ggplot object based on FinalExtr$combined
         ggplotList$general <- ggplot2::ggplot(
-          plotDFList$combined,
+          FinalExtr$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
           ## Draw geom_violin and geom_quasirandom
           ggplot2::geom_violin(
@@ -1071,9 +1031,9 @@ SummarizeMultiToolsMultiDatasets <-
         ## which is the caption of "datasetGroup"
         byCaption <- eval(parse(text = paste0("multiTools$",by,"Name")))
 
-        ## Generate a ggplot object based on plotDFList$combined
+        ## Generate a ggplot object based on FinalExtr$combined
         ggplotList[[by]] <- ggplot2::ggplot(
-          plotDFList$combined,
+          FinalExtr$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
           ## Draw geom_violin and geom_quasirandom
           ggplot2::geom_violin(
@@ -1145,110 +1105,42 @@ SummarizeMultiToolsMultiDatasets <-
 
 
 
-    ## Write a table for extraction measures.
-    if(FALSE){ ## Remove redundant measures
-      indexes <- c("averCosSim","falseNeg","falsePos",
-                   "truePos","TPR","PPV")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "False negatives",
-                       "False positives",
-                       "True positives",
-                       "True positive Rate (TPR, sensitivity)",
-                       "Positive predictive value (PPV, precision)")
-    } else{
-      indexes <- c("averCosSim","PPV")
-      indexLabels <- c("Average cosine similarity of all signatures",
-                       "Positive predictive value (PPV)")
-    }
-
-
-    ## Summarizing one-signature cosine similarity results.
-    {
-      FinalExtr$cosSim <- list()
-      ## Combine assessment onto multiple sheets.
-      ## Each sheet shows cosine similarity to one mutational signature.
-      for(datasetDir in dataset.dirs){
-        thirdLevelDir <- paste0(datasetDir,"/",second.third.level.dirname)
-        ## Add multiTools <- NULL to please R check
-        multiTools <- NULL
-        load(paste0(thirdLevelDir,"/multiTools.RDa"))
-
-        gtSigNames <- rownames(multiTools$combMeanSDMD)
-        sigNums <- length(gtSigNames)
-
-        if(length(FinalExtr$cosSim) == 0){
-          for(gtSigName in gtSigNames) {
-            FinalExtr$cosSim[[gtSigName]] <- data.frame()
-          }
-        }
-
-        ## Combine one-signature cosine similarity
-        current <- list()
-        for(gtSigName in gtSigNames){
-          current[[gtSigName]] <- multiTools$cosSim[[gtSigName]]
-          FinalExtr$cosSim[[gtSigName]] <- rbind(FinalExtr$cosSim[[gtSigName]],current[[gtSigName]])
-        }
-      }
-      for(gtSigName in gtSigNames){
-        write.csv(FinalExtr$cosSim[[gtSigName]],
-                  file = paste0(out.dir,"/onesig.cossim.",gtSigName,".csv"))
-      }
-    }
-
-
     ## Plot general png and pdf for one-signature cosine similarity summary
     ## Plot a general violin + beeswarm plot for multiple signatures
     ## in all runs and in all datasets.
     {
-      plotDFList <- list()
-
       ## For ground-truth signature,
       ## Create a data.frame integrating results of
       ## all runs and for all datasets
       gtSigNames <- multiTools$gtSigNames
       sigNums <- length(gtSigNames)
 
+      ## Combine all FinalExtr$cosSim[[gtSigName]] into FinalExtr$cosSimCombined
+      FinalExtr$cosSimCombined <- data.frame()
       for(gtSigName in gtSigNames){
-        plotDFList[[gtSigName]] <- data.frame()
+        plotDFOneMeasure <- data.frame(FinalExtr$cosSim[[gtSigName]], gtSigName = gtSigName)
+        FinalExtr$cosSimCombined <- rbind(FinalExtr$cosSimCombined,plotDFOneMeasure)
       }
-
-      ## For each dataset, combine the gtSigName values into plotDFList[[gtSigName]]
-      for(datasetDir in dataset.dirs){
-        thirdLevelDir <- paste0(datasetDir,"/",second.third.level.dirname)
-        ## Add multiTools <- NULL to please R check
-        multiTools <- NULL
-        load(paste0(thirdLevelDir,"/multiTools.RDa"))
-
-        for(gtSigName in gtSigNames){
-          plotDFList[[gtSigName]] <- rbind(plotDFList[[gtSigName]],multiTools$cosSim[[gtSigName]])
-        }
-      }
-
-      ## Combine all plotDFList[[gtSigName]] into plotDFList$Combined
-      plotDFList$combined <- data.frame()
-      for(gtSigName in gtSigNames){
-        plotDFList$combined <- rbind(plotDFList$combined,plotDFList[[gtSigName]])
-      }
-      ## Convert plotDFList$combined$datasetGroup and
+      ## Convert FinalExtr$combined$datasetGroup and
       ## Let their levels follow gtools::mixedsort() fashion
       ## So that the order of the facet labels will be more reasonable for readers.
-      plotDFList$combined$datasetGroup <- factor(
-        plotDFList$combined$datasetGroup,
-        levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
+      FinalExtr$cosSimCombined$datasetGroup <- factor(
+        FinalExtr$cosSimCombined$datasetGroup,
+        levels = gtools::mixedsort(unique(FinalExtr$cosSimCombined$datasetGroup)))
 
       if(!is.null(multiTools$datasetSubGroupName)) {
-        plotDFList$combined$datasetSubGroup <- factor(
-          plotDFList$combined$datasetSubGroup,
-          levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
+        FinalExtr$cosSimCombined$datasetSubGroup <- factor(
+          FinalExtr$cosSimCombined$datasetSubGroup,
+          levels = gtools::mixedsort(unique(FinalExtr$cosSimCombined$datasetSubGroup)))
       }
 
 
       ggplotList <- list()
       ## Plot a multi-facet ggplot for all gtSigNames and all runs.
       {
-        ## Generate a ggplot object based on plotDFList$combined
+        ## Generate a ggplot object based on FinalExtr$combined
         ggplotList$general <- ggplot2::ggplot(
-          plotDFList$combined,
+          FinalExtr$cosSimCombined,
           ggplot2::aes(x = .data$toolName, y = .data$value))
         ## Draw geom_violin and geom_quasirandom
         ggplotList$general <- ggplotList$general +
@@ -1302,13 +1194,12 @@ SummarizeMultiToolsMultiDatasets <-
           ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For one-signature cosine similarity, set ylim from the minimum of cosine similarity value to 1
-            limits = c(min(plotDFList$combined$value), 1),
+            limits = c(min(FinalExtr$cosSimCombined$value), 1),
             labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a multi-facet ggplot,
       ## facets are separated by gtSigNames and datasetGroup
       ## (in example, it refers to slope.)
-      multiTools$datasetSubGroup
       if(!is.null(multiTools$datasetSubGroupName)) {
         bys <- c("datasetGroup","datasetSubGroup")
       } else {
@@ -1322,9 +1213,9 @@ SummarizeMultiToolsMultiDatasets <-
         byCaption <- eval(parse(
           text = paste0("multiTools$",by,"Name")))
 
-        ## Generate a ggplot object based on plotDFList$combined
+        ## Generate a ggplot object based on FinalExtr$combined
         ggplotList[[by]] <- ggplot2::ggplot(
-          plotDFList$combined,
+          FinalExtr$cosSimCombined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
           ## Draw geom_violin and geom_quasirandom
           ggplot2::geom_violin(
@@ -1374,7 +1265,7 @@ SummarizeMultiToolsMultiDatasets <-
           ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For one-signature cosine similarity, set ylim from the minimum of cosine similarity value to 1
-            limits = c(min(plotDFList$combined$value), 1),
+            limits = c(min(FinalExtr$cosSimCombined$value), 1),
             labels = function(x) sprintf("%.2f", x))
       }
 
@@ -1387,7 +1278,8 @@ SummarizeMultiToolsMultiDatasets <-
     }
 
 
-    ## Summarizing attribution Scaled Manhattan distance results.
+    ## Summarizing Scaled Manhattan distance results,
+    ## which measures attribution performances. 
     {
       FinalAttr <- list()
       ## Combine attribution assessment onto multiple sheets.
@@ -1415,64 +1307,55 @@ SummarizeMultiToolsMultiDatasets <-
         }
       }
 
-      for(gtSigName in gtSigNames){
-        write.csv(FinalAttr[[gtSigName]],
-                  file = paste0(out.dir,"/ManhattanDist.",gtSigName,".csv"))
+      ## For the purpose of SBS1-SBS5 paper,
+      ## don't output summary tables for scaled Manhattan distance.
+      if(FALSE){
+        for(gtSigName in gtSigNames){
+          output <- FinalAttr[[gtSigName]]
+        
+          output <- output[,-4]
+          colnames(output)[1] <- "Seed or run number"
+          colnames(output)[2] <- paste0("Scaled distance of ",gtSigName)
+          colnames(output)[3] <- "Name of computational approach"
+          colnames(output)[4] <- datasetGroupName
+          colnames(output)[5] <- datasetSubGroupName
+      
+          write.csv(output,
+                    file = paste0(out.dir,"/ManhattanDist.",gtSigName,".csv"))
+      }
       }
     }
     ## Plot general png and pdf for attribution Scaled Manhattan distance summary
     ## Plot a general violin + beeswarm plot for multiple signatures
     ## in all runs and in all datasets.
     {
-      plotDFList <- list()
 
-      ## For ground-truth signature,
-      ## Create a data.frame integrating results of
-      ## all runs and for all datasets
-      gtSigNames <- multiTools$gtSigNames
-      sigNums <- length(gtSigNames)
-
+      ## Combine all FinalAttr[[gtSigName]] into FinalAttr$Combined
+      FinalAttr$combined <- data.frame()
       for(gtSigName in gtSigNames){
-        plotDFList[[gtSigName]] <- data.frame()
+        plotDFOneMeasure <- data.frame(FinalAttr[[gtSigName]], gtSigName = gtSigName)
+        FinalAttr$combined <- rbind(FinalAttr$combined,plotDFOneMeasure)
       }
 
-      ## For each dataset, combine the gtSigName values into plotDFList[[gtSigName]]
-      for(datasetDir in dataset.dirs){
-        thirdLevelDir <- paste0(datasetDir,"/",second.third.level.dirname)
-        ## Add multiTools <- NULL to please R check
-        multiTools <- NULL
-        load(paste0(thirdLevelDir,"/multiTools.RDa"))
-
-        for(gtSigName in gtSigNames){
-          plotDFList[[gtSigName]] <- rbind(plotDFList[[gtSigName]],multiTools$ManhattanDist[[gtSigName]])
-        }
-      }
-
-      ## Combine all plotDFList[[gtSigName]] into plotDFList$Combined
-      plotDFList$combined <- data.frame()
-      for(gtSigName in gtSigNames){
-        plotDFList$combined <- rbind(plotDFList$combined,plotDFList[[gtSigName]])
-      }
-
-      ## Convert plotDFList$combined$datasetGroup and
+      ## Convert FinalAttr$combined$datasetGroup and
       ## Let their levels follow gtools::mixedsort() fashion
       ## So that the order of the facet labels will be more reasonable for readers.
-      plotDFList$combined$datasetGroup <- factor(
-        plotDFList$combined$datasetGroup,
-        levels = gtools::mixedsort(unique(plotDFList$combined$datasetGroup)))
+      FinalAttr$combined$datasetGroup <- factor(
+        FinalAttr$combined$datasetGroup,
+        levels = gtools::mixedsort(unique(FinalAttr$combined$datasetGroup)))
 
       if(!is.null(multiTools$datasetSubGroupName)) {
-        plotDFList$combined$datasetSubGroup <- factor(
-          plotDFList$combined$datasetSubGroup,
-          levels = gtools::mixedsort(unique(plotDFList$combined$datasetSubGroup)))
+        FinalAttr$combined$datasetSubGroup <- factor(
+          FinalAttr$combined$datasetSubGroup,
+          levels = gtools::mixedsort(unique(FinalAttr$combined$datasetSubGroup)))
       }
 
       ggplotList <- list()
       ## Plot a multi-facet ggplot for all gtSigNames and all runs.
       {
-        ## Generate a ggplot object based on plotDFList$combined
+        ## Generate a ggplot object based on FinalAttr$combined
         ggplotList$general <- ggplot2::ggplot(
-          plotDFList$combined,
+          FinalAttr$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value)) +
           ## Draw geom_violin and geom_quasirandom
           ggplot2::geom_violin(
@@ -1524,7 +1407,7 @@ SummarizeMultiToolsMultiDatasets <-
           ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-            limits = c(0, max(plotDFList$combined$value)),
+            limits = c(0, max(FinalAttr$combined$value)),
             labels =function(x) sprintf("%.2f", x))
       }
       ## Plot a multi-facet ggplot,
@@ -1544,9 +1427,9 @@ SummarizeMultiToolsMultiDatasets <-
           text = paste0("multiTools$",by,"Name")))
 
 
-        ## Generate a ggplot object based on plotDFList$combined
+        ## Generate a ggplot object based on FinalAttr$combined
         ggplotList[[by]] <- ggplot2::ggplot(
-          plotDFList$combined,
+          FinalAttr$combined,
           ggplot2::aes(x = .data$toolName, y = .data$value))
         ## Draw geom_violin and geom_quasirandom
         ggplotList[[by]] <- ggplotList[[by]] +
@@ -1596,7 +1479,7 @@ SummarizeMultiToolsMultiDatasets <-
           ## Restrict the decimal numbers of values of measures to be 2
           ggplot2::scale_y_continuous(
             ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-            limits = c(0, max(plotDFList$combined$value)),
+            limits = c(0, max(FinalAttr$combined$value)),
             labels =function(x) sprintf("%.2f", x))
       }
 

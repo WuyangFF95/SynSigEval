@@ -42,8 +42,8 @@ any ground-truth signatures.
 \item $ManhattanDist Scaled Manhattan distance between ground-truth and inferred
 exposures to each of the ground-truth signatures.
 }
-This list also contains \code{mean} and \code{sd}, and other 
-statistics of these measures in \itemize{ 
+This list also contains \code{mean} and \code{sd}, and other
+statistics of these measures in \itemize{
 \item $fivenum
 \item $fivenumMD
 \item $meanSD
