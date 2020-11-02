@@ -435,76 +435,95 @@ SummarizeMultiRuns <-
       grDevices::dev.off()
     }
 
-    ## Indexes for exposure inference in multiple runs
-    ManhattanDist <- matrix(nrow = length(gtSigNames), ncol = length(run.names))
-    rownames(ManhattanDist) <- gtSigNames
-    colnames(ManhattanDist) <- run.names
+
+    ## Check whether runs of the computational approach
+    ## involves exposure inferrence summary.
+    exposureFlag <- TRUE
     for(runName in run.names){
       runDir <- paste0(tool.dir,"/",runName)
       summaryDir <- paste0(runDir,"/summary")
       exposureDiffFile <- paste0(summaryDir,"/exposureDiff.RDa")
-      ## Add exposureDiff <- NULL to please the R check
-      exposureDiff <- NULL
-      load(file = exposureDiffFile)
-      ManhattanDist[gtSigNames,runName] <- exposureDiff[gtSigNames,"Manhattan.distance"]
-    }
-    multiRun$ManhattanDist <- ManhattanDist
-
-    ## Calculate mean and SD for indexes of exposure inference
-    meanSDMD <- matrix(nrow = length(gtSigNames), ncol = 2)
-    rownames(meanSDMD) <- gtSigNames
-    colnames(meanSDMD) <- c("mean","stdev")
-    for(gtSigName in gtSigNames){
-      meanSDMD[gtSigName,"mean"] <- mean(ManhattanDist[gtSigName,])
-      meanSDMD[gtSigName,"stdev"] <- stats::sd(ManhattanDist[gtSigName,])
-    }
-    multiRun$meanSDMD <- meanSDMD
-
-    ## Calculate fivenums for exposure inference Scaled Manhattan distance
-    multiRun$fivenumMD <- matrix(nrow = length(gtSigNames), ncol = 5)
-    rownames(multiRun$fivenumMD) <- gtSigNames
-    colnames(multiRun$fivenumMD) <- c("min","lower-hinge","median","upperhinge","max")
-    for(gtSigName in gtSigNames){
-      multiRun$fivenumMD[gtSigName,] <- stats::fivenum(ManhattanDist[gtSigName,])
+      if(!file.exists(exposureDiffFile)){
+        exposureFlag <- FALSE
+        break
+      }
     }
 
-    ## Plot boxplot + beeswarm plot for exposure inference
-    if(FALSE){
-      ggplotList <- list()
+    ## Run exposure attribution summary only if there are
+    ## exposureDiff.Rda in all runDirs.
+    if(exposureFlag){
+      ## Indexes for exposure inference in multiple runs
+      ManhattanDist <- matrix(nrow = length(gtSigNames), ncol = length(run.names))
+      rownames(ManhattanDist) <- gtSigNames
+      colnames(ManhattanDist) <- run.names
+      for(runName in run.names){
+        runDir <- paste0(tool.dir,"/",runName)
+        summaryDir <- paste0(runDir,"/summary")
+        exposureDiffFile <- paste0(summaryDir,"/exposureDiff.RDa")
+        ## Add exposureDiff <- NULL to please the R check
+        exposureDiff <- NULL
+        load(file = exposureDiffFile)
+        ManhattanDist[gtSigNames,runName] <- exposureDiff[gtSigNames,"Manhattan.distance"]
+      }
+      multiRun$ManhattanDist <- ManhattanDist
+
+      ## Calculate mean and SD for indexes of exposure inference
+      meanSDMD <- matrix(nrow = length(gtSigNames), ncol = 2)
+      rownames(meanSDMD) <- gtSigNames
+      colnames(meanSDMD) <- c("mean","stdev")
       for(gtSigName in gtSigNames){
-        ggplotList[[gtSigName]] <- ggplot2::ggplot(
-          data.frame(value = ManhattanDist[gtSigName,],
-                     gtSigName = gtSigName),
-          ggplot2::aes(x = .data$gtSigName, y = .data$value))
-        ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
-          ggplot2::ggtitle(paste0("L1-difference of exposure of signature ",gtSigName))
-        ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
-          ggplot2::geom_boxplot() +
-          ggbeeswarm::geom_quasirandom(groupOnX = TRUE, size = 0.3) +
-          ## Restrict the decimal numbers of values of indexes to be 2
-          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+        meanSDMD[gtSigName,"mean"] <- mean(ManhattanDist[gtSigName,])
+        meanSDMD[gtSigName,"stdev"] <- stats::sd(ManhattanDist[gtSigName,])
+      }
+      multiRun$meanSDMD <- meanSDMD
+
+      ## Calculate fivenums for exposure inference Scaled Manhattan distance
+      multiRun$fivenumMD <- matrix(nrow = length(gtSigNames), ncol = 5)
+      rownames(multiRun$fivenumMD) <- gtSigNames
+      colnames(multiRun$fivenumMD) <- c("min","lower-hinge","median","upperhinge","max")
+      for(gtSigName in gtSigNames){
+        multiRun$fivenumMD[gtSigName,] <- stats::fivenum(ManhattanDist[gtSigName,])
       }
 
+      ## Plot boxplot + beeswarm plot for exposure inference
+      if(FALSE){
+        ggplotList <- list()
+        for(gtSigName in gtSigNames){
+          ggplotList[[gtSigName]] <- ggplot2::ggplot(
+            data.frame(value = ManhattanDist[gtSigName,],
+                       gtSigName = gtSigName),
+            ggplot2::aes(x = .data$gtSigName, y = .data$value))
+          ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
+            ggplot2::ggtitle(paste0("L1-difference of exposure of signature ",gtSigName))
+          ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
+            ggplot2::geom_boxplot() +
+            ggbeeswarm::geom_quasirandom(groupOnX = TRUE, size = 0.3) +
+            ## Restrict the decimal numbers of values of indexes to be 2
+            ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+        }
 
-      ## Print extraction indexes into one pdf file
-      grDevices::pdf(paste0(tool.dir,"/boxplot.attribution.measures.pdf"), pointsize = 1)
-      for(gtSigName in gtSigNames) print(ggplotList[[gtSigName]])
-      grDevices::dev.off()
+
+        ## Print extraction indexes into one pdf file
+        grDevices::pdf(paste0(tool.dir,"/boxplot.attribution.measures.pdf"), pointsize = 1)
+        for(gtSigName in gtSigNames) print(ggplotList[[gtSigName]])
+        grDevices::dev.off()
+      }
     }
-
 
     ## Save data and results
     save(multiRun,file = paste0(tool.dir,"/multiRun.RDa"))
-    write.csv(x = multiRun$ManhattanDist,
-              file = paste0(tool.dir,"/ManhattanDist.csv"))
     write.csv(x = multiRun$meanSD,
               file = paste0(tool.dir,"/meanSD.csv"))
-    write.csv(x = multiRun$meanSDMD,
-              file = paste0(tool.dir,"/meanSD.Manhattan.dist.csv"))
     write.csv(x = multiRun$fivenum,
               file = paste0(tool.dir,"/fivenum.csv"))
-    write.csv(x = multiRun$fivenumMD,
-              file = paste0(tool.dir,"/fivenum.Manhattan.dist.csv"))
+    if(exposureFlag){
+      write.csv(x = multiRun$ManhattanDist,
+                file = paste0(tool.dir,"/ManhattanDist.csv"))
+      write.csv(x = multiRun$meanSDMD,
+                file = paste0(tool.dir,"/meanSD.Manhattan.dist.csv"))
+      write.csv(x = multiRun$fivenumMD,
+                file = paste0(tool.dir,"/fivenum.Manhattan.dist.csv"))
+    }
     invisible(multiRun)
   }
 
@@ -820,7 +839,7 @@ SummarizeMultiToolsMultiDatasets <-
       toolNames <- character(0)
       for(index in indexes) {
         FinalExtr[[index]] <- data.frame()
-      }  
+      }
       FinalExtr$cosSim <- list()
 
 
@@ -830,10 +849,10 @@ SummarizeMultiToolsMultiDatasets <-
         ## Add multiTools <- NULL to please R check
         multiTools <- NULL
         load(paste0(thirdLevelDir,"/multiTools.RDa"))
-        
+
         datasetGroupName <- multiTools$datasetGroupName
         datasetSubGroupName <- multiTools$datasetSubGroupName
-        
+
 
         ## Find tool names
         toolNames <- unique(multiTools[["averCosSim"]][,"toolName"])
@@ -842,7 +861,7 @@ SummarizeMultiToolsMultiDatasets <-
         for(index in indexes){
           FinalExtr[[index]] <- rbind(FinalExtr[[index]],multiTools[[index]])
         }
-        
+
         ## Bind values of cosine similarity in multiTools$cosSim into FinalExtr$cosSim
         gtSigNames <- multiTools$gtSigNames
         if(length(FinalExtr$cosSim) == 0){
@@ -870,36 +889,36 @@ SummarizeMultiToolsMultiDatasets <-
     ## Generating csv tables for extraction performance measure
     ## and cosine similarities.
     {
-          
-      ## Output combined extraction 
+
+      ## Output combined extraction
       for(index in c(indexes,"compositeMeasure")){
-      
+
         output <- FinalExtr[[index]]
-      
+
         output <- output[,-4]
         colnames(output)[1] <- "Seed or run number"
         colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
         colnames(output)[3] <- "Name of computational approach"
         colnames(output)[4] <- datasetGroupName
         colnames(output)[5] <- datasetSubGroupName
-      
-      
+
+
         write.csv(output,
                   file = paste0(out.dir,"/",index,".csv"))
       }
-    
+
 
       for(gtSigName in gtSigNames){
-      
+
         output <- FinalExtr$cosSim[[gtSigName]]
-        
+
         output <- output[,-4]
         colnames(output)[1] <- "Seed or run number"
         colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
         colnames(output)[3] <- "Name of computational approach"
         colnames(output)[4] <- datasetGroupName
         colnames(output)[5] <- datasetSubGroupName
-      
+
         write.csv(output,
                   file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"))
       }
@@ -918,10 +937,10 @@ SummarizeMultiToolsMultiDatasets <-
         plotDFOneMeasure <- data.frame(FinalExtr[[index]], indexLabel = indexLabels[index])
         FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
       }
-      
+
       plotDFOneMeasure <- data.frame(FinalExtr$compositeMeasure, indexLabel = "Composite measure")
       FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
-      
+
       for(gtSigName in gtSigNames){
         plotDFOneMeasure <- data.frame(FinalExtr$cosSim[[gtSigName]], indexLabel = paste0("Cosine similarity to ",gtSigName))
         FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
@@ -1279,7 +1298,7 @@ SummarizeMultiToolsMultiDatasets <-
 
 
     ## Summarizing Scaled Manhattan distance results,
-    ## which measures attribution performances. 
+    ## which measures attribution performances.
     {
       FinalAttr <- list()
       ## Combine attribution assessment onto multiple sheets.
@@ -1312,14 +1331,14 @@ SummarizeMultiToolsMultiDatasets <-
       if(FALSE){
         for(gtSigName in gtSigNames){
           output <- FinalAttr[[gtSigName]]
-        
+
           output <- output[,-4]
           colnames(output)[1] <- "Seed or run number"
           colnames(output)[2] <- paste0("Scaled distance of ",gtSigName)
           colnames(output)[3] <- "Name of computational approach"
           colnames(output)[4] <- datasetGroupName
           colnames(output)[5] <- datasetSubGroupName
-      
+
           write.csv(output,
                     file = paste0(out.dir,"/ManhattanDist.",gtSigName,".csv"))
       }
