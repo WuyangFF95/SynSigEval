@@ -662,10 +662,22 @@ SummarizeMultiToolsOneDataset <- function(
       }
     }
 
+    ## meanSDMD contains mean and standard deviation
+    ## for each extraction index.
+    {
+      meanSD <- multiRun$meanSD
+      colnames(meanSD) <- paste0(toolDirName,".", colnames(meanSD))
+      if(is.null(meanSD)){
+        combMeanSD <- meanSD
+      } else{
+        combMeanSD <- cbind(combMeanSD,meanSD)
+      }
+    }
+
     ## Combine multi-runs and multi-tools for
     ## one-signature cosine similarity.
     {
-      gtSigNames <- rownames(multiRun$ManhattanDist)
+      gtSigNames <- names(multiRun$cosSim)
       multiTools$gtSigNames <- gtSigNames
       if(is.null(multiTools$cosSim)) multiTools$cosSim <- list()
 
@@ -697,67 +709,58 @@ SummarizeMultiToolsOneDataset <- function(
       }
     }
 
+    if(!is.null(multiRun$ManhattanDist)){
+      ## Combine multi-runs and multi-tools for Manhattan
+      ## distance of each ground-truth signature
+      {
+        if(is.null(multiTools$ManhattanDist)) multiTools$ManhattanDist <- list()
+        for(gtSigName in gtSigNames){
+          if(!exists("datasetSubGroup")) {
+            gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
+                                                        value = multiRun$ManhattanDist[gtSigName,],
+                                                        toolName = toolName,
+                                                        datasetName = multiRun$datasetName,
+                                                        datasetGroup = datasetGroup,
+                                                        stringsAsFactors = FALSE)
+          } else{
+            gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
+                                                        value = multiRun$ManhattanDist[gtSigName,],
+                                                        toolName = toolName,
+                                                        datasetName = multiRun$datasetName,
+                                                        datasetGroup = datasetGroup,
+                                                        datasetSubGroup = datasetSubGroup,
+                                                        stringsAsFactors = FALSE)
+          }
+          rownames(gtScaledManhattanDist4OneTool) <- NULL
+          ## Create a data.frame for each ground-truth signature,
+          ## and summarize multi-Run, multiDataset values
+          ## for each ground-truth signature.
+          if(is.null(multiTools$ManhattanDist[[gtSigName]])){
+            multiTools$ManhattanDist[[gtSigName]] <- data.frame()
+          }
+          multiTools$ManhattanDist[[gtSigName]] <- rbind(multiTools$ManhattanDist[[gtSigName]],gtScaledManhattanDist4OneTool)
+        }
+      }
 
-    ## Combine multi-runs and multi-tools for Manhattan
-    ## distance of each ground-truth signature
-    {
-      if(is.null(multiTools$ManhattanDist)) multiTools$ManhattanDist <- list()
-      for(gtSigName in gtSigNames){
-        if(!exists("datasetSubGroup")) {
-          gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
-                                                      value = multiRun$ManhattanDist[gtSigName,],
-                                                      toolName = toolName,
-                                                      datasetName = multiRun$datasetName,
-                                                      datasetGroup = datasetGroup,
-                                                      stringsAsFactors = FALSE)
+      ## meanSDMD contains mean and standard deviation
+      ## for Scaled Manhattan distance between ground-truth exposures
+      ## and inferred exposures for each ground-truth signature
+      {
+        meanSDMD <- multiRun$meanSDMD
+        colnames(meanSDMD) <- paste0(toolDirName,".", colnames(meanSDMD))
+        if(is.null(meanSDMD)){
+          combMeanSDMD <- meanSDMD
         } else{
-          gtScaledManhattanDist4OneTool <- data.frame(seed = colnames(multiRun$ManhattanDist),
-                                                      value = multiRun$ManhattanDist[gtSigName,],
-                                                      toolName = toolName,
-                                                      datasetName = multiRun$datasetName,
-                                                      datasetGroup = datasetGroup,
-                                                      datasetSubGroup = datasetSubGroup,
-                                                      stringsAsFactors = FALSE)
+          combMeanSDMD <- cbind(combMeanSDMD,meanSDMD)
         }
-        rownames(gtScaledManhattanDist4OneTool) <- NULL
-        ## Create a data.frame for each ground-truth signature,
-        ## and summarize multi-Run, multiDataset values
-        ## for each ground-truth signature.
-        if(is.null(multiTools$ManhattanDist[[gtSigName]])){
-          multiTools$ManhattanDist[[gtSigName]] <- data.frame()
-        }
-        multiTools$ManhattanDist[[gtSigName]] <- rbind(multiTools$ManhattanDist[[gtSigName]],gtScaledManhattanDist4OneTool)
-      }
-    }
-
-    ## meanSDMD contains mean and standard deviation
-    ## for each extraction index.
-    {
-      meanSD <- multiRun$meanSD
-      colnames(meanSD) <- paste0(toolDirName,".", colnames(meanSD))
-      if(is.null(meanSD)){
-        combMeanSD <- meanSD
-      } else{
-        combMeanSD <- cbind(combMeanSD,meanSD)
-      }
-    }
-
-    ## meanSDMD contains mean and standard deviation
-    ## for Scaled Manhattan distance between ground-truth exposures
-    ## and inferred exposures for each ground-truth signature
-    {
-      meanSDMD <- multiRun$meanSDMD
-      colnames(meanSDMD) <- paste0(toolDirName,".", colnames(meanSDMD))
-      if(is.null(meanSDMD)){
-        combMeanSDMD <- meanSDMD
-      } else{
-        combMeanSDMD <- cbind(combMeanSDMD,meanSDMD)
       }
     }
   }
 
   multiTools$combMeanSD <- combMeanSD
-  multiTools$combMeanSDMD <- combMeanSDMD
+  if(exists("combMeanSDMD")){
+    multiTools$combMeanSDMD <- combMeanSDMD
+  }
   multiTools$datasetName <- datasetName
   multiTools$datasetGroupName <- datasetGroupName
   multiTools$datasetSubGroupName <- datasetSubGroupName
@@ -765,8 +768,10 @@ SummarizeMultiToolsOneDataset <- function(
   save(multiTools,file = paste0(third.level.dir,"/multiTools.RDa"))
   write.csv(x = multiTools$combMeanSD,
             file = paste0(third.level.dir,"/combined.meanSD.csv"))
-  write.csv(x = multiTools$combMeanSDMD,
-            file = paste0(third.level.dir,"/combined.meanSD.Manhattan.dist.csv"))
+  if(!is.null(multiTools$combMeanSDMD)){
+    write.csv(x = multiTools$combMeanSDMD,
+              file = paste0(third.level.dir,"/combined.meanSD.Manhattan.dist.csv"))
+  }
   invisible(multiTools)
 }
 
