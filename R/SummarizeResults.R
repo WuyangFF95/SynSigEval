@@ -445,6 +445,7 @@ SummarizeMultiRuns <-
       exposureDiffFile <- paste0(summaryDir,"/exposureDiff.RDa")
       if(!file.exists(exposureDiffFile)){
         exposureFlag <- FALSE
+        message("Skip summarizing scaled Manhattan distance...\n")
         break
       }
     }
@@ -1951,158 +1952,175 @@ SummarizeOneToolMultiDatasets <-
     }
 
 
-
-    ## Summarize attribution scaled Manhattan distance for one tool.
+    ## Summarize scaled Manhattan distance only if
+    exposureFlag <- TRUE
     {
-      OneToolSummary$ManhattanDist <- list()
-
       for(datasetDir in dataset.dirs){
         thirdLevelDir <- paste0(datasetDir,"/",tool.dirname)
         toolName <- strsplit(basename(tool.dirname),".results")[[1]]
         ## Add multiRun <- NULL to please R check
-        multiRun <- NULL
+        multiRUn <- NULL
         load(paste0(thirdLevelDir,"/multiRun.RDa"))
-        gtSigNames <- rownames(multiRun$ManhattanDist)
-        sigNums <- length(gtSigNames)
-        datasetName <- basename(datasetDir)
-
-        for(gtSigName in gtSigNames){
-        if(FALSE) { # debug
-          gtScaledManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
-                                                         gtSigName = gtSigName,
-                                                         value = multiRun$ManhattanDist[gtSigName,],
-                                                         toolName = toolName,
-                                                         datasetName = datasetName,
-                                                         datasetGroup = datasetGroup[datasetName],
-                                                         datasetGroupName = datasetGroupName,
-                                                         datasetSubGroup = datasetSubGroup[datasetName],
-                                                         datasetSubGroupName = datasetSubGroupName,
-                                                         stringsAsFactors = FALSE)
-          } else {
-          gtScaledManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
-                                                value = multiRun$ManhattanDist[gtSigName,],
-                                                toolName = toolName,
-                                                datasetGroup = datasetGroup[datasetName],
-                                                datasetSubGroup = datasetSubGroup[datasetName],
-                                                stringsAsFactors = FALSE)
+        if(is.null(multiRun$ManhattanDist)){
+          exposureFlag <- FALSE
+          message("Skip summarizing scaled Manhattan distance...\n")
+          break
         }
-          rownames(gtScaledManhattanDist4OneDataset) <- NULL
+      }
+    }
 
-          ## Create a data.frame for each measure,
-          ## and summarize multi-Run, multiDataset values
-          ## for each measure.
-          if(is.null(OneToolSummary$ManhattanDist[[gtSigName]])){
-            OneToolSummary$ManhattanDist[[gtSigName]] <- data.frame()
+    if(exposureFlag){
+      ## Summarize attribution scaled Manhattan distance for one tool.
+      {
+        OneToolSummary$ManhattanDist <- list()
+
+        for(datasetDir in dataset.dirs){
+          thirdLevelDir <- paste0(datasetDir,"/",tool.dirname)
+          toolName <- strsplit(basename(tool.dirname),".results")[[1]]
+          ## Add multiRun <- NULL to please R check
+          multiRun <- NULL
+          load(paste0(thirdLevelDir,"/multiRun.RDa"))
+          gtSigNames <- rownames(multiRun$ManhattanDist)
+          sigNums <- length(gtSigNames)
+          datasetName <- basename(datasetDir)
+
+          for(gtSigName in gtSigNames){
+            if(FALSE) { # debug
+              gtScaledManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
+                                                             gtSigName = gtSigName,
+                                                             value = multiRun$ManhattanDist[gtSigName,],
+                                                             toolName = toolName,
+                                                             datasetName = datasetName,
+                                                             datasetGroup = datasetGroup[datasetName],
+                                                             datasetGroupName = datasetGroupName,
+                                                             datasetSubGroup = datasetSubGroup[datasetName],
+                                                             datasetSubGroupName = datasetSubGroupName,
+                                                             stringsAsFactors = FALSE)
+            } else {
+              gtScaledManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$ManhattanDist),
+                                                             value = multiRun$ManhattanDist[gtSigName,],
+                                                             toolName = toolName,
+                                                             datasetGroup = datasetGroup[datasetName],
+                                                             datasetSubGroup = datasetSubGroup[datasetName],
+                                                             stringsAsFactors = FALSE)
+            }
+            rownames(gtScaledManhattanDist4OneDataset) <- NULL
+
+            ## Create a data.frame for each measure,
+            ## and summarize multi-Run, multiDataset values
+            ## for each measure.
+            if(is.null(OneToolSummary$ManhattanDist[[gtSigName]])){
+              OneToolSummary$ManhattanDist[[gtSigName]] <- data.frame()
+            }
+            OneToolSummary$ManhattanDist[[gtSigName]] <- rbind(OneToolSummary$ManhattanDist[[gtSigName]],gtScaledManhattanDist4OneDataset)
           }
-          OneToolSummary$ManhattanDist[[gtSigName]] <- rbind(OneToolSummary$ManhattanDist[[gtSigName]],gtScaledManhattanDist4OneDataset)
         }
-      }
 
-      ## Combine multiple ground-truth signature Manhattan-distance data.frame
-      ## into OneToolSummary$ManhattanDist$combined.
-      OneToolSummary$ManhattanDist$combined <- data.frame()
-      for(gtSigName in gtSigNames){
-        gtScaledManhattanDist4AllDatasets <- data.frame(OneToolSummary$ManhattanDist[[gtSigName]],
-                                                        stringsAsFactors = FALSE)
-        rownames(gtScaledManhattanDist4AllDatasets) <- NULL
+        ## Combine multiple ground-truth signature Manhattan-distance data.frame
+        ## into OneToolSummary$ManhattanDist$combined.
+        OneToolSummary$ManhattanDist$combined <- data.frame()
+        for(gtSigName in gtSigNames){
+          gtScaledManhattanDist4AllDatasets <- data.frame(OneToolSummary$ManhattanDist[[gtSigName]],
+                                                          stringsAsFactors = FALSE)
+          rownames(gtScaledManhattanDist4AllDatasets) <- NULL
 
-        if(nrow(OneToolSummary$ManhattanDist$combined) == 0 |
-           ncol(OneToolSummary$ManhattanDist$combined) == 0 |
-           is.null(dim(OneToolSummary$ManhattanDist$combined)) ) {
-          OneToolSummary$ManhattanDist$combined <- gtScaledManhattanDist4AllDatasets
-        } else {
-          OneToolSummary$ManhattanDist$combined <-
-            rbind(OneToolSummary$ManhattanDist$combined,gtScaledManhattanDist4AllDatasets)
+          if(nrow(OneToolSummary$ManhattanDist$combined) == 0 |
+             ncol(OneToolSummary$ManhattanDist$combined) == 0 |
+             is.null(dim(OneToolSummary$ManhattanDist$combined)) ) {
+            OneToolSummary$ManhattanDist$combined <- gtScaledManhattanDist4AllDatasets
+          } else {
+            OneToolSummary$ManhattanDist$combined <-
+              rbind(OneToolSummary$ManhattanDist$combined,gtScaledManhattanDist4AllDatasets)
+          }
         }
-      }
 
-    }
-    ## Plot normalized Manhattan distance violin plot + beeswarm plot for one tool
-    { ## debug
-      ## Create a list to store ggplot2 boxplot + beeswarm plot objects
-      ggplotList$ManhattanDist <- list()
-      ## Plot a value~datasetSubGroup beeswarm plot for each signature.
-      for(gtSigName in gtSigNames){
-        sigNum <- which(gtSigNames == gtSigName)
-        ggplotList$ManhattanDist[[gtSigName]] <- ggplot2::ggplot(
-          OneToolSummary$ManhattanDist[[gtSigName]],
-          ## Make sure that only one x-label is shown in one small facet.
-          #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
-          ggplot2::aes(x = .data$toolName, y = .data$value)
-        )
-        ## Add facets
-        ggplotList$ManhattanDist[[gtSigName]] <- ggplotList$ManhattanDist[[gtSigName]] +
-          ggplot2::facet_grid(
-            rows = ggplot2::vars(datasetSubGroup),
-            cols = ggplot2::vars(datasetGroup),
-            ## Move x facet labels to the right,
-            ## This is to let the facet labels correspond to axis.title.
-            switch = "x") +
-          ## Draw beeswarm plots on multiple facets
-          ## Draw geom_violin
-          ggplot2::geom_violin(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            ## Maximize the violin plot width
-            scale = "width",
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
-          ## Draw beeswarm plot
-          ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
-                                       size = 0.3 ## Make dot size smaller
-                                       ,
-                                       ## Remove differentiated colors for beeswarm dots
-                                       ## Set groups for the filling functionalities to differentiate
-                                       #ggplot2::aes(color = .data$datasetGroup)
-          ) +
-          ## Change filling color
-          ggplot2::scale_fill_brewer(palette = "Greys") +
-          ## Change axis.text and tickmarks
-          ggplot2::theme(
-            ## Remove axis.text.x
-            axis.text.x = ggplot2::element_blank(),
-            ## Remove tick marks on x axis (axis.ticks.x)
-            axis.ticks.x = ggplot2::element_blank(),
-            ## Remove entire legend
-            legend.position = "none"
-          ) +
-          ## Change titles
-          ggplot2::labs(
-            ## Add title for value~datasetSubGroup beeswarm plot
-            title = paste0(toolName,": Scaled Manhattan distance of ",gtSigName," exposure"),
-            subtitle = "Between ground-truth exposure and inferred exposure",
-            ## Change title of y axis (axis.title.y) same as gtSigName info (same as title)
-            y = paste0("Scaled Manhattan distance of ",gtSigName," exposure"),
-            ## Change title of x axis to "Pearson's R squared"
-            x = "Pearson's R squared") +
-          ## Change title of legend to datasetGroupName
-          ggplot2::guides(color = ggplot2::guide_legend(title = datasetGroupName)) +
-          ## Restrict the decimal numbers of values of measures (y) to be 2
-          ggplot2::scale_y_continuous(
-            ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-            limits = c(0,max(OneToolSummary$ManhattanDist$combined$value)),
+      }
+      ## Plot normalized Manhattan distance violin plot + beeswarm plot for one tool
+      { ## debug
+        ## Create a list to store ggplot2 boxplot + beeswarm plot objects
+        ggplotList$ManhattanDist <- list()
+        ## Plot a value~datasetSubGroup beeswarm plot for each signature.
+        for(gtSigName in gtSigNames){
+          sigNum <- which(gtSigNames == gtSigName)
+          ggplotList$ManhattanDist[[gtSigName]] <- ggplot2::ggplot(
+            OneToolSummary$ManhattanDist[[gtSigName]],
+            ## Make sure that only one x-label is shown in one small facet.
+            #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
+            ggplot2::aes(x = .data$toolName, y = .data$value)
+          )
+          ## Add facets
+          ggplotList$ManhattanDist[[gtSigName]] <- ggplotList$ManhattanDist[[gtSigName]] +
+            ggplot2::facet_grid(
+              rows = ggplot2::vars(datasetSubGroup),
+              cols = ggplot2::vars(datasetGroup),
+              ## Move x facet labels to the right,
+              ## This is to let the facet labels correspond to axis.title.
+              switch = "x") +
+            ## Draw beeswarm plots on multiple facets
+            ## Draw geom_violin
+            ggplot2::geom_violin(
+              ## Change filling color to white
+              fill = "#FFFFFF",
+              ## Maximize the violin plot width
+              scale = "width",
+              ## Hide outliers
+              #outlier.shape = NA
+            ) +
+            ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+            ## Show mean of the extraction meaasure distribution, as a blue diamond.
+            ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+            ## Draw beeswarm plot
+            ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
+                                         size = 0.3 ## Make dot size smaller
+                                         ,
+                                         ## Remove differentiated colors for beeswarm dots
+                                         ## Set groups for the filling functionalities to differentiate
+                                         #ggplot2::aes(color = .data$datasetGroup)
+            ) +
+            ## Change filling color
+            ggplot2::scale_fill_brewer(palette = "Greys") +
+            ## Change axis.text and tickmarks
+            ggplot2::theme(
+              ## Remove axis.text.x
+              axis.text.x = ggplot2::element_blank(),
+              ## Remove tick marks on x axis (axis.ticks.x)
+              axis.ticks.x = ggplot2::element_blank(),
+              ## Remove entire legend
+              legend.position = "none"
+            ) +
+            ## Change titles
+            ggplot2::labs(
+              ## Add title for value~datasetSubGroup beeswarm plot
+              title = paste0(toolName,": Scaled Manhattan distance of ",gtSigName," exposure"),
+              subtitle = "Between ground-truth exposure and inferred exposure",
+              ## Change title of y axis (axis.title.y) same as gtSigName info (same as title)
+              y = paste0("Scaled Manhattan distance of ",gtSigName," exposure"),
+              ## Change title of x axis to "Pearson's R squared"
+              x = "Pearson's R squared") +
+            ## Change title of legend to datasetGroupName
+            ggplot2::guides(color = ggplot2::guide_legend(title = datasetGroupName)) +
             ## Restrict the decimal numbers of values of measures (y) to be 2
-            labels =function(x) sprintf("%.2f", x),
-            ## Add a secondary axis title on the top of the plot
-            ## Showing axis label indicating facets
-            sec.axis = ggplot2::dup_axis(
-              breaks = NULL, ## Don't show axis breaks
-              labels = NULL, ## Don't show axis tickmarks
-              name = "SBS1:SBS5 mutation count ratio"))
+            ggplot2::scale_y_continuous(
+              ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+              limits = c(0,max(OneToolSummary$ManhattanDist$combined$value)),
+              ## Restrict the decimal numbers of values of measures (y) to be 2
+              labels =function(x) sprintf("%.2f", x),
+              ## Add a secondary axis title on the top of the plot
+              ## Showing axis label indicating facets
+              sec.axis = ggplot2::dup_axis(
+                breaks = NULL, ## Don't show axis breaks
+                labels = NULL, ## Don't show axis tickmarks
+                name = "SBS1:SBS5 mutation count ratio"))
+        }
+
+
+        ## Output multiple extraction measures in a pdf file
+        grDevices::pdf(paste0(out.dir,"/boxplot.onetool.Manhattan.dist.pdf"), pointsize = 1)
+        for(gtSigName in gtSigNames)
+          suppressMessages(suppressWarnings(print(ggplotList$ManhattanDist[[gtSigName]])))
+        grDevices::dev.off()
       }
-
-
-      ## Output multiple extraction measures in a pdf file
-      grDevices::pdf(paste0(out.dir,"/boxplot.onetool.Manhattan.dist.pdf"), pointsize = 1)
-      for(gtSigName in gtSigNames)
-        suppressMessages(suppressWarnings(print(ggplotList$ManhattanDist[[gtSigName]])))
-      grDevices::dev.off()
     }
-
 
     ## Write Summary tables for extraction measures
     for(index in indexes){
