@@ -1303,10 +1303,8 @@ SummarizeMultiToolsMultiDatasets <-
     }
 
 
-    ## Summarizing Scaled Manhattan distance results,
-    ## which measures attribution performances.
     {
-      FinalAttr <- list()
+      flagExposure <- TRUE
       ## Combine attribution assessment onto multiple sheets.
       ## Each sheet shows Scaled Manhattan distance for one mutational signature.
       for(datasetDir in dataset.dirs){
@@ -1314,211 +1312,234 @@ SummarizeMultiToolsMultiDatasets <-
         ## Add multiTools <- NULL to please R check
         multiTools <- NULL
         load(paste0(thirdLevelDir,"/multiTools.RDa"))
+        if(is.null(multiTools$ManhattanDist)){
+          flagExposure <- FALSE
+          message("Skip summarizing scaled Manhattan distance...\n")
+          break
+        }
+      }
+    }
 
-        gtSigNames <- multiTools$gtSigNames
-        sigNums <- length(gtSigNames)
+    ## Summarizing Scaled Manhattan distance results,
+    ## which measures attribution performances.
+    if(flagExposure){
+      {
+        FinalAttr <- list()
+        ## Combine attribution assessment onto multiple sheets.
+        ## Each sheet shows Scaled Manhattan distance for one mutational signature.
+        for(datasetDir in dataset.dirs){
+          thirdLevelDir <- paste0(datasetDir,"/",second.third.level.dirname)
+          ## Add multiTools <- NULL to please R check
+          multiTools <- NULL
+          load(paste0(thirdLevelDir,"/multiTools.RDa"))
 
-        if(length(FinalAttr) == 0){
-          for(gtSigName in gtSigNames) {
-            FinalAttr[[gtSigName]] <- data.frame()
+          gtSigNames <- multiTools$gtSigNames
+          sigNums <- length(gtSigNames)
+
+          if(length(FinalAttr) == 0){
+            for(gtSigName in gtSigNames) {
+              FinalAttr[[gtSigName]] <- data.frame()
+            }
+          }
+
+          ## Combine Scaled Manhattan distance
+          for(gtSigName in gtSigNames){
+            FinalAttr[[gtSigName]] <- rbind(
+              FinalAttr[[gtSigName]],
+              multiTools$ManhattanDist[[gtSigName]])
           }
         }
 
-        ## Combine Scaled Manhattan distance
-        for(gtSigName in gtSigNames){
-          FinalAttr[[gtSigName]] <- rbind(
-            FinalAttr[[gtSigName]],
-            multiTools$ManhattanDist[[gtSigName]])
+        ## For the purpose of SBS1-SBS5 paper,
+        ## don't output summary tables for scaled Manhattan distance.
+        if(FALSE){
+          for(gtSigName in gtSigNames){
+            output <- FinalAttr[[gtSigName]]
+
+            output <- output[,-4]
+            colnames(output)[1] <- "Seed or run number"
+            colnames(output)[2] <- paste0("Scaled distance of ",gtSigName)
+            colnames(output)[3] <- "Name of computational approach"
+            colnames(output)[4] <- datasetGroupName
+            colnames(output)[5] <- datasetSubGroupName
+
+            write.csv(output,
+                      file = paste0(out.dir,"/ManhattanDist.",gtSigName,".csv"))
+          }
         }
       }
-
-      ## For the purpose of SBS1-SBS5 paper,
-      ## don't output summary tables for scaled Manhattan distance.
-      if(FALSE){
-        for(gtSigName in gtSigNames){
-          output <- FinalAttr[[gtSigName]]
-
-          output <- output[,-4]
-          colnames(output)[1] <- "Seed or run number"
-          colnames(output)[2] <- paste0("Scaled distance of ",gtSigName)
-          colnames(output)[3] <- "Name of computational approach"
-          colnames(output)[4] <- datasetGroupName
-          colnames(output)[5] <- datasetSubGroupName
-
-          write.csv(output,
-                    file = paste0(out.dir,"/ManhattanDist.",gtSigName,".csv"))
-      }
-      }
-    }
-    ## Plot general png and pdf for attribution Scaled Manhattan distance summary
-    ## Plot a general violin + beeswarm plot for multiple signatures
-    ## in all runs and in all datasets.
-    {
-
-      ## Combine all FinalAttr[[gtSigName]] into FinalAttr$Combined
-      FinalAttr$combined <- data.frame()
-      for(gtSigName in gtSigNames){
-        plotDFOneMeasure <- data.frame(FinalAttr[[gtSigName]], gtSigName = gtSigName)
-        FinalAttr$combined <- rbind(FinalAttr$combined,plotDFOneMeasure)
-      }
-
-      ## Convert FinalAttr$combined$datasetGroup and
-      ## Let their levels follow gtools::mixedsort() fashion
-      ## So that the order of the facet labels will be more reasonable for readers.
-      FinalAttr$combined$datasetGroup <- factor(
-        FinalAttr$combined$datasetGroup,
-        levels = gtools::mixedsort(unique(FinalAttr$combined$datasetGroup)))
-
-      if(!is.null(multiTools$datasetSubGroupName)) {
-        FinalAttr$combined$datasetSubGroup <- factor(
-          FinalAttr$combined$datasetSubGroup,
-          levels = gtools::mixedsort(unique(FinalAttr$combined$datasetSubGroup)))
-      }
-
-      ggplotList <- list()
-      ## Plot a multi-facet ggplot for all gtSigNames and all runs.
+      ## Plot general png and pdf for attribution Scaled Manhattan distance summary
+      ## Plot a general violin + beeswarm plot for multiple signatures
+      ## in all runs and in all datasets.
       {
-        ## Generate a ggplot object based on FinalAttr$combined
-        ggplotList$general <- ggplot2::ggplot(
-          FinalAttr$combined,
-          ggplot2::aes(x = .data$toolName, y = .data$value)) +
+
+        ## Combine all FinalAttr[[gtSigName]] into FinalAttr$Combined
+        FinalAttr$combined <- data.frame()
+        for(gtSigName in gtSigNames){
+          plotDFOneMeasure <- data.frame(FinalAttr[[gtSigName]], gtSigName = gtSigName)
+          FinalAttr$combined <- rbind(FinalAttr$combined,plotDFOneMeasure)
+        }
+
+        ## Convert FinalAttr$combined$datasetGroup and
+        ## Let their levels follow gtools::mixedsort() fashion
+        ## So that the order of the facet labels will be more reasonable for readers.
+        FinalAttr$combined$datasetGroup <- factor(
+          FinalAttr$combined$datasetGroup,
+          levels = gtools::mixedsort(unique(FinalAttr$combined$datasetGroup)))
+
+        if(!is.null(multiTools$datasetSubGroupName)) {
+          FinalAttr$combined$datasetSubGroup <- factor(
+            FinalAttr$combined$datasetSubGroup,
+            levels = gtools::mixedsort(unique(FinalAttr$combined$datasetSubGroup)))
+        }
+
+        ggplotList <- list()
+        ## Plot a multi-facet ggplot for all gtSigNames and all runs.
+        {
+          ## Generate a ggplot object based on FinalAttr$combined
+          ggplotList$general <- ggplot2::ggplot(
+            FinalAttr$combined,
+            ggplot2::aes(x = .data$toolName, y = .data$value)) +
+            ## Draw geom_violin and geom_quasirandom
+            ggplot2::geom_violin(
+              ## Change filling color to white
+              fill = "#FFFFFF",
+              #ggplot2::aes(fill = gtSigName),
+              ## Maximize the violin plot width
+              scale = "width",
+              ## Make bandwidth larger
+              #position = "dodge",
+              #width = 1.2
+              ## Hide outliers
+              #outlier.shape = NA
+            ) +
+            #ggbeeswarm::geom_quasirandom(
+            #  groupOnX = TRUE, size = 0.3
+            #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
+            #) +
+            ## Show median of the Scaled Manhattan distance distribution
+            ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+            ## Show mean of the extraction meaasure distribution, as a blue diamond.
+            ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+            ## Add title for general violin + beeswarm plot
+            ggplot2::ggtitle(label = "Scaled Manhattan distance between inferred and grond-truth exposures",
+                             subtitle = "for all computational approaches, ratios and correlation values.") +
+            ## Change axis titles
+            ggplot2::labs(x = "Computational approach",
+                          y = "Scaled Manhattan distance") +
+            ## Rotate the names of tools,
+            ## move axis.text.x right below the tick marks
+            ## and remove legends
+            ggplot2::theme(axis.text.x = ggplot2::element_text(
+              ## Rotate the axis.text.x (names of tools),
+              angle = 90,
+              ## move axis.text.x right below the tick marks
+              hjust = 1, vjust = 0.5),
+              ## remove legends.
+              legend.position = "none") +
+            ## Split the plot into multiple facets,
+            ## according to different gtSigNames
+            ggplot2::facet_wrap(
+              ggplot2::vars(gtSigName),
+              ## Force facet_wrap to have 2 columns
+              ncol = 2,
+              scales = "free",
+              ## Let facets be plotted vertically
+              dir = "v"
+            ) +
+            ## Restrict the decimal numbers of values of measures to be 2
+            ggplot2::scale_y_continuous(
+              ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+              limits = c(0, max(FinalAttr$combined$value)),
+              labels =function(x) sprintf("%.2f", x))
+        }
+        ## Plot a multi-facet ggplot,
+        ## facets are separated by gtSigNames and datasetGroup
+        ## (in example, it refers to slope.)
+        if(!is.null(multiTools$datasetSubGroupName)) {
+          bys <- c("datasetGroup","datasetSubGroup")
+        } else {
+          bys <- c("datasetGroup")
+        }
+
+        for(by in bys)  {
+
+          ## The value of "datasetGroupName" or "datasetSubGroupName"
+          ## which is the caption of "datasetGroup"
+          byCaption <- eval(parse(
+            text = paste0("multiTools$",by,"Name")))
+
+
+          ## Generate a ggplot object based on FinalAttr$combined
+          ggplotList[[by]] <- ggplot2::ggplot(
+            FinalAttr$combined,
+            ggplot2::aes(x = .data$toolName, y = .data$value))
           ## Draw geom_violin and geom_quasirandom
-          ggplot2::geom_violin(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            #ggplot2::aes(fill = gtSigName),
-            ## Maximize the violin plot width
-            scale = "width",
-            ## Make bandwidth larger
-            #position = "dodge",
-            #width = 1.2
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          #ggbeeswarm::geom_quasirandom(
-          #  groupOnX = TRUE, size = 0.3
-          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-          #) +
-          ## Show median of the Scaled Manhattan distance distribution
-          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
-          ## Add title for general violin + beeswarm plot
-          ggplot2::ggtitle(label = "Scaled Manhattan distance between inferred and grond-truth exposures",
-                           subtitle = "for all computational approaches, ratios and correlation values.") +
-          ## Change axis titles
-          ggplot2::labs(x = "Computational approach",
-                        y = "Scaled Manhattan distance") +
-          ## Rotate the names of tools,
-          ## move axis.text.x right below the tick marks
-          ## and remove legends
-          ggplot2::theme(axis.text.x = ggplot2::element_text(
+          ggplotList[[by]] <- ggplotList[[by]] +
+            ggplot2::geom_violin(
+              ## Change filling color to white
+              fill = "#FFFFFF",
+              #ggplot2::aes(fill = gtSigName),
+              ## Maximize the violin plot width
+              scale = "width"
+              #,
+              ## Make bandwidth larger
+              #position = "dodge",
+              #width = 1.2
+              ## Hide outliers
+              #outlier.shape = NA
+            ) +
+            #ggbeeswarm::geom_quasirandom(
+            #  groupOnX = TRUE, size = 0.3
+            #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
+            #) +
+            ## Show median of the Scaled Manhattan distance distribution
+            ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+            ## Show mean of the extraction meaasure distribution, as a blue diamond.
+            ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+            ## Add title for general violin + beeswarm plot
+            ggplot2::ggtitle(
+              label = paste0("Scaled Manhattan distance summary plot as a function of "),
+              subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
+            ## Change axis titles
+            ggplot2::labs(x = "Computational approach",
+                          y = "Scaled Manhattan distance") +
             ## Rotate the axis.text.x (names of tools),
-            angle = 90,
             ## move axis.text.x right below the tick marks
-            hjust = 1, vjust = 0.5),
-            ## remove legends.
-            legend.position = "none") +
-          ## Split the plot into multiple facets,
-          ## according to different gtSigNames
-          ggplot2::facet_wrap(
-            ggplot2::vars(gtSigName),
-            ## Force facet_wrap to have 2 columns
-            ncol = 2,
-            scales = "free",
-            ## Let facets be plotted vertically
-            dir = "v"
-          ) +
-          ## Restrict the decimal numbers of values of measures to be 2
-          ggplot2::scale_y_continuous(
-            ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-            limits = c(0, max(FinalAttr$combined$value)),
-            labels =function(x) sprintf("%.2f", x))
+            ## and remove legends
+            ggplot2::theme(axis.text.x = ggplot2::element_text(
+              ## Rotate the axis.text.x (names of tools),
+              angle = 90,
+              ## move axis.text.x right below the tick marks
+              hjust = 1, vjust = 0.5),
+              ## remove legends.
+              legend.position = "none") +
+            ## Split the plot into multiple facets,
+            ## according to different gtSigNames
+            ggplot2::facet_grid(rows =  ggplot2::vars(gtSigName),
+                                cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
+                                scales = "free") +
+            ## Restrict the decimal numbers of values of measures to be 2
+            ggplot2::scale_y_continuous(
+              ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+              limits = c(0, max(FinalAttr$combined$value)),
+              labels =function(x) sprintf("%.2f", x))
+        }
+
+        ## Plot violin + beeswarm plots in pdf format
+        grDevices::pdf(paste0(out.dir,"/Manhattan.Dist.violins.pdf"), pointsize = 1)
+        for(by in names(ggplotList)){
+          print(ggplotList[[by]])
+        }
+        grDevices::dev.off()
       }
-      ## Plot a multi-facet ggplot,
-      ## facets are separated by gtSigNames and datasetGroup
-      ## (in example, it refers to slope.)
-      if(!is.null(multiTools$datasetSubGroupName)) {
-        bys <- c("datasetGroup","datasetSubGroup")
-      } else {
-        bys <- c("datasetGroup")
-      }
-
-      for(by in bys)  {
-
-        ## The value of "datasetGroupName" or "datasetSubGroupName"
-        ## which is the caption of "datasetGroup"
-        byCaption <- eval(parse(
-          text = paste0("multiTools$",by,"Name")))
-
-
-        ## Generate a ggplot object based on FinalAttr$combined
-        ggplotList[[by]] <- ggplot2::ggplot(
-          FinalAttr$combined,
-          ggplot2::aes(x = .data$toolName, y = .data$value))
-        ## Draw geom_violin and geom_quasirandom
-        ggplotList[[by]] <- ggplotList[[by]] +
-          ggplot2::geom_violin(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            #ggplot2::aes(fill = gtSigName),
-            ## Maximize the violin plot width
-            scale = "width"
-            #,
-            ## Make bandwidth larger
-            #position = "dodge",
-            #width = 1.2
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          #ggbeeswarm::geom_quasirandom(
-          #  groupOnX = TRUE, size = 0.3
-          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-          #) +
-          ## Show median of the Scaled Manhattan distance distribution
-          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
-          ## Add title for general violin + beeswarm plot
-          ggplot2::ggtitle(
-            label = paste0("Scaled Manhattan distance summary plot as a function of "),
-            subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
-          ## Change axis titles
-          ggplot2::labs(x = "Computational approach",
-                        y = "Scaled Manhattan distance") +
-          ## Rotate the axis.text.x (names of tools),
-          ## move axis.text.x right below the tick marks
-          ## and remove legends
-          ggplot2::theme(axis.text.x = ggplot2::element_text(
-            ## Rotate the axis.text.x (names of tools),
-            angle = 90,
-            ## move axis.text.x right below the tick marks
-            hjust = 1, vjust = 0.5),
-            ## remove legends.
-            legend.position = "none") +
-          ## Split the plot into multiple facets,
-          ## according to different gtSigNames
-          ggplot2::facet_grid(rows =  ggplot2::vars(gtSigName),
-                              cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
-                              scales = "free") +
-          ## Restrict the decimal numbers of values of measures to be 2
-          ggplot2::scale_y_continuous(
-            ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-            limits = c(0, max(FinalAttr$combined$value)),
-            labels =function(x) sprintf("%.2f", x))
-      }
-
-      ## Plot violin + beeswarm plots in pdf format
-      grDevices::pdf(paste0(out.dir,"/Manhattan.Dist.violins.pdf"), pointsize = 1)
-      for(by in names(ggplotList)){
-        print(ggplotList[[by]])
-      }
-      grDevices::dev.off()
     }
 
     FinalSummary <- list()
     FinalSummary$FinalExtr <- FinalExtr
-    FinalSummary$FinalAttr <- FinalAttr
+    if(flagExposure) {
+      FinalSummary$FinalAttr <- FinalAttr
+    }
 
     save(FinalSummary,file = paste0(out.dir,"/FinalSummary.RDa"))
 
