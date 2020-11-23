@@ -462,10 +462,10 @@ SummarizeMultiRuns <-
     ## Run exposure attribution summary only if there are
     ## exposureDiff.Rda in all runDirs.
     if(exposureFlag){
-      ## Indexes for exposure inference in multiple runs
-      ManhattanDist <- matrix(nrow = length(gtSigNames), ncol = length(run.names))
-      rownames(ManhattanDist) <- gtSigNames
-      colnames(ManhattanDist) <- run.names
+      ## Read scaled aggregated Manhattan distances in multiple runs
+      AggManhattanDist <- matrix(nrow = length(gtSigNames), ncol = length(run.names))
+      rownames(AggManhattanDist) <- gtSigNames
+      colnames(AggManhattanDist) <- run.names
       for(runName in run.names){
         runDir <- paste0(tool.dir,"/",runName)
         summaryDir <- paste0(runDir,"/summary")
@@ -473,50 +473,26 @@ SummarizeMultiRuns <-
         ## Add exposureDiff <- NULL to please the R check
         exposureDiff <- NULL
         load(file = exposureDiffFile)
-        ManhattanDist[gtSigNames,runName] <- exposureDiff[gtSigNames,"Manhattan.distance"]
+        AggManhattanDist[gtSigNames,runName] <- exposureDiff$aggregated[gtSigNames,"Scaled.Aggregated.Manhattan.distance"]
       }
-      multiRun$ManhattanDist <- ManhattanDist
+      multiRun$AggManhattanDist <- AggManhattanDist
 
-      ## Calculate mean and SD for indexes of exposure inference
-      meanSDMD <- matrix(nrow = length(gtSigNames), ncol = 2)
-      rownames(meanSDMD) <- gtSigNames
-      colnames(meanSDMD) <- c("mean","stdev")
+      ## Calculate mean and SD for aggregated  Manhattan distance
+      meanSDAggMD <- matrix(nrow = length(gtSigNames), ncol = 2)
+      rownames(meanSDAggMD) <- gtSigNames
+      colnames(meanSDAggMD) <- c("mean","stdev")
       for(gtSigName in gtSigNames){
-        meanSDMD[gtSigName,"mean"] <- mean(ManhattanDist[gtSigName,])
-        meanSDMD[gtSigName,"stdev"] <- stats::sd(ManhattanDist[gtSigName,])
+        meanSDAggMD[gtSigName,"mean"] <- mean(AggManhattanDist[gtSigName,])
+        meanSDAggMD[gtSigName,"stdev"] <- stats::sd(AggManhattanDist[gtSigName,])
       }
-      multiRun$meanSDMD <- meanSDMD
+      multiRun$meanSDAggMD <- meanSDAggMD
 
       ## Calculate fivenums for exposure inference Scaled Manhattan distance
-      multiRun$fivenumMD <- matrix(nrow = length(gtSigNames), ncol = 5)
-      rownames(multiRun$fivenumMD) <- gtSigNames
-      colnames(multiRun$fivenumMD) <- c("min","lower-hinge","median","upperhinge","max")
+      multiRun$fivenumAggMD <- matrix(nrow = length(gtSigNames), ncol = 5)
+      rownames(multiRun$fivenumAggMD) <- gtSigNames
+      colnames(multiRun$fivenumAggMD) <- c("min","lower-hinge","median","upperhinge","max")
       for(gtSigName in gtSigNames){
-        multiRun$fivenumMD[gtSigName,] <- stats::fivenum(ManhattanDist[gtSigName,])
-      }
-
-      ## Plot boxplot + beeswarm plot for exposure inference
-      if(FALSE){
-        ggplotList <- list()
-        for(gtSigName in gtSigNames){
-          ggplotList[[gtSigName]] <- ggplot2::ggplot(
-            data.frame(value = ManhattanDist[gtSigName,],
-                       gtSigName = gtSigName),
-            ggplot2::aes(x = .data$gtSigName, y = .data$value))
-          ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
-            ggplot2::ggtitle(paste0("L1-difference of exposure of signature ",gtSigName))
-          ggplotList[[gtSigName]] <- ggplotList[[gtSigName]] +
-            ggplot2::geom_boxplot() +
-            ggbeeswarm::geom_quasirandom(groupOnX = TRUE, size = 0.3) +
-            ## Restrict the decimal numbers of values of indexes to be 2
-            ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
-        }
-
-
-        ## Print extraction indexes into one pdf file
-        grDevices::pdf(paste0(tool.dir,"/boxplot.attribution.measures.pdf"), pointsize = 1)
-        for(gtSigName in gtSigNames) print(ggplotList[[gtSigName]])
-        grDevices::dev.off()
+        multiRun$fivenumAggMD[gtSigName,] <- stats::fivenum(AggManhattanDist[gtSigName,])
       }
     }
 
@@ -527,12 +503,12 @@ SummarizeMultiRuns <-
     write.csv(x = multiRun$fivenum,
               file = paste0(tool.dir,"/fivenum.csv"))
     if(exposureFlag){
-      write.csv(x = multiRun$ManhattanDist,
-                file = paste0(tool.dir,"/ManhattanDist.csv"))
-      write.csv(x = multiRun$meanSDMD,
-                file = paste0(tool.dir,"/meanSD.Manhattan.dist.csv"))
-      write.csv(x = multiRun$fivenumMD,
-                file = paste0(tool.dir,"/fivenum.Manhattan.dist.csv"))
+      write.csv(x = multiRun$AggManhattanDist,
+                file = paste0(tool.dir,"/Scaled.Aggregated.ManhattanDist.csv"))
+      write.csv(x = multiRun$meanSDAggMD,
+                file = paste0(tool.dir,"/meanSD.Scaled.Aggregated.Manhattan.dist.csv"))
+      write.csv(x = multiRun$fivenumAggMD,
+                file = paste0(tool.dir,"/fivenum.Scaled.Aggregated.Manhattan.dist.csv"))
     }
     invisible(multiRun)
   }
