@@ -147,10 +147,19 @@ SummarizeSigOneSubdir <-
           ground.truth.exposures =
             paste0(ground.truth.exposure.dir,"/ground.truth.syn.exposures.csv"))
 
-        # Write results of exposure inference analysis
-        write.csv(exposureDiff,
+        # Write results of exposure inference measures,
+        # in aggregated format
+        write.csv(exposureDiff$aggregated,
                   file = paste0(outputPath,"/aggregatedExposureDifference.csv"),
                   quote = T)
+        # Write results of exposure inference measures,
+        # in aggregated format for each tumor and each
+        # ground-truth signature.
+        for(gtSigName in names(exposureDiff$separated)){
+          write.csv(exposureDiff$separated[[gtSigName]],
+                    file = paste0(outputPath,"/separatedExposureDifference.",gtSigName,".csv"),
+                    quote = T)
+        }
 
         # Copy inferred exposures to summary folder.
         CopyWithChecks(inferred.exp.path,
