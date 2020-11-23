@@ -149,7 +149,7 @@ SummarizeSigOneSubdir <-
 
         # Write results of exposure inference analysis
         write.csv(exposureDiff,
-                  file = paste0(outputPath,"/exposureDifference.csv"),
+                  file = paste0(outputPath,"/aggregatedExposureDifference.csv"),
                   quote = T)
 
         # Copy inferred exposures to summary folder.

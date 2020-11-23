@@ -148,21 +148,25 @@ ReadAndAnalyzeExposures <-
     rownames(exposureDiff) <- gtSigsNames
     colnames(exposureDiff) <- c("Ground.truth.exposure", ## Sum of all tumor's ground-truth exposure to gtSigsName
                                 "Inferred.exposure", ## Sum of all tumor's inferred exposure to gtSigsName
-                                "Absolute.difference", ## Sum of absolute difference of two exposure values for each tumor
-                                "Manhattan.distance") ## L1-difference betwen ground-truth exposure and inferred exposure.
-    ## = Absolute.difference/Ground.truth.Exposure
+                                "Aggregated.Manhattan.difference", ## Sum of absolute difference (L1-norm) of two exposure values for each tumor
+                                "Scaled.Aggregated.Manhattan.distance") ## Aggregated Manhattan Distance, scaled by the sum of 
+								                                        ## exposures of ground-truth signature in all tumors
 
     ## For each of the ground-truth signature, calculate the absolute difference
     ## between its input (ground-truth) exposure and its inferred exposure.
-    ## Inferred exposure of a input signature equals to the sum of
-    ## exposures of all extracted signatures which matches to
-    ## this input signature.
+    ## Inferred exposure of a ground-truth signature equals to
+    ## exposures of the extracted signature most similar to 
+    ## this ground-truth signature, and their cosine simlarity needs to
+    ## be > 0.90.
     for (gtSigName in gtSigsNames) {
-      matchedExtrSigIndex <- which(sigMatch$match1[,1] == gtSigName)
+      matchedExtrSigIndex <- intersect(
+        which(rownames(sigMatch$match2) == gtSigName),
+		which(sigMatch$match2[,2] >= 0.9)
+        )
 
       if (length(matchedExtrSigIndex) > 0)
-        ## 1 or more extracted signatures match to gtSigName in match1
-        matchedExtrSigName <- rownames(sigMatch$match1)[matchedExtrSigIndex]
+        ## 1 extracted signature match most similar to gtSigName in match2
+        matchedExtrSigName <- sigMatch$match2[matchedExtrSigIndex,1]
       else ## No extracted signatures match to gtSigName
         matchedExtrSigName <- NULL
 
@@ -181,8 +185,8 @@ ReadAndAnalyzeExposures <-
     }
 
     ## Only after the cycle, the exposureDiff[,c(1,3)] has been fixed.
-    ## The Manhattan distance should normalize against the sum of exposures
-    ## of one signature, not sum of exposures of all signatures.
+    ## The Scaled Aggregated Manhattan distance should normalize against 
+	## the sum of exposures of one signature, not sum of exposures of all signatures.
     ## This can prevent the underestimation of discrepancy between inferred
     ## exposures and ground-truth exposures.
     exposureDiff[,4] <- exposureDiff[,3] / exposureDiff[,1]
