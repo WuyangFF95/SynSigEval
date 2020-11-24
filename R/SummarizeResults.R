@@ -497,6 +497,39 @@ SummarizeMultiRuns <-
       }
     }
 
+    ## Summarize Manhattan distance scaled for
+    ## individual tumors only if there are
+    ## exposureDiff.Rda in all runDirs.
+    if(exposureFlag){
+
+      if(TRUE){
+        ## Read scaled aggregated Manhattan distances in multiple runs
+        meanSepMD <- matrix(nrow = length(gtSigNames), ncol = length(run.names))
+		sdSepMD <- matrix(nrow = length(gtSigNames), ncol = length(run.names))
+        rownames(meanSepMD) <- gtSigNames
+        colnames(meanSepMD) <- run.names
+        rownames(sdSepMD) <- gtSigNames
+        colnames(sdSepMD) <- run.names		
+		
+        for(runName in run.names){
+          runDir <- paste0(tool.dir,"/",runName)
+          summaryDir <- paste0(runDir,"/summary")
+          exposureDiffFile <- paste0(summaryDir,"/exposureDiff.RDa")
+          ## Add exposureDiff <- NULL to please the R check
+          exposureDiff <- NULL
+          load(file = exposureDiffFile)
+          for(gtSigName in gtSigNames){
+            meanSepMD[gtSigName,runName] <- mean(exposureDiff$separated[[gtSigName]][,"Scaled.Manhattan.distance"])
+			sdSepMD[gtSigName,runName] <- sd(exposureDiff$separated[[gtSigName]][,"Scaled.Manhattan.distance"])
+          }
+        }
+        multiRun$meanSepMD <- meanSepMD
+        multiRun$sdSepMD <- sdSepMD
+      }
+
+    }
+
+
     ## Save data and results
     save(multiRun,file = paste0(tool.dir,"/multiRun.RDa"))
     write.csv(x = multiRun$meanSD,
@@ -510,6 +543,10 @@ SummarizeMultiRuns <-
                 file = paste0(tool.dir,"/meanSD.Scaled.Aggregated.Manhattan.dist.csv"))
       write.csv(x = multiRun$fivenumAggMD,
                 file = paste0(tool.dir,"/fivenum.Scaled.Aggregated.Manhattan.dist.csv"))
+      write.csv(x = multiRun$meanSepMD,
+                file = paste0(tool.dir,"/mean.Scaled.Manhattan.dist.for.each.tumor.csv"))
+      write.csv(x = multiRun$sdSepMD,
+                file = paste0(tool.dir,"/sd.Scaled.Manhattan.dist.for.each.tumor.csv"))
     }
     invisible(multiRun)
   }
