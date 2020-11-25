@@ -630,7 +630,7 @@ SummarizeMultiToolsOneDataset <- function(
 
   multiTools <- list()
   combMeanSD <- NULL
-  combMeanSDMD <- NULL
+  combMeanSDAggMD <- NULL
 
   for(toolNumber in 1:length(toolNames)){
     toolName <- toolNames[toolNumber]
@@ -686,8 +686,8 @@ SummarizeMultiToolsOneDataset <- function(
       }
     }
 
-    ## meanSDMD contains mean and standard deviation
-    ## for each extraction index.
+    ## meanSD contains mean and standard deviation
+    ## for each extraction measure.
     {
       meanSD <- multiRun$meanSD
       colnames(meanSD) <- paste0(toolDirName,".", colnames(meanSD))
@@ -766,24 +766,24 @@ SummarizeMultiToolsOneDataset <- function(
         }
       }
 
-      ## meanSDMD contains mean and standard deviation
-      ## for Scaled Manhattan distance between ground-truth exposures
+      ## meanSDAggMD contains mean and standard deviation
+      ## for aggregated Scaled Manhattan distance between ground-truth exposures
       ## and inferred exposures for each ground-truth signature
       {
-        meanSDMD <- multiRun$meanSDMD
-        colnames(meanSDMD) <- paste0(toolDirName,".", colnames(meanSDMD))
-        if(is.null(meanSDMD)){
-          combMeanSDMD <- meanSDMD
+        meanSDAggMD <- multiRun$meanSDAggMD
+        colnames(meanSDAggMD) <- paste0(toolDirName,".", colnames(meanSDAggMD))
+        if(is.null(meanSDAggMD)){
+          combMeanSDAggMD <- meanSDAggMD
         } else{
-          combMeanSDMD <- cbind(combMeanSDMD,meanSDMD)
+          combMeanSDAggMD <- cbind(combMeanSDAggMD,meanSDAggMD)
         }
       }
     }
   }
 
   multiTools$combMeanSD <- combMeanSD
-  if(exists("combMeanSDMD")){
-    multiTools$combMeanSDMD <- combMeanSDMD
+  if(exists("combMeanSDAggMD")){
+    multiTools$combMeanSDAggMD <- combMeanSDAggMD
   }
   multiTools$datasetName <- datasetName
   multiTools$datasetGroupName <- datasetGroupName
@@ -792,9 +792,9 @@ SummarizeMultiToolsOneDataset <- function(
   save(multiTools,file = paste0(third.level.dir,"/multiTools.RDa"))
   write.csv(x = multiTools$combMeanSD,
             file = paste0(third.level.dir,"/combined.meanSD.csv"))
-  if(!is.null(multiTools$combMeanSDMD)){
-    write.csv(x = multiTools$combMeanSDMD,
-              file = paste0(third.level.dir,"/combined.meanSD.Manhattan.dist.csv"))
+  if(!is.null(multiTools$combMeanSDAggMD)){
+    write.csv(x = multiTools$combMeanSDAggMD,
+              file = paste0(third.level.dir,"/combined.meanSD.Aggregated.Manhattan.dist.csv"))
   }
   invisible(multiTools)
 }
