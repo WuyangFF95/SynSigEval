@@ -1343,11 +1343,11 @@ SummarizeMultiToolsMultiDatasets <-
       }
     }
 
-    ## Summarizing Scaled Manhattan distance results,
-    ## which measures attribution performances.
+    ## Summarizing aggregated Scaled Manhattan distance results
     if(flagExposure){
       {
         FinalAttr <- list()
+		FinalAttr$AggMD <- list()
         ## Combine attribution assessment onto multiple sheets.
         ## Each sheet shows Scaled Manhattan distance for one mutational signature.
         for(datasetDir in dataset.dirs){
@@ -1359,16 +1359,16 @@ SummarizeMultiToolsMultiDatasets <-
           gtSigNames <- multiTools$gtSigNames
           sigNums <- length(gtSigNames)
 
-          if(length(FinalAttr) == 0){
+          if(length(FinalAttr$AggMD) == 0){
             for(gtSigName in gtSigNames) {
-              FinalAttr[[gtSigName]] <- data.frame()
+              FinalAttr$AggMD[[gtSigName]] <- data.frame()
             }
           }
 
           ## Combine Scaled Manhattan distance
           for(gtSigName in gtSigNames){
-            FinalAttr[[gtSigName]] <- rbind(
-              FinalAttr[[gtSigName]],
+            FinalAttr$AggMD[[gtSigName]] <- rbind(
+              FinalAttr$AggMD[[gtSigName]],
               multiTools$AggManhattanDist[[gtSigName]])
           }
         }
@@ -1377,7 +1377,7 @@ SummarizeMultiToolsMultiDatasets <-
         ## don't output summary tables for scaled Manhattan distance.
         if(FALSE){
           for(gtSigName in gtSigNames){
-            output <- FinalAttr[[gtSigName]]
+            output <- FinalAttr$AggMD[[gtSigName]]
 
             output <- output[,-4]
             colnames(output)[1] <- "Seed or run number"
@@ -1396,32 +1396,32 @@ SummarizeMultiToolsMultiDatasets <-
       ## in all runs and in all datasets.
       {
 
-        ## Combine all FinalAttr[[gtSigName]] into FinalAttr$Combined
-        FinalAttr$combined <- data.frame()
+        ## Combine all FinalAttr$AggMD[[gtSigName]] into FinalAttr$AggMD$Combined
+        FinalAttr$AggMD$combined <- data.frame()
         for(gtSigName in gtSigNames){
-          plotDFOneMeasure <- data.frame(FinalAttr[[gtSigName]], gtSigName = gtSigName)
-          FinalAttr$combined <- rbind(FinalAttr$combined,plotDFOneMeasure)
+          plotDFOneMeasure <- data.frame(FinalAttr$AggMD[[gtSigName]], gtSigName = gtSigName)
+          FinalAttr$AggMD$combined <- rbind(FinalAttr$AggMD$combined,plotDFOneMeasure)
         }
 
-        ## Convert FinalAttr$combined$datasetGroup and
+        ## Convert FinalAttr$AggMD$combined$datasetGroup and
         ## Let their levels follow gtools::mixedsort() fashion
         ## So that the order of the facet labels will be more reasonable for readers.
-        FinalAttr$combined$datasetGroup <- factor(
-          FinalAttr$combined$datasetGroup,
-          levels = gtools::mixedsort(unique(FinalAttr$combined$datasetGroup)))
+        FinalAttr$AggMD$combined$datasetGroup <- factor(
+          FinalAttr$AggMD$combined$datasetGroup,
+          levels = gtools::mixedsort(unique(FinalAttr$AggMD$combined$datasetGroup)))
 
         if(!is.null(multiTools$datasetSubGroupName)) {
-          FinalAttr$combined$datasetSubGroup <- factor(
-            FinalAttr$combined$datasetSubGroup,
-            levels = gtools::mixedsort(unique(FinalAttr$combined$datasetSubGroup)))
+          FinalAttr$AggMD$combined$datasetSubGroup <- factor(
+            FinalAttr$AggMD$combined$datasetSubGroup,
+            levels = gtools::mixedsort(unique(FinalAttr$AggMD$combined$datasetSubGroup)))
         }
 
         ggplotList <- list()
         ## Plot a multi-facet ggplot for all gtSigNames and all runs.
         {
-          ## Generate a ggplot object based on FinalAttr$combined
+          ## Generate a ggplot object based on FinalAttr$AggMD$combined
           ggplotList$general <- ggplot2::ggplot(
-            FinalAttr$combined,
+            FinalAttr$AggMD$combined,
             ggplot2::aes(x = .data$toolName, y = .data$value)) +
             ## Draw geom_violin and geom_quasirandom
             ggplot2::geom_violin(
@@ -1473,7 +1473,7 @@ SummarizeMultiToolsMultiDatasets <-
             ## Restrict the decimal numbers of values of measures to be 2
             ggplot2::scale_y_continuous(
               ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-              limits = c(0, max(FinalAttr$combined$value)),
+              limits = c(0, max(FinalAttr$AggMD$combined$value)),
               labels =function(x) sprintf("%.2f", x))
         }
         ## Plot a multi-facet ggplot,
@@ -1493,9 +1493,9 @@ SummarizeMultiToolsMultiDatasets <-
             text = paste0("multiTools$",by,"Name")))
 
 
-          ## Generate a ggplot object based on FinalAttr$combined
+          ## Generate a ggplot object based on FinalAttr$AggMD$combined
           ggplotList[[by]] <- ggplot2::ggplot(
-            FinalAttr$combined,
+            FinalAttr$AggMD$combined,
             ggplot2::aes(x = .data$toolName, y = .data$value))
           ## Draw geom_violin and geom_quasirandom
           ggplotList[[by]] <- ggplotList[[by]] +
@@ -1545,7 +1545,7 @@ SummarizeMultiToolsMultiDatasets <-
             ## Restrict the decimal numbers of values of measures to be 2
             ggplot2::scale_y_continuous(
               ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-              limits = c(0, max(FinalAttr$combined$value)),
+              limits = c(0, max(FinalAttr$AggMD$combined$value)),
               labels =function(x) sprintf("%.2f", x))
         }
 
@@ -1557,6 +1557,7 @@ SummarizeMultiToolsMultiDatasets <-
         grDevices::dev.off()
       }
     }
+
 
     FinalSummary <- list()
     FinalSummary$FinalExtr <- FinalExtr
