@@ -509,8 +509,8 @@ SummarizeMultiRuns <-
         rownames(meanSepMD) <- gtSigNames
         colnames(meanSepMD) <- run.names
         rownames(sdSepMD) <- gtSigNames
-        colnames(sdSepMD) <- run.names		
-		
+        colnames(sdSepMD) <- run.names
+
         for(runName in run.names){
           runDir <- paste0(tool.dir,"/",runName)
           summaryDir <- paste0(runDir,"/summary")
@@ -647,7 +647,7 @@ SummarizeMultiToolsOneDataset <- function(
     }
     datasetName <- multiRun$datasetName
 
-    ## Combine multi-runs and multi-tools for each index
+    ## Combine multi-runs and multi-tools for each measure
     {
       indexes <- c("averCosSim","falseNeg","falsePos",
                    "truePos","TPR","PPV")
@@ -733,6 +733,8 @@ SummarizeMultiToolsOneDataset <- function(
       }
     }
 
+    ## Combine multi-runs and multi-tools for
+    ## aggregated scaled Manhattan distance.
     if(!is.null(multiRun$AggManhattanDist)){
       ## Combine multi-runs and multi-tools for Manhattan
       ## distance of each ground-truth signature
@@ -779,6 +781,78 @@ SummarizeMultiToolsOneDataset <- function(
         }
       }
     }
+
+
+    ## Combine multi-runs and multi-tools for
+    ## mean of scaled Manhattan distance for each tumor.
+    if(!is.null(multiRun$meanSepMD)){
+      ## Combine multi-runs and multi-tools for Manhattan
+      ## distance of each ground-truth signature
+      if(is.null(multiTools$meanSepMD)) multiTools$meanSepMD <- list()
+      for(gtSigName in gtSigNames){
+        if(!exists("datasetSubGroup")) {
+          gtmeanSepMD4OneTool <- data.frame(seed = colnames(multiRun$meanSepMD),
+                                            value = multiRun$meanSepMD[gtSigName,],
+                                            toolName = toolName,
+                                            datasetName = multiRun$datasetName,
+                                            datasetGroup = datasetGroup,
+                                            stringsAsFactors = FALSE)
+        } else{
+          gtmeanSepMD4OneTool <- data.frame(seed = colnames(multiRun$meanSepMD),
+                                            value = multiRun$meanSepMD[gtSigName,],
+                                            toolName = toolName,
+                                            datasetName = multiRun$datasetName,
+                                            datasetGroup = datasetGroup,
+                                            datasetSubGroup = datasetSubGroup,
+                                            stringsAsFactors = FALSE)
+        }
+        rownames(gtmeanSepMD4OneTool) <- NULL
+        ## Create a data.frame for each ground-truth signature,
+        ## and summarize multi-Run, multiDataset values
+        ## for each ground-truth signature.
+        if(is.null(multiTools$meanSepMD[[gtSigName]])){
+          multiTools$meanSepMD[[gtSigName]] <- data.frame()
+        }
+        multiTools$meanSepMD[[gtSigName]] <- rbind(multiTools$meanSepMD[[gtSigName]],gtmeanSepMD4OneTool)
+      }
+    }
+
+    ## Combine multi-runs and multi-tools for
+    ## standard deviation of scaled Manhattan distance for each tumor.
+    if(!is.null(multiRun$sdSepMD)){
+      ## Combine multi-runs and multi-tools for Manhattan
+      ## distance of each ground-truth signature
+
+      if(is.null(multiTools$sdSepMD)) multiTools$sdSepMD <- list()
+      for(gtSigName in gtSigNames){
+        if(!exists("datasetSubGroup")) {
+          gtsdSepMD4OneTool <- data.frame(seed = colnames(multiRun$sdSepMD),
+                                          value = multiRun$sdSepMD[gtSigName,],
+                                          toolName = toolName,
+                                          datasetName = multiRun$datasetName,
+                                          datasetGroup = datasetGroup,
+                                          stringsAsFactors = FALSE)
+        } else{
+          gtsdSepMD4OneTool <- data.frame(seed = colnames(multiRun$sdSepMD),
+                                          value = multiRun$sdSepMD[gtSigName,],
+                                          toolName = toolName,
+                                          datasetName = multiRun$datasetName,
+                                          datasetGroup = datasetGroup,
+                                          datasetSubGroup = datasetSubGroup,
+                                          stringsAsFactors = FALSE)
+        }
+        rownames(gtsdSepMD4OneTool) <- NULL
+        ## Create a data.frame for each ground-truth signature,
+        ## and summarize multi-Run, multiDataset values
+        ## for each ground-truth signature.
+        if(is.null(multiTools$sdSepMD[[gtSigName]])){
+          multiTools$sdSepMD[[gtSigName]] <- data.frame()
+        }
+        multiTools$sdSepMD[[gtSigName]] <- rbind(multiTools$sdSepMD[[gtSigName]],gtmeanSepMD4OneTool)
+      }
+    }
+
+
   }
 
   multiTools$combMeanSD <- combMeanSD
@@ -795,6 +869,14 @@ SummarizeMultiToolsOneDataset <- function(
   if(!is.null(multiTools$combMeanSDAggMD)){
     write.csv(x = multiTools$combMeanSDAggMD,
               file = paste0(third.level.dir,"/combined.meanSD.Aggregated.Manhattan.dist.csv"))
+  }
+  if(!is.null(multiTools$meanSepMD)){
+    write.csv(x = multiTools$meanSepMD,
+              file = paste0(third.level.dir,"/mean.of.Manhattan.dist.for.each.tumor.csv"))
+  }
+  if(!is.null(multiTools$sdSepMD)){
+    write.csv(x = multiTools$sdSepMD,
+              file = paste0(third.level.dir,"/stdev.of.Manhattan.dist.for.each.tumor.csv"))
   }
   invisible(multiTools)
 }
@@ -1325,7 +1407,8 @@ SummarizeMultiToolsMultiDatasets <-
       grDevices::dev.off()
     }
 
-
+    ## Summarize aggregated scaled Manhattan distance only if
+	## multiTools$AggManhattanDist exists.
     {
       flagExposure <- TRUE
       ## Combine attribution assessment onto multiple sheets.
