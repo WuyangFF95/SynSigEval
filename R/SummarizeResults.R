@@ -544,9 +544,9 @@ SummarizeMultiRuns <-
       write.csv(x = multiRun$fivenumAggMD,
                 file = paste0(tool.dir,"/fivenum.Scaled.Aggregated.Manhattan.dist.csv"))
       write.csv(x = multiRun$meanSepMD,
-                file = paste0(tool.dir,"/mean.Scaled.Manhattan.dist.for.each.tumor.csv"))
+                file = paste0(tool.dir,"/mean.of.sep.Scaled.Manhattan.dist.csv"))
       write.csv(x = multiRun$sdSepMD,
-                file = paste0(tool.dir,"/sd.Scaled.Manhattan.dist.for.each.tumor.csv"))
+                file = paste0(tool.dir,"/stdev.of.sep.Scaled.Manhattan.dist.csv"))
     }
     invisible(multiRun)
   }
@@ -872,11 +872,11 @@ SummarizeMultiToolsOneDataset <- function(
   }
   if(!is.null(multiTools$meanSepMD)){
     write.csv(x = multiTools$meanSepMD,
-              file = paste0(third.level.dir,"/mean.of.Manhattan.dist.for.each.tumor.csv"))
+              file = paste0(third.level.dir,"/mean.of.sep.Scaled.Manhattan.dist.csv"))
   }
   if(!is.null(multiTools$sdSepMD)){
     write.csv(x = multiTools$sdSepMD,
-              file = paste0(third.level.dir,"/stdev.of.Manhattan.dist.for.each.tumor.csv"))
+              file = paste0(third.level.dir,"/stdev.of.sep.Scaled.Manhattan.dist.csv"))
   }
   invisible(multiTools)
 }
@@ -1782,25 +1782,25 @@ SummarizeOneToolMultiDatasets <-
         load(paste0(thirdLevelDir,"/multiRun.RDa"))
         datasetName <- basename(datasetDir)
         for(index in indexes){
-        if(FALSE){ ## debug
-          measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
-                                           index = index,
-                                           value = multiRun[[index]],
-                                           toolName = toolName,
-                                           datasetName = datasetName,
-                                           datasetGroup = datasetGroup[datasetName],
-                                           datasetGroupName = datasetGroupName,
-                                           datasetSubGroup = datasetSubGroup[datasetName],
-                                           datasetSubGroupName = datasetSubGroupName,
-                                           stringsAsFactors = FALSE)
-        } else {
-          measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
-                                           value = multiRun[[index]],
-                                           toolName = toolName,
-                                           datasetGroup = datasetGroup[datasetName],
-                                           datasetSubGroup = datasetSubGroup[datasetName],
-                                           stringsAsFactors = FALSE)
-        }
+          if(FALSE){ ## debug
+            measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
+                                             index = index,
+                                             value = multiRun[[index]],
+                                             toolName = toolName,
+                                             datasetName = datasetName,
+                                             datasetGroup = datasetGroup[datasetName],
+                                             datasetGroupName = datasetGroupName,
+                                             datasetSubGroup = datasetSubGroup[datasetName],
+                                             datasetSubGroupName = datasetSubGroupName,
+                                             stringsAsFactors = FALSE)
+          } else {
+            measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
+                                             value = multiRun[[index]],
+                                             toolName = toolName,
+                                             datasetGroup = datasetGroup[datasetName],
+                                             datasetSubGroup = datasetSubGroup[datasetName],
+                                             stringsAsFactors = FALSE)
+          }
           rownames(measure4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
@@ -1935,25 +1935,25 @@ SummarizeOneToolMultiDatasets <-
 
         for(gtSigName in gtSigNames){
 
-        if(FALSE){ # debug
-          gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
-                                                gtSigName = gtSigName,
-                                                value = multiRun$cosSim[[gtSigName]],
-                                                toolName = toolName,
-                                                datasetName = datasetName,
-                                                datasetGroup = datasetGroup[datasetName],
-                                                datasetGroupName = datasetGroupName,
-                                                datasetSubGroup = datasetSubGroup[datasetName],
-                                                datasetSubGroupName = datasetSubGroupName,
-                                                stringsAsFactors = FALSE)
-        } else {
-          gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
-                                                value = multiRun$cosSim[[gtSigName]],
-                                                toolName = toolName,
-                                                datasetGroup = datasetGroup[datasetName],
-                                                datasetSubGroup = datasetSubGroup[datasetName],
-                                                stringsAsFactors = FALSE)
-        }
+          if(FALSE){ # debug
+            gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
+                                                  gtSigName = gtSigName,
+                                                  value = multiRun$cosSim[[gtSigName]],
+                                                  toolName = toolName,
+                                                  datasetName = datasetName,
+                                                  datasetGroup = datasetGroup[datasetName],
+                                                  datasetGroupName = datasetGroupName,
+                                                  datasetSubGroup = datasetSubGroup[datasetName],
+                                                  datasetSubGroupName = datasetSubGroupName,
+                                                  stringsAsFactors = FALSE)
+          } else {
+            gtMeanCosSim4OneDataset <- data.frame(seed = names(multiRun$cosSim[[gtSigName]]),
+                                                  value = multiRun$cosSim[[gtSigName]],
+                                                  toolName = toolName,
+                                                  datasetGroup = datasetGroup[datasetName],
+                                                  datasetSubGroup = datasetSubGroup[datasetName],
+                                                  stringsAsFactors = FALSE)
+          }
           rownames(gtMeanCosSim4OneDataset) <- NULL
 
           ## Create a data.frame for each measure,
@@ -2081,13 +2081,14 @@ SummarizeOneToolMultiDatasets <-
 
 
     ## Summarize scaled Manhattan distance only if
+    ## scaled Manhattan distance data exists in object multRun
     exposureFlag <- TRUE
     {
       for(datasetDir in dataset.dirs){
         thirdLevelDir <- paste0(datasetDir,"/",tool.dirname)
         toolName <- strsplit(basename(tool.dirname),".results")[[1]]
         ## Add multiRun <- NULL to please R check
-        multiRUn <- NULL
+        multiRun <- NULL
         load(paste0(thirdLevelDir,"/multiRun.RDa"))
         if(is.null(multiRun$AggManhattanDist)){
           exposureFlag <- FALSE
@@ -2097,8 +2098,9 @@ SummarizeOneToolMultiDatasets <-
       }
     }
 
+    ## Summarize aggregated scaled Manhattan distance for one tool.
     if(exposureFlag){
-      ## Summarize attribution scaled Manhattan distance for one tool.
+      ## Summarize aggregated scaled Manhattan distance for one tool.
       {
         OneToolSummary$AggManhattanDist <- list()
 
@@ -2115,22 +2117,22 @@ SummarizeOneToolMultiDatasets <-
           for(gtSigName in gtSigNames){
             if(FALSE) { # debug
               gtAggManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$AggManhattanDist),
-                                                             gtSigName = gtSigName,
-                                                             value = multiRun$AggManhattanDist[gtSigName,],
-                                                             toolName = toolName,
-                                                             datasetName = datasetName,
-                                                             datasetGroup = datasetGroup[datasetName],
-                                                             datasetGroupName = datasetGroupName,
-                                                             datasetSubGroup = datasetSubGroup[datasetName],
-                                                             datasetSubGroupName = datasetSubGroupName,
-                                                             stringsAsFactors = FALSE)
+                                                          gtSigName = gtSigName,
+                                                          value = multiRun$AggManhattanDist[gtSigName,],
+                                                          toolName = toolName,
+                                                          datasetName = datasetName,
+                                                          datasetGroup = datasetGroup[datasetName],
+                                                          datasetGroupName = datasetGroupName,
+                                                          datasetSubGroup = datasetSubGroup[datasetName],
+                                                          datasetSubGroupName = datasetSubGroupName,
+                                                          stringsAsFactors = FALSE)
             } else {
               gtAggManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$AggManhattanDist),
-                                                             value = multiRun$AggManhattanDist[gtSigName,],
-                                                             toolName = toolName,
-                                                             datasetGroup = datasetGroup[datasetName],
-                                                             datasetSubGroup = datasetSubGroup[datasetName],
-                                                             stringsAsFactors = FALSE)
+                                                          value = multiRun$AggManhattanDist[gtSigName,],
+                                                          toolName = toolName,
+                                                          datasetGroup = datasetGroup[datasetName],
+                                                          datasetSubGroup = datasetSubGroup[datasetName],
+                                                          stringsAsFactors = FALSE)
             }
             rownames(gtAggManhattanDist4OneDataset) <- NULL
 
@@ -2149,7 +2151,7 @@ SummarizeOneToolMultiDatasets <-
         OneToolSummary$AggManhattanDist$combined <- data.frame()
         for(gtSigName in gtSigNames){
           gtAggManhattanDist4AllDatasets <- data.frame(OneToolSummary$AggManhattanDist[[gtSigName]],
-                                                          stringsAsFactors = FALSE)
+                                                       stringsAsFactors = FALSE)
           rownames(gtAggManhattanDist4AllDatasets) <- NULL
 
           if(nrow(OneToolSummary$AggManhattanDist$combined) == 0 |
@@ -2163,7 +2165,8 @@ SummarizeOneToolMultiDatasets <-
         }
 
       }
-      ## Plot normalized Manhattan distance violin plot + beeswarm plot for one tool
+      ## Plot aggregated scaled Manhattan distance violin plot
+      ## + beeswarm plot for one tool
       { ## debug
         ## Create a list to store ggplot2 boxplot + beeswarm plot objects
         ggplotList$AggManhattanDist <- list()
@@ -2249,6 +2252,317 @@ SummarizeOneToolMultiDatasets <-
         grDevices::dev.off()
       }
     }
+
+    if(TRUE){
+      ## Summarize mean of scaled Manhattan distance
+      ## separated for individual tumors for each tool.
+      if(exposureFlag){
+        {
+          OneToolSummary$meanSepMD <- list()
+
+          for(datasetDir in dataset.dirs){
+            thirdLevelDir <- paste0(datasetDir,"/",tool.dirname)
+            toolName <- strsplit(basename(tool.dirname),".results")[[1]]
+            ## Add multiRun <- NULL to please R check
+            multiRun <- NULL
+            load(paste0(thirdLevelDir,"/multiRun.RDa"))
+            gtSigNames <- rownames(multiRun$meanSepMD)
+            sigNums <- length(gtSigNames)
+            datasetName <- basename(datasetDir)
+
+            for(gtSigName in gtSigNames){
+              if(FALSE) { # debug
+                gtmeanSepMD4OneDataset <- data.frame(seed = colnames(multiRun$meanSepMD),
+                                                     gtSigName = gtSigName,
+                                                     value = multiRun$meanSepMD[gtSigName,],
+                                                     toolName = toolName,
+                                                     datasetName = datasetName,
+                                                     datasetGroup = datasetGroup[datasetName],
+                                                     datasetGroupName = datasetGroupName,
+                                                     datasetSubGroup = datasetSubGroup[datasetName],
+                                                     datasetSubGroupName = datasetSubGroupName,
+                                                     stringsAsFactors = FALSE)
+              } else {
+                gtmeanSepMD4OneDataset <- data.frame(seed = colnames(multiRun$meanSepMD),
+                                                     value = multiRun$meanSepMD[gtSigName,],
+                                                     toolName = toolName,
+                                                     datasetGroup = datasetGroup[datasetName],
+                                                     datasetSubGroup = datasetSubGroup[datasetName],
+                                                     stringsAsFactors = FALSE)
+              }
+              rownames(gtmeanSepMD4OneDataset) <- NULL
+
+              ## Create a data.frame for each measure,
+              ## and summarize multi-Run, multiDataset values
+              ## for each measure.
+              if(is.null(OneToolSummary$meanSepMD[[gtSigName]])){
+                OneToolSummary$meanSepMD[[gtSigName]] <- data.frame()
+              }
+              OneToolSummary$meanSepMD[[gtSigName]] <- rbind(OneToolSummary$meanSepMD[[gtSigName]],gtmeanSepMD4OneDataset)
+            }
+          }
+
+          OneToolSummary$meanSepMD$combined <- data.frame()
+          for(gtSigName in gtSigNames){
+            gtmeanSepMD4AllDatasets <- data.frame(OneToolSummary$meanSepMD[[gtSigName]],
+                                                  stringsAsFactors = FALSE)
+            rownames(gtmeanSepMD4AllDatasets) <- NULL
+
+            if(nrow(OneToolSummary$meanSepMD$combined) == 0 |
+               ncol(OneToolSummary$meanSepMD$combined) == 0 |
+               is.null(dim(OneToolSummary$meanSepMD$combined)) ) {
+              OneToolSummary$meanSepMD$combined <- gtmeanSepMD4AllDatasets
+            } else {
+              OneToolSummary$meanSepMD$combined <-
+                rbind(OneToolSummary$meanSepMD$combined,gtmeanSepMD4AllDatasets)
+            }
+          }
+
+        }
+        ## Plot mean of separated scaled Manhattan distance violin plot
+        ## + beeswarm plot for one tool
+        { ## debug
+          ## Create a list to store ggplot2 boxplot + beeswarm plot objects
+          ggplotList$meanSepMD <- list()
+          ## Plot a value~datasetSubGroup beeswarm plot for each signature.
+          for(gtSigName in gtSigNames){
+            sigNum <- which(gtSigNames == gtSigName)
+            ggplotList$meanSepMD[[gtSigName]] <- ggplot2::ggplot(
+              OneToolSummary$meanSepMD[[gtSigName]],
+              ## Make sure that only one x-label is shown in one small facet.
+              #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
+              ggplot2::aes(x = .data$toolName, y = .data$value)
+            )
+            ## Add facets
+            ggplotList$meanSepMD[[gtSigName]] <- ggplotList$meanSepMD[[gtSigName]] +
+              ggplot2::facet_grid(
+                rows = ggplot2::vars(datasetSubGroup),
+                cols = ggplot2::vars(datasetGroup),
+                ## Move x facet labels to the right,
+                ## This is to let the facet labels correspond to axis.title.
+                switch = "x") +
+              ## Draw beeswarm plots on multiple facets
+              ## Draw geom_violin
+              ggplot2::geom_violin(
+                ## Change filling color to white
+                fill = "#FFFFFF",
+                ## Maximize the violin plot width
+                scale = "width",
+                ## Hide outliers
+                #outlier.shape = NA
+              ) +
+              ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+              ## Show mean of the extraction meaasure distribution, as a blue diamond.
+              ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+              ## Draw beeswarm plot
+              ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
+                                           size = 0.3 ## Make dot size smaller
+                                           ,
+                                           ## Remove differentiated colors for beeswarm dots
+                                           ## Set groups for the filling functionalities to differentiate
+                                           #ggplot2::aes(color = .data$datasetGroup)
+              ) +
+              ## Change filling color
+              ggplot2::scale_fill_brewer(palette = "Greys") +
+              ## Change axis.text and tickmarks
+              ggplot2::theme(
+                ## Remove axis.text.x
+                axis.text.x = ggplot2::element_blank(),
+                ## Remove tick marks on x axis (axis.ticks.x)
+                axis.ticks.x = ggplot2::element_blank(),
+                ## Remove entire legend
+                legend.position = "none"
+              ) +
+              ## Change titles
+              ggplot2::labs(
+                title = paste0(toolName,": Mean of scaled Manhattan distance of "),
+                subtitle = paste0(gtSigName," exposure in individual tumors"),
+                ## Change title of y axis (axis.title.y) same as gtSigName info (same as title)
+                y = paste0("mean(separated Manhattan distance of ",gtSigName," exposure)"),
+                ## Change title of x axis to "Pearson's R squared"
+                x = "Pearson's R squared") +
+              ## Change title of legend to datasetGroupName
+              ggplot2::guides(color = ggplot2::guide_legend(title = datasetGroupName)) +
+              ## Restrict the decimal numbers of values of measures (y) to be 2
+              ggplot2::scale_y_continuous(
+                ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+                limits = c(0,max(OneToolSummary$meanSepMD$combined$value)),
+                ## Restrict the decimal numbers of values of measures (y) to be 2
+                labels =function(x) sprintf("%.2f", x),
+                ## Add a secondary axis title on the top of the plot
+                ## Showing axis label indicating facets
+                sec.axis = ggplot2::dup_axis(
+                  breaks = NULL, ## Don't show axis breaks
+                  labels = NULL, ## Don't show axis tickmarks
+                  name = "SBS1:SBS5 mutation count ratio"))
+          }
+
+
+          ## Output multiple extraction measures in a pdf file
+          grDevices::pdf(paste0(out.dir,"/boxplot.onetool.mean.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
+          for(gtSigName in gtSigNames)
+            suppressMessages(suppressWarnings(print(ggplotList$meanSepMD[[gtSigName]])))
+          grDevices::dev.off()
+        }
+      }
+
+
+      ## Summarize standard deviation of scaled Manhattan distance
+      ## separated for individual tumors for each tool.
+      if(exposureFlag){
+        {
+          OneToolSummary$sdSepMD <- list()
+
+          for(datasetDir in dataset.dirs){
+            thirdLevelDir <- paste0(datasetDir,"/",tool.dirname)
+            toolName <- strsplit(basename(tool.dirname),".results")[[1]]
+            ## Add multiRun <- NULL to please R check
+            multiRun <- NULL
+            load(paste0(thirdLevelDir,"/multiRun.RDa"))
+            gtSigNames <- rownames(multiRun$sdSepMD)
+            sigNums <- length(gtSigNames)
+            datasetName <- basename(datasetDir)
+
+            for(gtSigName in gtSigNames){
+              if(FALSE) { # debug
+                gtsdSepMD4OneDataset <- data.frame(seed = colnames(multiRun$sdSepMD),
+                                                   gtSigName = gtSigName,
+                                                   value = multiRun$sdSepMD[gtSigName,],
+                                                   toolName = toolName,
+                                                   datasetName = datasetName,
+                                                   datasetGroup = datasetGroup[datasetName],
+                                                   datasetGroupName = datasetGroupName,
+                                                   datasetSubGroup = datasetSubGroup[datasetName],
+                                                   datasetSubGroupName = datasetSubGroupName,
+                                                   stringsAsFactors = FALSE)
+              } else {
+                gtsdSepMD4OneDataset <- data.frame(seed = colnames(multiRun$sdSepMD),
+                                                   value = multiRun$sdSepMD[gtSigName,],
+                                                   toolName = toolName,
+                                                   datasetGroup = datasetGroup[datasetName],
+                                                   datasetSubGroup = datasetSubGroup[datasetName],
+                                                   stringsAsFactors = FALSE)
+              }
+              rownames(gtsdSepMD4OneDataset) <- NULL
+
+              ## Create a data.frame for each measure,
+              ## and summarize multi-Run, multiDataset values
+              ## for each measure.
+              if(is.null(OneToolSummary$sdSepMD[[gtSigName]])){
+                OneToolSummary$sdSepMD[[gtSigName]] <- data.frame()
+              }
+              OneToolSummary$sdSepMD[[gtSigName]] <- rbind(OneToolSummary$sdSepMD[[gtSigName]],gtsdSepMD4OneDataset)
+            }
+          }
+
+          OneToolSummary$sdSepMD$combined <- data.frame()
+          for(gtSigName in gtSigNames){
+            gtsdSepMD4AllDatasets <- data.frame(OneToolSummary$sdSepMD[[gtSigName]],
+                                                stringsAsFactors = FALSE)
+            rownames(gtsdSepMD4AllDatasets) <- NULL
+
+            if(nrow(OneToolSummary$sdSepMD$combined) == 0 |
+               ncol(OneToolSummary$sdSepMD$combined) == 0 |
+               is.null(dim(OneToolSummary$sdSepMD$combined)) ) {
+              OneToolSummary$sdSepMD$combined <- gtsdSepMD4AllDatasets
+            } else {
+              OneToolSummary$sdSepMD$combined <-
+                rbind(OneToolSummary$sdSepMD$combined,gtsdSepMD4AllDatasets)
+            }
+          }
+
+        }
+        ## Plot standard deviation of separated scaled Manhattan distance
+        ## violin plot + beeswarm plot for one tool
+        { ## debug
+          ## Create a list to store ggplot2 boxplot + beeswarm plot objects
+          ggplotList$sdSepMD <- list()
+          ## Plot a value~datasetSubGroup beeswarm plot for each signature.
+          for(gtSigName in gtSigNames){
+            sigNum <- which(gtSigNames == gtSigName)
+            ggplotList$sdSepMD[[gtSigName]] <- ggplot2::ggplot(
+              OneToolSummary$sdSepMD[[gtSigName]],
+              ## Make sure that only one x-label is shown in one small facet.
+              #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
+              ggplot2::aes(x = .data$toolName, y = .data$value)
+            )
+            ## Add facets
+            ggplotList$sdSepMD[[gtSigName]] <- ggplotList$sdSepMD[[gtSigName]] +
+              ggplot2::facet_grid(
+                rows = ggplot2::vars(datasetSubGroup),
+                cols = ggplot2::vars(datasetGroup),
+                ## Move x facet labels to the right,
+                ## This is to let the facet labels correspond to axis.title.
+                switch = "x") +
+              ## Draw beeswarm plots on multiple facets
+              ## Draw geom_violin
+              ggplot2::geom_violin(
+                ## Change filling color to white
+                fill = "#FFFFFF",
+                ## Maximize the violin plot width
+                scale = "width",
+                ## Hide outliers
+                #outlier.shape = NA
+              ) +
+              ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+              ## Show mean of the extraction meaasure distribution, as a blue diamond.
+              ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+              ## Draw beeswarm plot
+              ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
+                                           size = 0.3 ## Make dot size smaller
+                                           ,
+                                           ## Remove differentiated colors for beeswarm dots
+                                           ## Set groups for the filling functionalities to differentiate
+                                           #ggplot2::aes(color = .data$datasetGroup)
+              ) +
+              ## Change filling color
+              ggplot2::scale_fill_brewer(palette = "Greys") +
+              ## Change axis.text and tickmarks
+              ggplot2::theme(
+                ## Remove axis.text.x
+                axis.text.x = ggplot2::element_blank(),
+                ## Remove tick marks on x axis (axis.ticks.x)
+                axis.ticks.x = ggplot2::element_blank(),
+                ## Remove entire legend
+                legend.position = "none"
+              ) +
+              ## Change titles
+              ggplot2::labs(
+                ## Add title for value~datasetSubGroup beeswarm plot
+                title = paste0(toolName,": Standard deviation of scaled Manhattan distance of "),
+                subtitle = paste0(gtSigName," exposure in individual tumors"),
+                ## Change title of y axis (axis.title.y) same as gtSigName info (same as title)
+                y = paste0("sd(separated Manhattan distance of ",gtSigName," exposure)"),
+                ## Change title of x axis to "Pearson's R squared"
+                x = "Pearson's R squared") +
+              ## Change title of legend to datasetGroupName
+              ggplot2::guides(color = ggplot2::guide_legend(title = datasetGroupName)) +
+              ## Restrict the decimal numbers of values of measures (y) to be 2
+              ggplot2::scale_y_continuous(
+                ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+                limits = c(0,max(OneToolSummary$sdSepMD$combined$value)),
+                ## Restrict the decimal numbers of values of measures (y) to be 2
+                labels =function(x) sprintf("%.2f", x),
+                ## Add a secondary axis title on the top of the plot
+                ## Showing axis label indicating facets
+                sec.axis = ggplot2::dup_axis(
+                  breaks = NULL, ## Don't show axis breaks
+                  labels = NULL, ## Don't show axis tickmarks
+                  name = "SBS1:SBS5 mutation count ratio"))
+          }
+
+
+          ## Output multiple extraction measures in a pdf file
+          grDevices::pdf(paste0(out.dir,"/boxplot.onetool.stdev.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
+          for(gtSigName in gtSigNames)
+            suppressMessages(suppressWarnings(print(ggplotList$sdSepMD[[gtSigName]])))
+          grDevices::dev.off()
+        }
+      }
+
+
+    }
+
 
     ## Write Summary tables for extraction measures
     for(index in indexes){
