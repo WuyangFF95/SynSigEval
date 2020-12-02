@@ -59,18 +59,17 @@ SummarizeSigOnehelmsmanSubdir <-
     # and convert it into our internal format
     inferred.exp.path.helmsman.format <-
       paste0(inputPath,"/W_components.txt")
+    ## The sum of exposure of each spectrum needs to
+    ## be normalized to the total number of mutations
+    ## in each spectrum.
     rawExposure <- ReadhelmsmanExposure(
       inferred.exp.path.helmsman.format,
       check.names = FALSE)
-
     spectra <- ICAMS::ReadCatalog(
       file = paste0(ground.truth.exposure.dir,"/ground.truth.syn.catalog.csv"),
       catalog.type = "counts",
       strict = FALSE)
     exposureCounts <- rawExposure
-    ## The sum of exposure of each spectrum needs to
-    ## be normalized to the total number of mutations
-    ## in each spectrum.
     for(sample in colnames(exposureCounts)){
       exposureCounts[,sample] <- rawExposure[,sample] / sum(rawExposure[,sample]) * sum(spectra[,sample])
     }
