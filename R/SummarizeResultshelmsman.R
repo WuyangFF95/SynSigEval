@@ -47,6 +47,11 @@ SummarizeSigOnehelmsmanSubdir <-
       cat = paste0(inputPath,"/H_loadings.txt"),
       region = "unknown",
       catalog.type = "counts.signature")
+    ## extracted signatures need to be normalized.
+    for(sigName in colnames(extractedSigs)){
+      extractedSigs[,sigName] <- extractedSigs[,sigName] / sum(extractedSigs[,sigName])
+    }
+
     extracted.sigs.path <- paste0(run.dir,"/extracted.signatures.csv")
     ICAMS::WriteCatalog(extractedSigs, extracted.sigs.path)
 
@@ -63,6 +68,9 @@ SummarizeSigOnehelmsmanSubdir <-
       catalog.type = "counts",
       strict = FALSE)
     exposureCounts <- rawExposure
+    ## The sum of exposure of each spectrum needs to
+    ## be normalized to the total number of mutations
+    ## in each spectrum.
     for(sample in colnames(exposureCounts)){
       exposureCounts[,sample] <- rawExposure[,sample] / sum(rawExposure[,sample]) * sum(spectra[,sample])
     }
