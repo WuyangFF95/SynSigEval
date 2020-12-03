@@ -2246,7 +2246,7 @@ SummarizeOneToolMultiDatasets <-
 
 
         ## Output multiple extraction measures in a pdf file
-        grDevices::pdf(paste0(out.dir,"/boxplot.onetool.Manhattan.dist.pdf"), pointsize = 1)
+        grDevices::pdf(paste0(out.dir,"/boxplot.onetool.aggregated.Manhattan.dist.pdf"), pointsize = 1)
         for(gtSigName in gtSigNames)
           suppressMessages(suppressWarnings(print(ggplotList$AggManhattanDist[[gtSigName]])))
         grDevices::dev.off()
