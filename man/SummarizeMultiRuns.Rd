@@ -39,7 +39,7 @@ any ground-truth signatures.
 \item $TPR True positive rate (TPR, Sensitivity): TP / (TP + FN)
 \item $PPV Positive predictive value (PPV): TP / (FP + TP)
 \item $cosSim Average cosine similarity to each of the ground-truth signatures.
-\item $ManhattanDist Scaled Manhattan distance between ground-truth and inferred
+\item $AggManhattanDist Scaled Manhattan distance between ground-truth and inferred
 exposures to each of the ground-truth signatures.
 }
 This list also contains \code{mean} and \code{sd}, and other
