@@ -2799,7 +2799,7 @@ SummarizeOneToolMultiDatasets <-
     for(index in indexes){
       output <- OneToolSummary[[index]]
 
-      ## Change "value” to label of measure.
+      ## Change "value" to label of measure.
       colnames(output)[1] <- "Seed or run number"
       colnames(output)[2] <- indexLabels[index]
       colnames(output)[3] <- "Name of computational approach"
@@ -2815,7 +2815,7 @@ SummarizeOneToolMultiDatasets <-
     for(gtSigName in gtSigNames){
       output <- OneToolSummary[[index]]
 
-      ## Change "value” to label of measure.
+      ## Change "value" to label of measure.
       colnames(output)[1] <- "Seed or run number"
       colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
       colnames(output)[3] <- "Name of computational approach"
