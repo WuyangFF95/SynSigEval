@@ -21,3 +21,8 @@ r_github_packages:
   - steverozen/SynSigGen
   - steverozen/PCAWG7
   - steverozen/ICAMSxtra
+
+addons:
+  apt:
+    packages:
+      - libgit2-dev
