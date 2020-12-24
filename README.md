@@ -10,13 +10,21 @@ status](https://travis-ci.com/WuyangFF95/SynSigEval.svg?branch=master)](https://
 
 <!-- badges: end -->
 
-Assess the performance of mutational-signature analysis programs Using
+Assess the performance of mutational-signature analysis programs using
 catalogs of synthetic mutational spectra created by package
 [SynSigGen](https://github.com/steverozen/SynSigGen).
 
 ## Installation
 
-Install the development version of SynSigRun from
+Before installation, prerequisites in
+[Bioconductor](https://www.bioconductor.org/) needs to be installed:
+
+``` r
+install.packages("BiocManager")
+BiocManager::install(c("Biostrings","BSgenome","GenomeInfoDb","GenomicRanges"))
+```
+
+Install the development version of SynsigEval from
 [GitHub](https://github.com/) with the R command line:
 
 ``` r
@@ -26,4 +34,4 @@ devtools::install_github("WuyangFF95/SynSigEval")
 
 ## Reference manual
 
-<https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.0.4.9001.pdf>
+<https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.1.2.pdf>

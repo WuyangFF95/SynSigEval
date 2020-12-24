@@ -44,4 +44,4 @@ devtools::install_github("WuyangFF95/SynSigEval")
 
 ## Reference manual
 
-https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.1.2.pdf
+https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.1.8.pdf
