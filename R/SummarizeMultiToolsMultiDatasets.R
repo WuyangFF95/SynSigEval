@@ -347,9 +347,9 @@ SummarizeMultiToolsMultiDatasets <-
             #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
             #) +
             ## Show median of the extraction measure distribution, as a solid dot.
-            ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+            ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
             ## Show mean of the extraction meaasure distribution, as a blue diamond.
-            ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+            ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
             ## Change axis titles
             ggplot2::labs(x = "Approach") +
             ## Remove axis.title.y (defaults to be "value", meaningless)
@@ -472,9 +472,9 @@ SummarizeMultiToolsMultiDatasets <-
           #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
           ## Show median of the cosine similarity distribution
-          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+          ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+          ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
           ggplot2::ggtitle(label = "Average cosine similarity between ground-truth and extracted signatures",
                            subtitle = "for all computational approaches, ratios and correlation values.") +
@@ -547,9 +547,9 @@ SummarizeMultiToolsMultiDatasets <-
           #  , ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
           #) +
           ## Show median of the extraction measure distribution
-          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+          ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+          ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
           ## Add title for general violin + beeswarm plot
           ggplot2::ggtitle(
             label = paste0("Extraction cosine similarity as a function of"),
@@ -704,9 +704,9 @@ SummarizeMultiToolsMultiDatasets <-
               #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
               #) +
               ## Show median of the Scaled Manhattan distance distribution
-              ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+              ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
               ## Show mean of the extraction meaasure distribution, as a blue diamond.
-              ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+              ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
               ## Add title for general violin + beeswarm plot
               ggplot2::ggtitle(label = "Scaled aggregated Manhattan distance between inferred and ground-truth",
                                subtitle = "exposures for all computational approaches, ratios and correlation values.") +
@@ -780,9 +780,9 @@ SummarizeMultiToolsMultiDatasets <-
               #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
               #) +
               ## Show median of the Scaled Manhattan distance distribution
-              ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+              ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
               ## Show mean of the extraction meaasure distribution, as a blue diamond.
-              ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+              ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
               ## Add title for general violin + beeswarm plot
               ggplot2::ggtitle(
                 label = paste0("Scaled aggregated Manhattan distance summary plot as a function of "),
@@ -931,9 +931,9 @@ SummarizeMultiToolsMultiDatasets <-
               #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
               #) +
               ## Show median of the Scaled Manhattan distance distribution
-              ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+              ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
               ## Show mean of the extraction meaasure distribution, as a blue diamond.
-              ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+              ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
               ## Add title for general violin + beeswarm plot
               ggplot2::ggtitle(label = titles[measure],
                                subtitle = " between inferred and ground-truth exposures.") +
@@ -1007,9 +1007,9 @@ SummarizeMultiToolsMultiDatasets <-
               #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
               #) +
               ## Show median of the Scaled Manhattan distance distribution
-              ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+              ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
               ## Show mean of the extraction meaasure distribution, as a blue diamond.
-              ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+              ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
               ## Add title for general violin + beeswarm plot
               ggplot2::ggtitle(
                 label = paste0(titles[measure]," as a function of "),
