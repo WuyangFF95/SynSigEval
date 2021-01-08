@@ -282,13 +282,12 @@ SummarizeMultiToolsMultiDatasets <-
 
         ggplotsExtr <- list()
         ggplotsExtr$Measures <- list()
+        for(gtSigName in gtSigNames){
+          ggplotsExtr$Measures[[gtSigName]] <- plottingFunc(plotDFList$Extr[[gtSigName]],paste0("Cosine similarity to ",gtSigName))
+        }
         for(measure in c("TPR","PPV")){
           ggplotsExtr$Measures[[measure]] <- plottingFunc(plotDFList$Extr[[measure]],indexLabels[measure])
         }
-		for(gtSigName in gtSigNames){
-		  ggplotsExtr$Measures[[gtSigName]] <- plottingFunc(plotDFList$Extr[[gtSigName]],paste0("Cosine similarity to ",gtSigName))
-		}
-		
 
         ## ggplotObj for PDF 1: Composite measure
         ggplotsExtr$compositeMeasure <- plottingFunc(plotDFList$compositeMeasure,indexLabels["compositeMeasure"])
@@ -385,13 +384,13 @@ SummarizeMultiToolsMultiDatasets <-
         }
         ## Plot violin + beeswarm plots in pdf format
 
-		## PDF 1: Composite measure
+        ## PDF 1: Composite measure
         grDevices::pdf(paste0(out.dir,"/compositeMeasure.pdf"),
                        width = 3.5,
                        height = 3.5, ## Make height larger
                        pointsize = 1)
         plot(ggplotsExtr$compositeMeasure)
-		grDevices::dev.off()
+        grDevices::dev.off()
 
 
         ## PDF 2: Cosine similarity to ground-truth, TPR, PPV
@@ -400,11 +399,11 @@ SummarizeMultiToolsMultiDatasets <-
                        height = 7,
                        pointsize = 1)
         plot(ggplotsExtr$combinedWOComp)
-		grDevices::dev.off()
+        grDevices::dev.off()
 
 
         ## PDF 3 and 4: all measures, against datasetGroupName or datsetSubGroupName
-		grDevices::pdf(paste0(out.dir,"/combined.measures.additional.pdf"),
+        grDevices::pdf(paste0(out.dir,"/combined.measures.additional.pdf"),
                        width = 7,
                        height = 10.5,
                        pointsize = 1)
@@ -447,7 +446,7 @@ SummarizeMultiToolsMultiDatasets <-
       }
 
       ## Plot a multi-facet ggplot for all gtSigNames and all runs.
-	  ggplotList <- list()
+      ggplotList <- list()
       {
         ## Generate a ggplot object based on FinalExtr$combined
         ggplotList$general <- ggplot2::ggplot(
@@ -1041,7 +1040,7 @@ SummarizeMultiToolsMultiDatasets <-
           }
 
           ## Plot violin + beeswarm plots in pdf format
-          grDevices::pdf(paste0(out.dir,"/",fileNames[measure],".",".pdf"), pointsize = 1)
+          grDevices::pdf(paste0(out.dir,"/",fileNames[measure],".pdf"), pointsize = 1)
           for(by in names(ggplotList)){
             print(ggplotList[[by]])
           }
