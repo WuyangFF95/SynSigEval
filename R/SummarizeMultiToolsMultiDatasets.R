@@ -53,10 +53,12 @@ SummarizeMultiToolsMultiDatasets <-
                        "falseNeg" = "False negatives",
                        "falsePos" = "False positives",
                        "truePos" = "True positives",
-                       "TPR" = "True positive rate (TPR, sensitivity)",
-                       "PPV" = "Positive predictive value (PPV, precision)")
+                       "TPR" = "True positive rate",
+                       "PPV" = "Positive predictive value",
+                       "compositeMeasure" = "Composite measure")
       indexNums <- length(indexes)
     }
+
 
     ## Summarizing different measures for extraction performance
     ## separately into list "FinalExtr".
@@ -85,7 +87,10 @@ SummarizeMultiToolsMultiDatasets <-
         ## Find tool names
         toolNames <- unique(multiTools[["averCosSim"]][,"toolName"])
 
-        ## Bind values of measures in multiTools into FinalExtr.
+        ## For each extraction measures,
+        ## merge values from multiple runs
+        ## into one data.frame FinalExtr$<measure_name>
+        ## and computational approaches for easier plotting.
         for(index in indexes){
           FinalExtr[[index]] <- rbind(FinalExtr[[index]],multiTools[[index]])
         }
@@ -114,10 +119,10 @@ SummarizeMultiToolsMultiDatasets <-
 
     }
 
+
     ## Generating csv tables for extraction performance measure
     ## and cosine similarities.
     {
-
       ## Output combined extraction
       for(index in c(indexes,"compositeMeasure")){
 
@@ -125,7 +130,7 @@ SummarizeMultiToolsMultiDatasets <-
 
         output <- output[,-4]
         colnames(output)[1] <- "Seed or run number"
-        colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
+        colnames(output)[2] <- indexLabels[index]
         colnames(output)[3] <- "Name of computational approach"
         colnames(output)[4] <- datasetGroupName
         colnames(output)[5] <- datasetSubGroupName
@@ -153,10 +158,10 @@ SummarizeMultiToolsMultiDatasets <-
     }
 
 
-    ## For each extraction measures,
-    ## merge values from multiple runs
-    ## into one data.frame FinalExtr$<measure_name>
-    ## and computational approaches for easier plotting.
+    ## To generate page 3 and page 4 in
+    ## extraction summary plots,
+    ## values of different measures need to be
+    ## merged into one data.frame.
     {
       ## Combine all extraction measurements, FinalExtr[[index]] into FinalExtr$Combined
       ## combined all one-signature cosine similarity, FinalExtr[[gtSigName]] into FinalExtr$Combined
@@ -195,161 +200,221 @@ SummarizeMultiToolsMultiDatasets <-
     ## Plot a general violin + beeswarm plot for multiple measures
     ## in all runs and in all datasets.
     {
-
-      ## Plot a multi-facet ggplot for all measures and all runs.
+      ## Specify the titles of each measure.
       {
-        ggplotList <- list()
-        ## Generate a ggplot object based on FinalExtr$combined
-        ggplotList$general <- ggplot2::ggplot(
-          FinalExtr$combined,
-          ggplot2::aes(x = .data$toolName, y = .data$value)) +
-          ## Draw geom_violin and geom_quasirandom
-          ggplot2::geom_violin(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            #ggplot2::aes(fill = index),
-            ## Maximize the violin plot width
-            scale = "width",
-            ## Make bandwidth larger
-            #position = "dodge",
-            #width = 1.2
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          #
-          #ggbeeswarm::geom_quasirandom(
-          #  groupOnX = TRUE, size = 0.3
-          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-          #) +
-          ## Show median of the extraction measure distribution, as a solid dot.
-          ggplot2::stat_summary(fun.y="median", geom="point", fill = "red", shape = 21) +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun.y="mean", geom="point", fill="blue", shape = 23) +
-          ## Change title for general violin + beeswarm plot
-          ggplot2::ggtitle(label = "Extraction performance",
-                           subtitle = "for all methods across all data sets and replicates") +
-          ## Change axis titles
-          ggplot2::labs(x = "Computational approach") +
-          ## Remove axis.title.y (defaults to be "value", meaningless)
-          ## Rotate axis.text.x 90 degrees,
-          ## move axis.text.x right below the tick marks,
-          ## and remove legends.
-          ggplot2::theme(
-            ## Remove axis.title.y
-            axis.title.y = ggplot2::element_blank(),
-            axis.text.x = ggplot2::element_text(
-              ## Rotate the axis.text.x
-              angle = 90,
-              ## move axis.text.x right below the tick marks
-              hjust = 1,vjust = 0.5),
-            ## Make font size of facet label smaller.
-            strip.text = ggplot2::element_text(size = 10),
-            ## remove legends.
-            legend.position = "none") +
-          ## Split the plot into multiple facets,
-          ## according to different measures
-          ggplot2::facet_wrap(
-            ggplot2::vars(.data$indexLabel),
-            ## Force facet_wrap to have 2 columns
-            ncol = 2,
-            scales = "free",
-            ## Let facet label to be print on multiple lines
-            labeller = ggplot2::label_wrap_gen(multi_line = T),
-            ## Let facets be plotted horizontally
-            dir = "h",
-            ## Put facet label to the top
-            strip.position = "top"
-          ) +
-          ## Restrict the decimal numbers of values of measures to be 2
-          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
-      }
-      ## Plot a multi-facet ggplot,
-      ## facets are separated by measures and datasetGroup
-      ## (in example, it refers to slope.)
-      if(!is.null(multiTools$datasetSubGroupName)) {
-        bys <- c("datasetGroup","datasetSubGroup")
-      } else{
-        bys <- c("datasetGroup")
+        ## Generate separate panels (Composite measure,
+        ## Cosine similarity to ground-truth signatures,
+        ## True positive rate, Positive predictive value)
+        ## and combine them using ggpubr::ggarrage
+        plotDFList <- list()
+        plotDFList$Extr <- list()
+        plotLabels <- character(0)
+
+        ## Composite measure needs to be plotted separately.
+        {
+          ## data.frame to be plotted in the panel
+          plotDFList$compositeMeasure <- FinalExtr$compositeMeasure
+          ## Text on Y axis
+          plotLabels["compositeMeasure"] <- indexLabels["compositeMeasure"]
+        }
+
+        for(measure in c("TPR","PPV")){
+          ## data.frame to be plotted in the panel
+          plotDFList$Extr[[measure]] <- FinalExtr[[measure]]
+          ## Text on Y axis
+          plotLabels[measure] <- indexLabels[measure]
+        }
+
+        for(gtSigName in gtSigNames){
+          ## data.frame to be plotted in the panel
+          plotDFList$Extr[[gtSigName]] <- FinalExtr$cosSim[[gtSigName]]
+
+          plotLabels[gtSigName] <- paste0("Cosine similarity to ",gtSigName)
+        }
       }
 
-      for(by in bys)  {
 
-        ## The value of "datasetGroupName" or "datasetSubGroupName"
-        ## which is the caption of "datasetGroup"
-        byCaption <- eval(parse(text = paste0("multiTools$",by,"Name")))
+      ## Plot violin plots for extraction summary.
+      ##
+      ## Page 1: composite measure
+      ## Page 2: combination of measures (Cosine similarity to ground-truth signatures, TPR, PPV)
+      ## Page 3: extraction measures as a function of correlation
+      ## Page 4: extraction measures as a function of signature counts ratio
+      {
+        plottingFunc <- function(PlotDF,YCaption) {
+          ggObj <- ggplot2::ggplot(
+            PlotDF,
+            ggplot2::aes(x = .data$toolName, y = .data$value)) +
+            ## Draw geom_violin and geom_quasirandom
+            ggplot2::geom_violin(
+              ## Change filling color to white
+              fill = "#FFFFFF",
+              #ggplot2::aes(fill = index),
+              ## Maximize the violin plot width
+              scale = "width",
+              ## Make bandwidth larger
+              #position = "dodge",
+              #width = 1.2
+              ## Hide outliers
+              #outlier.shape = NA
+            ) +
+            ## Show median of the extraction measure distribution, as a solid dot.
+            ggplot2::stat_summary(fun="median", geom="point", fill = "red", shape = 21) +
+            ## Show mean of the extraction meaasure distribution, as a blue diamond.
+            ggplot2::stat_summary(fun="mean", geom="point", fill="blue", shape = 23) +
+            ## Change axis titles
+            ggplot2::labs(x = "Approach", y = YCaption) +
+            ## Rotate axis.text.x 90 degrees,
+            ## move axis.text.x right below the tick marks,
+            ## and remove legends.
+            ggplot2::theme(
+              axis.text.x = ggplot2::element_text(
+                ## Rotate the axis.text.x
+                angle = 90,
+                ## move axis.text.x right below the tick marks
+                hjust = 1,vjust = 0.5),
+              ## Make font size of facet label smaller.
+              strip.text = ggplot2::element_text(size = 10),
+              ## remove legends.
+              legend.position = "none")
+          return(ggObj)
+        }
 
-        ## Generate a ggplot object based on FinalExtr$combined
-        ggplotList[[by]] <- ggplot2::ggplot(
-          FinalExtr$combined,
-          ggplot2::aes(x = .data$toolName, y = .data$value)) +
-          ## Draw geom_violin and geom_quasirandom
-          ggplot2::geom_violin(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            #ggplot2::aes(fill = index),
-            ## Maximize the violin plot width
-            scale = "width",
-            ## Make bandwidth larger
-            #position = "dodge",
-            #width = 1.2
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          #
-          #ggbeeswarm::geom_quasirandom(
-          #  groupOnX = TRUE, size = 0.3
-          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-          #) +
-          ## Show median of the extraction measure distribution, as a solid dot.
-          ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
-          ## Change axis titles
-          ggplot2::labs(x = "Computational approach") +
-          ## Remove axis.title.y (defaults to be "value", meaningless)
-          ## Rotate the axis.text.x (names of tools),
-          ## move axis.text.x right below the tick marks
-          ## and remove legends
-          ggplot2::theme(
-            ## Remove axis.title.y
-            axis.title.y = ggplot2::element_blank(),
-            axis.text.x = ggplot2::element_text(
-              ## Rotate the axis.text.x (names of tools)
-              angle = 90,
-              ## move axis.text.x right below the tick marks
-              hjust = 1, vjust = 0.5),
-            ## remove legends
-            legend.position = "none") +
-          ## Split the plot into multiple facets,
-          ## according to different measures
-          ggplot2::facet_grid(
-            rows =  ggplot2::vars(.data$indexLabel),
-            cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
-            scales = "free",
-            ## Let facet label to be print on multiple lines
-            labeller = ggplot2::label_wrap_gen(multi_line = T)
-          ) +
-          ## Make facet label font size smaller
-          ggplot2::theme(strip.text.y = ggplot2::element_text(size = 4)) +
-          ## Add title for general violin + beeswarm plot
-          ggplot2::ggtitle(
-            label = paste0("Measures of extraction performance as a function of"),
-            subtitle = paste0(byCaption,".")) +
-          ## Restrict the decimal numbers of values of measures to be 2
-          ggplot2::scale_y_continuous(labels =function(x) sprintf("%.2f", x))
+        ggplotsExtr <- list()
+        ggplotsExtr$Measures <- list()
+        for(measure in c("TPR","PPV")){
+          ggplotsExtr$Measures[[measure]] <- plottingFunc(plotDFList$Extr[[measure]],indexLabels[measure])
+        }
+		for(gtSigName in gtSigNames){
+		  ggplotsExtr$Measures[[gtSigName]] <- plottingFunc(plotDFList$Extr[[gtSigName]],paste0("Cosine similarity to ",gtSigName))
+		}
+		
+
+        ## ggplotObj for PDF 1: Composite measure
+        ggplotsExtr$compositeMeasure <- plottingFunc(plotDFList$compositeMeasure,indexLabels["compositeMeasure"])
+
+        ## ggplotObj for PDF 2: combination of measures,
+        ## excluding composite measure.
+        ggplotsExtr$combinedWOComp <- ggpubr::ggarrange(
+          plotlist = ggplotsExtr$Measures,
+          font.label = list(size = 14, color = "black", face = "bold", family = "sans"),
+          ncol = 2,
+          nrow = ceiling(length(plotDFList$Extr)/2),
+          legend = "right",
+          common.legend = T
+        )
+
+        ## Plot a multi-facet ggplot,
+        ## facets are separated by measures and datasetGroup
+        ## (in example, it refers to slope.)
+        if(!is.null(multiTools$datasetSubGroupName)) {
+          ## Generate page 3 and page 4
+          bys <- c("datasetGroup","datasetSubGroup")
+        } else{
+          ## Generate page 3 only.
+          bys <- c("datasetGroup")
+        }
+
+        ## PDF3 with two pages,
+        ## combination of all measures,
+        ## as a function of datasetGroup or datasetSubGroup
+        ggplotsExtr$combined <- list()
+        for(by in bys)  {
+
+          ## The value of "datasetGroupName" or "datasetSubGroupName"
+          ## which is the caption of "datasetGroup"
+          byCaption <- eval(parse(text = paste0("multiTools$",by,"Name")))
+
+          ## Generate a ggplot object based on FinalExtr$combined
+          ggplotsExtr$combined[[by]] <- ggplot2::ggplot(
+            FinalExtr$combined,
+            ggplot2::aes(x = .data$toolName, y = .data$value)) +
+            ## Draw geom_violin and geom_quasirandom
+            ggplot2::geom_violin(
+              ## Change filling color to white
+              fill = "#FFFFFF",
+              #ggplot2::aes(fill = index),
+              ## Maximize the violin plot width
+              scale = "width",
+              ## Make bandwidth larger
+              #position = "dodge",
+              #width = 1.2
+              ## Hide outliers
+              #outlier.shape = NA
+            ) +
+            #
+            #ggbeeswarm::geom_quasirandom(
+            #  groupOnX = TRUE, size = 0.3
+            #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
+            #) +
+            ## Show median of the extraction measure distribution, as a solid dot.
+            ggplot2::stat_summary(fun.y="median", geom="point", shape = 21, fill = "red") +
+            ## Show mean of the extraction meaasure distribution, as a blue diamond.
+            ggplot2::stat_summary(fun.y="mean", geom="point", shape=23, fill="blue") +
+            ## Change axis titles
+            ggplot2::labs(x = "Approach") +
+            ## Remove axis.title.y (defaults to be "value", meaningless)
+            ## Rotate the axis.text.x (names of tools),
+            ## move axis.text.x right below the tick marks
+            ## and remove legends
+            ggplot2::theme(
+              ## Remove axis.title.y
+              axis.title.y = ggplot2::element_blank(),
+              axis.text.x = ggplot2::element_text(
+                ## Rotate the axis.text.x (names of tools)
+                angle = 90,
+                ## move axis.text.x right below the tick marks
+                hjust = 1, vjust = 0.5),
+              ## remove legends
+              legend.position = "none") +
+            ## Split the plot into multiple facets,
+            ## according to different measures
+            ggplot2::facet_grid(
+              rows =  ggplot2::vars(.data$indexLabel),
+              cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
+              scales = "free",
+              ## Let facet label to be print on multiple lines
+              labeller = ggplot2::label_wrap_gen(multi_line = T)
+            ) +
+            ## Make facet label font size smaller
+            ggplot2::theme(strip.text.y = ggplot2::element_text(size = 4)) +
+            ## Add title for general violin + beeswarm plot
+            ggplot2::ggtitle(
+              label = paste0("Measures of extraction performance as a function of"),
+              subtitle = paste0(byCaption,"."))
+        }
+        ## Plot violin + beeswarm plots in pdf format
+
+		## PDF 1: Composite measure
+        grDevices::pdf(paste0(out.dir,"/compositeMeasure.pdf"),
+                       width = 3.5,
+                       height = 3.5, ## Make height larger
+                       pointsize = 1)
+        plot(ggplotsExtr$compositeMeasure)
+		grDevices::dev.off()
+
+
+        ## PDF 2: Cosine similarity to ground-truth, TPR, PPV
+        grDevices::pdf(paste0(out.dir,"/combined.measures.wo.composite.pdf"),
+                       width = 7,
+                       height = 7,
+                       pointsize = 1)
+        plot(ggplotsExtr$combinedWOComp)
+		grDevices::dev.off()
+
+
+        ## PDF 3 and 4: all measures, against datasetGroupName or datsetSubGroupName
+		grDevices::pdf(paste0(out.dir,"/combined.measures.additional.pdf"),
+                       width = 7,
+                       height = 10.5,
+                       pointsize = 1)
+        for(by in names(ggplotsExtr$combined)){
+          print(ggplotsExtr$combined[[by]])
+        }
+        grDevices::dev.off()
       }
-      ## Plot violin + beeswarm plots in pdf format
-      grDevices::pdf(paste0(out.dir,"/extraction.violins.pdf"),
-                     #paper = "a4", ## A4 size
-                     width = 7,
-                     height = 10.5, ## Make height larger
-                     pointsize = 1)
-      for(by in names(ggplotList)){
-        print(ggplotList[[by]])
-      }
-      grDevices::dev.off()
+
     }
-
 
 
     ## Plot general png and pdf for one-signature cosine similarity summary
@@ -381,9 +446,8 @@ SummarizeMultiToolsMultiDatasets <-
           levels = gtools::mixedsort(unique(FinalExtr$cosSimCombined$datasetSubGroup)))
       }
 
-
-      ggplotList <- list()
       ## Plot a multi-facet ggplot for all gtSigNames and all runs.
+	  ggplotList <- list()
       {
         ## Generate a ggplot object based on FinalExtr$combined
         ggplotList$general <- ggplot2::ggplot(
