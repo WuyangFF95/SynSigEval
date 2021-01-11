@@ -65,7 +65,7 @@ SummarizeMultiRuns <-
                  "truePos","TPR","PPV")
     for(index in indexes) assign(index,numeric(0))
     cosSim <- list()
-
+    NumSigsSimilar <- list()
 
     for(runName in run.names){
       ## Load directories
@@ -104,6 +104,23 @@ SummarizeMultiRuns <-
           cosSim[[gtSigName]] <- numeric(0)
         cosSim[[gtSigName]] <- c(cosSim[[gtSigName]],sigAnalysis$cosSim[[gtSigName]])
       }
+
+      ## Concatenating number of extracted signatures
+      ## most similar to each ground-truth signature, with
+      ## pairwise cosine similarity greater than threshold
+      ## 0.9.
+      ##
+      ## This is to check oversplitting in results of
+      ## each computational approach.
+      for(gtSigName in gtSigNames) {
+        number.similar.sigs <- length(intersect(
+          which(sigAnalysis$match1$to == gtSigName),
+          which(sigAnalysis$match1$sim > 0.9)
+        ))
+        if(is.null(NumSigsSimilar[[gtSigName]]))
+          NumSigsSimilar[[gtSigName]] <- numeric(0)
+        NumSigsSimilar[[gtSigName]] <- c(NumSigsSimilar[[gtSigName]],number.similar.sigs)
+      }
     }
 
     ## Make every vector named by run names (e.g. "seed.1")
@@ -113,8 +130,10 @@ SummarizeMultiRuns <-
     names(truePos) <- run.names
     names(TPR) <- run.names
     names(PPV) <- run.names
-    for(gtSigName in gtSigNames)
+    for(gtSigName in gtSigNames){
       names(cosSim[[gtSigName]]) <- run.names
+      names(NumSigsSimilar[[gtSigName]]) <- run.names
+    }
 
 
     multiRun <- list()
@@ -130,6 +149,9 @@ SummarizeMultiRuns <-
     multiRun$PPV <- PPV
     ## Save one-signature cosine similarity on multiple runs
     multiRun$cosSim <- cosSim
+    ## Save number of sigs similar to each ground-truth signature,
+    ## with cosine similarity > 0.9
+    multiRun$NumSigsSimilar <- NumSigsSimilar
 
 
 

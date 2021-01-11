@@ -144,9 +144,12 @@ SummarizeMultiToolsOneDataset <- function(
       }
     }
 
-    ## Combine multi-runs and multi-tools for
-    ## one-signature cosine similarity.
-    {
+    ## Combine multi-runs and multi-tools for:
+    ## $cosSim - cosine similarity to each ground-truth signature
+    ## $NumSigsSimilar - number of extracted sigs similar to each
+    ## ground-truth sig (requires cosine similarity > 0.9)
+    if(TRUE){ ## old code
+      {
       gtSigNames <- names(multiRun$cosSim)
       multiTools$gtSigNames <- gtSigNames
       if(is.null(multiTools$cosSim)) multiTools$cosSim <- list()
@@ -178,6 +181,51 @@ SummarizeMultiToolsOneDataset <- function(
         multiTools$cosSim[[gtSigName]] <- rbind(multiTools$cosSim[[gtSigName]],gtMeanCosSim4OneTool)
       }
     }
+
+    }else{ ## new code
+
+      gtSigNames <- names(multiRun$cosSim)
+      multiTools$gtSigNames <- gtSigNames
+      measures <- c("cosSim","NumSigsSimilar")
+
+      for(measure in measures){
+        multiTools[[measure]] <- list()
+        ## Create a data.frame for each ground-truth signature,
+        ## and summarize multi-Run, multiDataset values
+        ## for each ground-truth signature.
+        for(gtSigName in gtSigNames){
+          multiTools[[measure]][[gtSigName]] <- data.frame()
+        }
+      }
+
+      for(measure in measures){
+        for(gtSigName in gtSigNames){
+          if(!exists("datasetSubGroup")) {
+            measure4OneTool <- data.frame(
+              seed = names(multiRun[[measure]][[gtSigName]]),
+              value = multiRun[[measure]][[gtSigName]],
+              toolName = toolName,
+              datasetName = multiRun$datasetName,
+              datasetGroup = datasetGroup,
+              stringsAsFactors = FALSE)
+          } else {
+            measure4OneTool <- data.frame(
+              seed = names(multiRun[[measure]][[gtSigName]]),
+              value = multiRun[[measure]][[gtSigName]],
+              toolName = toolName,
+              datasetName = multiRun$datasetName,
+              datasetGroup = datasetGroup,
+              datasetSubGroup = datasetSubGroup,
+              stringsAsFactors = FALSE)
+          }
+          rownames(measure4OneTool) <- NULL
+          multiTools$cosSim[[gtSigName]] <- rbind(
+            multiTools$cosSim[[gtSigName]],measure4OneTool)
+        }
+      }
+
+    }
+
 
     ## Combine multi-runs and multi-tools for
     ## aggregated scaled Manhattan distance.
