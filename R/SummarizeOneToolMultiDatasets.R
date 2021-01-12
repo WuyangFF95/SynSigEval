@@ -81,8 +81,6 @@ SummarizeOneToolMultiDatasets <-
     ## Re-order the dataset.group for better visualization of
     ## ggplot facets.
     {
-      datasetNames <- basename(datasetNames)
-
       if(is.null(datasetGroup))
         datasetGroup <- rep("Default",length(datasetNames))
       datasetGroup <- factor(
