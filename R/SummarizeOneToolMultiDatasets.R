@@ -50,6 +50,9 @@
 #'
 #' @param out.dir Path of the output directory.
 #'
+#' @param display.datasetName Whether to put the name of spectra datasets inside of
+#' the csv outputs of summary tables.
+#'
 #' @param overwrite Whether to overwrite the contents in out.dir if
 #' it already exists. (Default: FALSE)
 #'
@@ -68,6 +71,7 @@ SummarizeOneToolMultiDatasets <-
            toolName,
            toolPath,
            out.dir,
+           display.datasetName = FALSE,
            overwrite = FALSE){
 
     ## Create output directory
@@ -132,6 +136,7 @@ SummarizeOneToolMultiDatasets <-
           measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
                                            value = multiRun[[index]],
                                            toolName = toolName,
+                                           datasetName = datasetName,
                                            datasetGroup = datasetGroup[datasetName],
                                            datasetSubGroup = datasetSubGroup[datasetName],
                                            stringsAsFactors = FALSE)
@@ -245,7 +250,7 @@ SummarizeOneToolMultiDatasets <-
 
 
       ## Output multiple extraction measures in a pdf file
-      grDevices::pdf(paste0(out.dir,"/boxplot.onetool.extraction.measures.pdf"), pointsize = 1)
+      grDevices::pdf(paste0(out.dir,"/onetool.extraction.measures.pdf"), pointsize = 1)
       for(index in indexes)
         suppressMessages(suppressWarnings(print(ggplotList[[index]])))
       grDevices::dev.off()
@@ -275,6 +280,7 @@ SummarizeOneToolMultiDatasets <-
             gtMeasure4OneDataset <- data.frame(seed = names(multiRun[[measure]][[gtSigName]]),
                                                value = multiRun[[measure]][[gtSigName]],
                                                toolName = toolName,
+                                               datasetName = datasetName,
                                                datasetGroup = datasetGroup[datasetName],
                                                datasetSubGroup = datasetSubGroup[datasetName],
                                                stringsAsFactors = FALSE)
@@ -405,7 +411,7 @@ SummarizeOneToolMultiDatasets <-
 
 
       ## Output multiple extraction measures in a pdf file
-      grDevices::pdf(paste0(out.dir,"/boxplot.onetool.onesig.cossim.pdf"), pointsize = 1)
+      grDevices::pdf(paste0(out.dir,"/onetool.onesig.cossim.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames)
         suppressMessages(suppressWarnings(print(ggplotList$cosSim[[gtSigName]])))
       grDevices::dev.off()
@@ -446,25 +452,15 @@ SummarizeOneToolMultiDatasets <-
           sigNums <- length(gtSigNames)
 
           for(gtSigName in gtSigNames){
-            if(FALSE) { # debug
-              gtAggManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$AggManhattanDist),
-                                                          gtSigName = gtSigName,
-                                                          value = multiRun$AggManhattanDist[gtSigName,],
-                                                          toolName = toolName,
-                                                          datasetName = datasetName,
-                                                          datasetGroup = datasetGroup[datasetName],
-                                                          datasetGroupName = datasetGroupName,
-                                                          datasetSubGroup = datasetSubGroup[datasetName],
-                                                          datasetSubGroupName = datasetSubGroupName,
-                                                          stringsAsFactors = FALSE)
-            } else {
-              gtAggManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$AggManhattanDist),
-                                                          value = multiRun$AggManhattanDist[gtSigName,],
-                                                          toolName = toolName,
-                                                          datasetGroup = datasetGroup[datasetName],
-                                                          datasetSubGroup = datasetSubGroup[datasetName],
-                                                          stringsAsFactors = FALSE)
-            }
+            
+            gtAggManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$AggManhattanDist),
+                                                        value = multiRun$AggManhattanDist[gtSigName,],
+                                                        toolName = toolName,
+                                                        datasetName = datasetName,
+                                                        datasetGroup = datasetGroup[datasetName],
+                                                        datasetSubGroup = datasetSubGroup[datasetName],
+                                                        stringsAsFactors = FALSE)
+            
             rownames(gtAggManhattanDist4OneDataset) <- NULL
 
             ## Create a data.frame for each measure,
@@ -577,7 +573,7 @@ SummarizeOneToolMultiDatasets <-
 
 
         ## Output multiple extraction measures in a pdf file
-        grDevices::pdf(paste0(out.dir,"/boxplot.onetool.aggregated.Manhattan.dist.pdf"), pointsize = 1)
+        grDevices::pdf(paste0(out.dir,"/onetool.aggregated.Manhattan.dist.pdf"), pointsize = 1)
         for(gtSigName in gtSigNames)
           suppressMessages(suppressWarnings(print(ggplotList$AggManhattanDist[[gtSigName]])))
         grDevices::dev.off()
@@ -601,25 +597,15 @@ SummarizeOneToolMultiDatasets <-
           sigNums <- length(gtSigNames)
 
           for(gtSigName in gtSigNames){
-            if(FALSE) { # debug
-              gtmeanSepMD4OneDataset <- data.frame(seed = colnames(multiRun$meanSepMD),
-                                                   gtSigName = gtSigName,
-                                                   value = multiRun$meanSepMD[gtSigName,],
-                                                   toolName = toolName,
-                                                   datasetName = datasetName,
-                                                   datasetGroup = datasetGroup[datasetName],
-                                                   datasetGroupName = datasetGroupName,
-                                                   datasetSubGroup = datasetSubGroup[datasetName],
-                                                   datasetSubGroupName = datasetSubGroupName,
-                                                   stringsAsFactors = FALSE)
-            } else {
-              gtmeanSepMD4OneDataset <- data.frame(seed = colnames(multiRun$meanSepMD),
-                                                   value = multiRun$meanSepMD[gtSigName,],
-                                                   toolName = toolName,
-                                                   datasetGroup = datasetGroup[datasetName],
-                                                   datasetSubGroup = datasetSubGroup[datasetName],
-                                                   stringsAsFactors = FALSE)
-            }
+
+            gtmeanSepMD4OneDataset <- data.frame(seed = colnames(multiRun$meanSepMD),
+                                                 value = multiRun$meanSepMD[gtSigName,],
+                                                 toolName = toolName,
+                                                 datasetName = datasetName,
+                                                 datasetGroup = datasetGroup[datasetName],
+                                                 datasetSubGroup = datasetSubGroup[datasetName],
+                                                 stringsAsFactors = FALSE)
+
             rownames(gtmeanSepMD4OneDataset) <- NULL
 
             ## Create a data.frame for each measure,
@@ -729,7 +715,7 @@ SummarizeOneToolMultiDatasets <-
 
 
         ## Output multiple extraction measures in a pdf file
-        grDevices::pdf(paste0(out.dir,"/boxplot.onetool.mean.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
+        grDevices::pdf(paste0(out.dir,"/onetool.mean.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
         for(gtSigName in gtSigNames)
           suppressMessages(suppressWarnings(print(ggplotList$meanSepMD[[gtSigName]])))
         grDevices::dev.off()
@@ -753,25 +739,15 @@ SummarizeOneToolMultiDatasets <-
           sigNums <- length(gtSigNames)
 
           for(gtSigName in gtSigNames){
-            if(FALSE) { # debug
-              gtsdSepMD4OneDataset <- data.frame(seed = colnames(multiRun$sdSepMD),
-                                                 gtSigName = gtSigName,
-                                                 value = multiRun$sdSepMD[gtSigName,],
-                                                 toolName = toolName,
-                                                 datasetName = datasetName,
-                                                 datasetGroup = datasetGroup[datasetName],
-                                                 datasetGroupName = datasetGroupName,
-                                                 datasetSubGroup = datasetSubGroup[datasetName],
-                                                 datasetSubGroupName = datasetSubGroupName,
-                                                 stringsAsFactors = FALSE)
-            } else {
-              gtsdSepMD4OneDataset <- data.frame(seed = colnames(multiRun$sdSepMD),
-                                                 value = multiRun$sdSepMD[gtSigName,],
-                                                 toolName = toolName,
-                                                 datasetGroup = datasetGroup[datasetName],
-                                                 datasetSubGroup = datasetSubGroup[datasetName],
-                                                 stringsAsFactors = FALSE)
-            }
+
+            gtsdSepMD4OneDataset <- data.frame(seed = colnames(multiRun$sdSepMD),
+                                               value = multiRun$sdSepMD[gtSigName,],
+                                               toolName = toolName,
+                                               datasetName = datasetName,
+                                               datasetGroup = datasetGroup[datasetName],
+                                               datasetSubGroup = datasetSubGroup[datasetName],
+                                               stringsAsFactors = FALSE)
+            
             rownames(gtsdSepMD4OneDataset) <- NULL
 
             ## Create a data.frame for each measure,
@@ -882,7 +858,7 @@ SummarizeOneToolMultiDatasets <-
 
 
         ## Output multiple extraction measures in a pdf file
-        grDevices::pdf(paste0(out.dir,"/boxplot.onetool.stdev.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
+        grDevices::pdf(paste0(out.dir,"/onetool.stdev.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
         for(gtSigName in gtSigNames)
           suppressMessages(suppressWarnings(print(ggplotList$sdSepMD[[gtSigName]])))
         grDevices::dev.off()
@@ -901,8 +877,16 @@ SummarizeOneToolMultiDatasets <-
       colnames(output)[1] <- "Seed or run number"
       colnames(output)[2] <- indexLabels[index]
       colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- datasetGroupName
-      colnames(output)[5] <- datasetSubGroupName
+      colnames(output)[4] <- "Name of mutational spectra dataset"
+      colnames(output)[5] <- datasetGroupName
+      colnames(output)[6] <- datasetSubGroupName
+
+      if(!display.datasetName){
+        ## Delete the 4th column,
+        ## which refers to the name of the corresponding
+        ## spectra dataset.
+        output <- output[,-4]
+      }
 
       write.csv(output,
                 file = paste0(out.dir,"/",index,".csv"),
@@ -917,8 +901,16 @@ SummarizeOneToolMultiDatasets <-
       colnames(output)[1] <- "Seed or run number"
       colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
       colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- datasetGroupName
-      colnames(output)[5] <- datasetSubGroupName
+      colnames(output)[4] <- "Name of mutational spectra dataset"
+      colnames(output)[5] <- datasetGroupName
+      colnames(output)[6] <- datasetSubGroupName
+
+      if(!display.datasetName){
+        ## Delete the 4th column,
+        ## which refers to the name of the corresponding
+        ## spectra dataset.
+        output <- output[,-4]
+      }
 
       write.csv(output,
                 file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"),
@@ -926,7 +918,7 @@ SummarizeOneToolMultiDatasets <-
     }
 
     ## Write Summary tables for number of extracted sigs similar to
-    ## ground-truth sig.
+    ## each ground-truth sig.
     for(gtSigName in gtSigNames){
       output <- OneToolSummary$NumSigsSimilar[[gtSigName]]
 
@@ -935,8 +927,16 @@ SummarizeOneToolMultiDatasets <-
       colnames(output)[2] <- paste0("Number of software-reported signatures with ",
                                     "cosine similarity > 0.9 to ",gtSigName)
       colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- datasetGroupName
-      colnames(output)[5] <- datasetSubGroupName
+      colnames(output)[4] <- "Name of mutational spectra dataset"
+      colnames(output)[5] <- datasetGroupName
+      colnames(output)[6] <- datasetSubGroupName
+
+      if(!display.datasetName){
+        ## Delete the 4th column,
+        ## which refers to the name of the corresponding
+        ## spectra dataset.
+        output <- output[,-4]
+      }
 
       write.csv(output,
                 file = paste0(out.dir,"/num.sigs.similar.to.",gtSigName,".csv"),
