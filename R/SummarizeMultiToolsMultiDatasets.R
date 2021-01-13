@@ -327,7 +327,7 @@ SummarizeMultiToolsMultiDatasets <-
 
         ggplotsExtr <- list()
         ggplotsExtr$Measures <- list()
-        for(gtSigName in gtSigNames){
+        for(gtSigName in gtools::mixedsort(gtSigNames)){
           ggplotsExtr$Measures[[gtSigName]] <- plottingFunc(plotDFList$Extr[[gtSigName]],paste0("Cosine similarity to ",gtSigName))
         }
         for(measure in c("TPR","PPV")){
