@@ -94,7 +94,7 @@ SummarizeMultiToolsMultiDatasets <-
         }
 
         ## Bind values of cosine similarity in OneToolSummary$cosSim into FinalExtr$cosSim
-        gtSigNames <- setdiff(names(OneToolSummary$cosSim),"combined")
+        gtSigNames <- gtools::mixedsort(setdiff(names(OneToolSummary$cosSim),"combined"))
 
         for(measure in c("cosSim","NumSigsSimilar")){
 
@@ -242,7 +242,7 @@ SummarizeMultiToolsMultiDatasets <-
 
 
     ## Plot general pdf for all extraction measures
-    ## Plot a general violin + beeswarm plot for multiple measures
+    ## Plot a general violin plot for multiple measures
     ## in all runs and in all datasets.
     {
       ## Specify the titles of each measure.
@@ -327,7 +327,7 @@ SummarizeMultiToolsMultiDatasets <-
 
         ggplotsExtr <- list()
         ggplotsExtr$Measures <- list()
-        for(gtSigName in gtools::mixedsort(gtSigNames)){
+        for(gtSigName in gtSigNames){
           ggplotsExtr$Measures[[gtSigName]] <- plottingFunc(plotDFList$Extr[[gtSigName]],paste0("Cosine similarity to ",gtSigName))
         }
         for(measure in c("TPR","PPV")){
@@ -386,11 +386,6 @@ SummarizeMultiToolsMultiDatasets <-
               ## Hide outliers
               #outlier.shape = NA
             ) +
-            #
-            #ggbeeswarm::geom_quasirandom(
-            #  groupOnX = TRUE, size = 0.3
-            #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-            #) +
             ## Show median of the extraction measure distribution, as a solid dot.
             ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
             ## Show mean of the extraction meaasure distribution, as a blue diamond.
@@ -422,12 +417,12 @@ SummarizeMultiToolsMultiDatasets <-
             ) +
             ## Make facet label font size smaller
             ggplot2::theme(strip.text.y = ggplot2::element_text(size = 4)) +
-            ## Add title for general violin + beeswarm plot
+            ## Add title for general violin plot
             ggplot2::ggtitle(
               label = paste0("Measures of extraction performance as a function of"),
               subtitle = paste0(byCaption,"."))
         }
-        ## Plot violin + beeswarm plots in pdf format
+        ## Plot violin plots in pdf format
 
         ## PDF 1: Composite measure
         grDevices::pdf(paste0(out.dir,"/compositeMeasure.pdf"),
@@ -462,7 +457,7 @@ SummarizeMultiToolsMultiDatasets <-
 
 
     ## Plot general png and pdf for one-signature cosine similarity summary
-    ## Plot a general violin + beeswarm plot for multiple signatures
+    ## Plot a general violin plot for multiple signatures
     ## in all runs and in all datasets.
     {
       ## For ground-truth signature,
@@ -511,16 +506,11 @@ SummarizeMultiToolsMultiDatasets <-
             ## Hide outliers
             #outlier.shape = NA
           ) +
-          #
-          #ggbeeswarm::geom_quasirandom(
-          #  groupOnX = TRUE, size = 0.3
-          #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-          #) +
           ## Show median of the cosine similarity distribution
           ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-          ## Add title for general violin + beeswarm plot
+          ## Add title for general violin plot
           ggplot2::ggtitle(label = "Average cosine similarity between ground-truth and extracted signatures",
                            subtitle = "for all computational approaches, ratios and correlation values.") +
           ## Change axis titles
@@ -585,17 +575,11 @@ SummarizeMultiToolsMultiDatasets <-
             ## Hide outliers
             #outlier.shape = NA
           ) +
-          #ggbeeswarm::geom_quasirandom(
-          #  groupOnX = TRUE, size = 0.3
-          #  ## Need to add a single color (different from black)
-          #  ## for all data points.
-          #  , ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-          #) +
           ## Show median of the extraction measure distribution
           ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
           ## Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-          ## Add title for general violin + beeswarm plot
+          ## Add title for general violin plot
           ggplot2::ggtitle(
             label = paste0("Extraction cosine similarity as a function of"),
             subtitle = paste0(byCaption,".")) +
@@ -624,7 +608,7 @@ SummarizeMultiToolsMultiDatasets <-
             labels = function(x) sprintf("%.2f", x))
       }
 
-      ## Plot violin + beeswarm plots in pdf format
+      ## Plot violin plots in pdf format
       grDevices::pdf(paste0(out.dir,"/onesig.cossim.violins.pdf"), pointsize = 1)
       for(by in names(ggplotList)){
         print(ggplotList[[by]])
@@ -697,7 +681,7 @@ SummarizeMultiToolsMultiDatasets <-
         }
 
         ## Plot general png and pdf for attribution Scaled Manhattan distance summary
-        ## Plot a general violin + beeswarm plot for multiple signatures
+        ## Plot a general violin plot for multiple signatures
         ## in all runs and in all datasets.
         {
 
@@ -741,15 +725,11 @@ SummarizeMultiToolsMultiDatasets <-
                 ## Hide outliers
                 #outlier.shape = NA
               ) +
-              #ggbeeswarm::geom_quasirandom(
-              #  groupOnX = TRUE, size = 0.3
-              #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-              #) +
               ## Show median of the Scaled Manhattan distance distribution
               ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
               ## Show mean of the extraction meaasure distribution, as a blue diamond.
               ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-              ## Add title for general violin + beeswarm plot
+              ## Add title for general violin plot
               ggplot2::ggtitle(label = "Scaled aggregated Manhattan distance between inferred and ground-truth",
                                subtitle = "exposures for all computational approaches, ratios and correlation values.") +
               ## Change axis titles
@@ -817,15 +797,11 @@ SummarizeMultiToolsMultiDatasets <-
                 ## Hide outliers
                 #outlier.shape = NA
               ) +
-              #ggbeeswarm::geom_quasirandom(
-              #  groupOnX = TRUE, size = 0.3
-              #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-              #) +
               ## Show median of the Scaled Manhattan distance distribution
               ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
               ## Show mean of the extraction meaasure distribution, as a blue diamond.
               ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-              ## Add title for general violin + beeswarm plot
+              ## Add title for general violin plot
               ggplot2::ggtitle(
                 label = paste0("Scaled aggregated Manhattan distance summary plot as a function of "),
                 subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
@@ -854,7 +830,7 @@ SummarizeMultiToolsMultiDatasets <-
                 labels =function(x) sprintf("%.2f", x))
           }
 
-          ## Plot violin + beeswarm plots in pdf format
+          ## Plot violin plots in pdf format
           grDevices::pdf(paste0(out.dir,"/Aggregated.Scaled.Manhattan.Dist.violins.pdf"), pointsize = 1)
           for(by in names(ggplotList)){
             print(ggplotList[[by]])
@@ -922,7 +898,7 @@ SummarizeMultiToolsMultiDatasets <-
         }
 
         ## Plot general png and pdf for attribution Scaled Manhattan distance summary
-        ## Plot a general violin + beeswarm plot for multiple signatures
+        ## Plot a general violin plot for multiple signatures
         ## in all runs and in all datasets.
         {
 
@@ -966,15 +942,11 @@ SummarizeMultiToolsMultiDatasets <-
                 ## Hide outliers
                 #outlier.shape = NA
               ) +
-              #ggbeeswarm::geom_quasirandom(
-              #  groupOnX = TRUE, size = 0.3
-              #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-              #) +
               ## Show median of the Scaled Manhattan distance distribution
               ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
               ## Show mean of the extraction meaasure distribution, as a blue diamond.
               ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-              ## Add title for general violin + beeswarm plot
+              ## Add title for general violin plot
               ggplot2::ggtitle(label = titles[measure],
                                subtitle = " between inferred and ground-truth exposures.") +
               ## Change axis titles
@@ -1042,15 +1014,11 @@ SummarizeMultiToolsMultiDatasets <-
                 ## Hide outliers
                 #outlier.shape = NA
               ) +
-              #ggbeeswarm::geom_quasirandom(
-              #  groupOnX = TRUE, size = 0.3
-              #  ,ggplot2::aes(color = grDevices::hcl(h = 300,c = 35,l = 60)) ## A purple color, albeit deeper than default hcl colors.
-              #) +
               ## Show median of the Scaled Manhattan distance distribution
               ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
               ## Show mean of the extraction meaasure distribution, as a blue diamond.
               ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-              ## Add title for general violin + beeswarm plot
+              ## Add title for general violin plot
               ggplot2::ggtitle(
                 label = paste0(titles[measure]," as a function of "),
                 subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
@@ -1079,7 +1047,7 @@ SummarizeMultiToolsMultiDatasets <-
                 labels =function(x) sprintf("%.2f", x))
           }
 
-          ## Plot violin + beeswarm plots in pdf format
+          ## Plot violin plots in pdf format
           grDevices::pdf(paste0(out.dir,"/",fileNames[measure],".pdf"), pointsize = 1)
           for(by in names(ggplotList)){
             print(ggplotList[[by]])
