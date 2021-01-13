@@ -170,9 +170,9 @@ SummarizeOneToolMultiDatasets <-
 
     }
 
-    ## Draw boxplot + beeswarm plot for extraction measures
+    ## Draw violin + beeswarm plot for extraction measures
     {
-      ## Create a list to store ggplot2 boxplot + beeswarm plot objects
+      ## Create a list to store ggplot2 violin + beeswarm plot objects
       ggplotList <- list()
       ## Plot a value~datasetSubGroup beeswarm for each measure.
       for(index in indexes){
@@ -192,7 +192,7 @@ SummarizeOneToolMultiDatasets <-
             ## Move x facet labels to the right,
             ## This is to let the facet labels correspond to axis.title.
             switch = "x") +
-          ## Draw boxplots and beeswarm plots on multi-facets.
+          ## Draw violin and beeswarm plots on multi-facets.
           ## Draw geom_violin
           ggplot2::geom_violin(
             ## Change filling color to white
@@ -332,9 +332,9 @@ SummarizeOneToolMultiDatasets <-
     }
 
 
-    ## Plot one-signature cosine similarity boxplot + beeswarm plot for one tool
+    ## Plot one-signature cosine similarity violin + beeswarm plot for one tool
     { ## debug
-      ## Create a list to store ggplot2 boxplot + beeswarm plot objects
+      ## Create a list to store ggplot2 violin + beeswarm plot objects
       ggplotList$cosSim <- list()
       ## Plot a value~datasetSubGroup beeswarm plot for each signature.
       for(gtSigName in gtSigNames){
@@ -493,7 +493,7 @@ SummarizeOneToolMultiDatasets <-
       ## Plot aggregated scaled Manhattan distance violin plot
       ## + beeswarm plot for one tool
       { ## debug
-        ## Create a list to store ggplot2 boxplot + beeswarm plot objects
+        ## Create a list to store ggplot2 violin + beeswarm plot objects
         ggplotList$AggManhattanDist <- list()
         ## Plot a value~datasetSubGroup beeswarm plot for each signature.
         for(gtSigName in gtSigNames){
@@ -634,7 +634,7 @@ SummarizeOneToolMultiDatasets <-
       ## Plot mean of separated scaled Manhattan distance violin plot
       ## + beeswarm plot for one tool
       { ## debug
-        ## Create a list to store ggplot2 boxplot + beeswarm plot objects
+        ## Create a list to store ggplot2 violin + beeswarm plot objects
         ggplotList$meanSepMD <- list()
         ## Plot a value~datasetSubGroup beeswarm plot for each signature.
         for(gtSigName in gtSigNames){
@@ -774,7 +774,7 @@ SummarizeOneToolMultiDatasets <-
       ## Plot standard deviation of separated scaled Manhattan distance
       ## violin plot + beeswarm plot for one tool
       { ## debug
-        ## Create a list to store ggplot2 boxplot + beeswarm plot objects
+        ## Create a list to store ggplot2 violin + beeswarm plot objects
         ggplotList$sdSepMD <- list()
         ## Plot a value~datasetSubGroup beeswarm plot for each signature.
         for(gtSigName in gtSigNames){

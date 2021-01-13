@@ -28,7 +28,7 @@ the csv outputs of summary tables.}
 it already exists. (Default: FALSE)}
 }
 \description{
-Summarize results of mutational signature extraction and exposure inferrence
+Summarize results of mutational signature extraction and exposure inference
 by multiple computational approaches on multiple datasets. Before running this
 function, make sure the summary file for each single data set
  \code{toolSummaryPaths}/\code{OneToolSummary.Rda} exists.

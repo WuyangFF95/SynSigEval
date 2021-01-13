@@ -8,7 +8,7 @@
 Assess the performance of two steps in mutational signature
 analysis: \itemize{
 \item signature extraction
-\item exposure inferrence (a.k.a. signature attribution)
+\item exposure inference (a.k.a. signature attribution)
 } by computational approaches, using catalogs of synthetic mutational
 spectra created by package \code{SynSigGen}.
 }
@@ -24,7 +24,7 @@ spectra created by package \code{SynSigGen}.
 ground-truth mutational signature profiles (S) and exposures
 (synthetic.exposures). It can be created from \code{SynSigGen}.
 
-\item T, signatures extracted by SignatureAnalzer, SigProfiler,
+\item T, signatures extracted by SignatureAnalyzer, SigProfiler,
 or other computational approaches on \code{synthetic.spectra}.
 For attribution-only approaches, T=S.
 

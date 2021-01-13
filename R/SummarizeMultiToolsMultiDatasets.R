@@ -1,6 +1,6 @@
 #' Summarize results for multiple datasets, by different computational approaches.
 #'
-#' Summarize results of mutational signature extraction and exposure inferrence
+#' Summarize results of mutational signature extraction and exposure inference
 #' by multiple computational approaches on multiple datasets. Before running this
 #' function, make sure the summary file for each single data set
 #'  \code{toolSummaryPaths}/\code{OneToolSummary.Rda} exists.
@@ -212,15 +212,24 @@ SummarizeMultiToolsMultiDatasets <-
       ## combined all one-signature cosine similarity, FinalExtr[[gtSigName]] into FinalExtr$Combined
       FinalExtr$combined <- data.frame()
       for(index in c("TPR","PPV")){
-        plotDFOneMeasure <- data.frame(FinalExtr[[index]], indexLabel = indexLabels[index])
+        plotDFOneMeasure <- data.frame(
+          FinalExtr[[index]], indexLabel = indexLabels[index],
+          row.names = NULL)
+        rownames(plotDFOneMeasure) <- NULL
         FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
       }
 
-      plotDFOneMeasure <- data.frame(FinalExtr$compositeMeasure, indexLabel = "Composite measure")
+      plotDFOneMeasure <- data.frame(
+        FinalExtr$compositeMeasure, indexLabel = "Composite measure", 
+        row.names = NULL)
+      rownames(plotDFOneMeasure) <- NULL
       FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
 
       for(gtSigName in gtSigNames){
-        plotDFOneMeasure <- data.frame(FinalExtr$cosSim[[gtSigName]], indexLabel = paste0("Cosine similarity to ",gtSigName))
+        plotDFOneMeasure <- data.frame(
+          FinalExtr$cosSim[[gtSigName]], indexLabel = paste0("Cosine similarity to ",gtSigName),
+          row.names = NULL)
+        rownames(plotDFOneMeasure) <- NULL
         FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
       }
 
@@ -250,7 +259,7 @@ SummarizeMultiToolsMultiDatasets <-
         ## Generate separate panels (Composite measure,
         ## Cosine similarity to ground-truth signatures,
         ## True positive rate, Positive predictive value)
-        ## and combine them using ggpubr::ggarrage
+        ## and combine them using ggpubr::ggarrange
         plotDFList <- list()
         plotDFList$Extr <- list()
         plotLabels <- character(0)
