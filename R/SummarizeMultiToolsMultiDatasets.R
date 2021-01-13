@@ -463,7 +463,6 @@ SummarizeMultiToolsMultiDatasets <-
       ## For ground-truth signature,
       ## Create a data.frame integrating results of
       ## all runs and for all datasets
-      gtSigNames <- setdiff(names(OneToolSummary$cosSim),"combined")
       sigNums <- length(gtSigNames)
 
       ## Combine all FinalExtr$cosSim[[gtSigName]] into FinalExtr$cosSimCombined
@@ -645,9 +644,6 @@ SummarizeMultiToolsMultiDatasets <-
           ## Add OneToolSummary <- NULL to please R check
           OneToolSummary <- NULL
           load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
-
-          gtSigNames <- setdiff(names(OneToolSummary$cosSim),"combined")
-          sigNums <- length(gtSigNames)
 
           if(length(FinalAttr$AggManhattanDist) == 0){
             for(gtSigName in gtSigNames) {
@@ -862,9 +858,6 @@ SummarizeMultiToolsMultiDatasets <-
           ## Add OneToolSummary <- NULL to please R check
           OneToolSummary <- NULL
           load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
-
-          gtSigNames <- setdiff(names(OneToolSummary$cosSim),"combined")
-          sigNums <- length(gtSigNames)
 
           if(length(FinalAttr[[measure]]) == 0){
             for(gtSigName in gtSigNames) {

@@ -448,8 +448,6 @@ SummarizeOneToolMultiDatasets <-
           ## Add multiRun <- NULL to please R check
           multiRun <- NULL
           load(paste0(thirdLevelDir,"/multiRun.RDa"))
-          gtSigNames <- rownames(multiRun$AggManhattanDist)
-          sigNums <- length(gtSigNames)
 
           for(gtSigName in gtSigNames){
             
@@ -593,8 +591,6 @@ SummarizeOneToolMultiDatasets <-
           ## Add multiRun <- NULL to please R check
           multiRun <- NULL
           load(paste0(thirdLevelDir,"/multiRun.RDa"))
-          gtSigNames <- rownames(multiRun$meanSepMD)
-          sigNums <- length(gtSigNames)
 
           for(gtSigName in gtSigNames){
 
@@ -735,8 +731,6 @@ SummarizeOneToolMultiDatasets <-
           ## Add multiRun <- NULL to please R check
           multiRun <- NULL
           load(paste0(thirdLevelDir,"/multiRun.RDa"))
-          gtSigNames <- rownames(multiRun$sdSepMD)
-          sigNums <- length(gtSigNames)
 
           for(gtSigName in gtSigNames){
 
