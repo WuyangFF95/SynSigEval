@@ -6,7 +6,7 @@
 <!-- badges: start -->
 
 [![Travis build
-status](https://travis-ci.com/WuyangFF95/SynSigEval.svg?branch=master)](https://travis-ci.com/WuyangFF95/SynSigEval)
+status](https://travis-ci.com/WuyangFF95/SynSigEval.svg?branch=0.2.1)](https://travis-ci.com/WuyangFF95/SynSigEval)
 
 <!-- badges: end -->
 
@@ -34,4 +34,4 @@ devtools::install_github("WuyangFF95/SynSigEval")
 
 ## Reference manual
 
-<https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.2.1.pdf>
+<https://github.com/WuyangFF95/SynSigEval/blob/0.2.1/data-raw/SynSigEval_0.2.1.pdf>
