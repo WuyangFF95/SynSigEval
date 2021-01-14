@@ -250,7 +250,7 @@ SummarizeOneToolMultiDatasets <-
 
 
       ## Output multiple extraction measures in a pdf file
-      grDevices::pdf(paste0(out.dir,"/onetool.extraction.measures.pdf"), pointsize = 1)
+      grDevices::pdf(paste0(out.dir,"/extraction.measures.pdf"), pointsize = 1)
       for(index in indexes)
         suppressMessages(suppressWarnings(print(ggplotList[[index]])))
       grDevices::dev.off()
@@ -411,7 +411,7 @@ SummarizeOneToolMultiDatasets <-
 
 
       ## Output multiple extraction measures in a pdf file
-      grDevices::pdf(paste0(out.dir,"/onetool.onesig.cossim.pdf"), pointsize = 1)
+      grDevices::pdf(paste0(out.dir,"/onesig.cossim.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames)
         suppressMessages(suppressWarnings(print(ggplotList$cosSim[[gtSigName]])))
       grDevices::dev.off()
@@ -450,7 +450,7 @@ SummarizeOneToolMultiDatasets <-
           load(paste0(thirdLevelDir,"/multiRun.RDa"))
 
           for(gtSigName in gtSigNames){
-            
+
             gtAggManhattanDist4OneDataset <- data.frame(seed = colnames(multiRun$AggManhattanDist),
                                                         value = multiRun$AggManhattanDist[gtSigName,],
                                                         toolName = toolName,
@@ -458,7 +458,7 @@ SummarizeOneToolMultiDatasets <-
                                                         datasetGroup = datasetGroup[datasetName],
                                                         datasetSubGroup = datasetSubGroup[datasetName],
                                                         stringsAsFactors = FALSE)
-            
+
             rownames(gtAggManhattanDist4OneDataset) <- NULL
 
             ## Create a data.frame for each measure,
@@ -571,7 +571,7 @@ SummarizeOneToolMultiDatasets <-
 
 
         ## Output multiple extraction measures in a pdf file
-        grDevices::pdf(paste0(out.dir,"/onetool.aggregated.Manhattan.dist.pdf"), pointsize = 1)
+        grDevices::pdf(paste0(out.dir,"/aggregated.Manhattan.dist.pdf"), pointsize = 1)
         for(gtSigName in gtSigNames)
           suppressMessages(suppressWarnings(print(ggplotList$AggManhattanDist[[gtSigName]])))
         grDevices::dev.off()
@@ -711,7 +711,7 @@ SummarizeOneToolMultiDatasets <-
 
 
         ## Output multiple extraction measures in a pdf file
-        grDevices::pdf(paste0(out.dir,"/onetool.mean.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
+        grDevices::pdf(paste0(out.dir,"/mean.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
         for(gtSigName in gtSigNames)
           suppressMessages(suppressWarnings(print(ggplotList$meanSepMD[[gtSigName]])))
         grDevices::dev.off()
@@ -741,7 +741,7 @@ SummarizeOneToolMultiDatasets <-
                                                datasetGroup = datasetGroup[datasetName],
                                                datasetSubGroup = datasetSubGroup[datasetName],
                                                stringsAsFactors = FALSE)
-            
+
             rownames(gtsdSepMD4OneDataset) <- NULL
 
             ## Create a data.frame for each measure,
@@ -852,7 +852,7 @@ SummarizeOneToolMultiDatasets <-
 
 
         ## Output multiple extraction measures in a pdf file
-        grDevices::pdf(paste0(out.dir,"/onetool.stdev.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
+        grDevices::pdf(paste0(out.dir,"/stdev.of.sep.Scaled.Manhattan.dist.pdf"), pointsize = 1)
         for(gtSigName in gtSigNames)
           suppressMessages(suppressWarnings(print(ggplotList$sdSepMD[[gtSigName]])))
         grDevices::dev.off()
