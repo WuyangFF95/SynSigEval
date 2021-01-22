@@ -19,6 +19,16 @@
 #' @param display.datasetName Whether to put the name of spectra datasets inside of
 #' the csv outputs of summary tables.
 #'
+#' @param sort.by.composite.extraction.measure Whether to re-order the computational
+#' approaches on violin plots, based on the mean of composite measure.
+#'
+#' \code{"descending"}: Put the computational approach with the highest mean composite
+#' measure to the left, and arrange approaches in descending order.
+#' \code{"ascending"}:  Put the computational approach with the lowest mean composite
+#' measure to the left, and arrange approaches in ascending order.
+#' Anything else: Keep the computational approaches in a smart alphabetical order embedded with numbers,
+#' defined by \code{\link[gtools](mixedsort)}.
+#'
 #' @param overwrite Whether to overwrite the contents in out.dir if
 #' it already exists. (Default: FALSE)
 #'
@@ -32,6 +42,7 @@ SummarizeMultiToolsMultiDatasets <-
   function(toolSummaryPaths,
            out.dir,
            display.datasetName = FALSE,
+           sort.by.composite.extraction.measure = "descending",
            overwrite = FALSE){
 
     ## Create output directory
@@ -73,6 +84,7 @@ SummarizeMultiToolsMultiDatasets <-
 
 
       ## Combine extraction measures of different computational approaches:
+      toolNames <- character(0)
       for(toolSummaryPath in toolSummaryPaths){
         ## Add OneToolSummary <- NULL to please R check
         OneToolSummary <- NULL
@@ -83,7 +95,8 @@ SummarizeMultiToolsMultiDatasets <-
 
 
         ## Find tool names
-        toolNames <- unique(OneToolSummary[["averCosSim"]][,"toolName"])
+        toolName <- unique(OneToolSummary[["averCosSim"]][,"toolName"])
+        toolNames <- c(toolNames, toolName)
 
         ## For each extraction measures,
         ## merge values from multiple runs
@@ -121,6 +134,25 @@ SummarizeMultiToolsMultiDatasets <-
       FinalExtr$compositeMeasure$value <- FinalExtr$TPR$value + FinalExtr$PPV$value
       for(gtSigName in gtSigNames){
         FinalExtr$compositeMeasure$value <- FinalExtr$compositeMeasure$value + FinalExtr$cosSim[[gtSigName]]$value
+      }
+
+      ## Order computational approaches according to their mean of composite measure
+      if(sort.by.composite.extraction.measure %in% c("ascending","descending")){
+
+        meanCOMPOSITE <- numeric(0)
+        for(tool in toolNames){
+          rowNums <- which(FinalExtr$compositeMeasure$toolName == tool)
+          meanVal <- mean(FinalExtr$compositeMeasure$value[rowNums])
+          names(meanVal) <- tool
+          meanCOMPOSITE <- c(meanCOMPOSITE, meanVal)
+        }
+        if(sort.by.composite.extraction.measure == "descending") {
+          meanCOMPOSITE <- gtools::mixedsort(meanCOMPOSITE,decreasing = T)
+        } else {
+          meanCOMPOSITE <- gtools::mixedsort(meanCOMPOSITE,decreasing = F)
+        }
+        ## Update order of toolNames.
+        toolNames <- names(meanCOMPOSITE)
       }
 
     }
@@ -220,7 +252,7 @@ SummarizeMultiToolsMultiDatasets <-
       }
 
       plotDFOneMeasure <- data.frame(
-        FinalExtr$compositeMeasure, indexLabel = "Composite measure", 
+        FinalExtr$compositeMeasure, indexLabel = "Composite measure",
         row.names = NULL)
       rownames(plotDFOneMeasure) <- NULL
       FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
@@ -312,6 +344,9 @@ SummarizeMultiToolsMultiDatasets <-
               ## Hide outliers
               #outlier.shape = NA
             ) +
+            ## Set the order of computational approaches to the
+            ## reordered-vector toolNames
+            ggplot2::scale_x_discrete(limits = toolNames) +
             ## Show median of the extraction measure distribution, as a solid dot.
             ggplot2::stat_summary(fun="median", geom="point", fill = "red", shape = 21) +
             ## Show mean of the extraction meaasure distribution, as a blue diamond.
@@ -395,6 +430,9 @@ SummarizeMultiToolsMultiDatasets <-
               ## Hide outliers
               #outlier.shape = NA
             ) +
+            ## Let the names of computational approaches
+            ## follow the order in toolNames.
+            ggplot2::scale_x_discrete(limits = toolNames) +
             ## Show median of the extraction measure distribution, as a solid dot.
             ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
             ## Show mean of the extraction meaasure distribution, as a blue diamond.
