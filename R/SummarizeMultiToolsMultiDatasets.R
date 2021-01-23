@@ -64,6 +64,7 @@ SummarizeMultiToolsMultiDatasets <-
                        "truePos" = "True positives",
                        "TPR" = "True positive rate",
                        "PPV" = "Positive predictive value",
+                       "NumSigsExtracted" = "Number of signatures extracted",
                        "compositeMeasure" = "Composite measure")
       indexNums <- length(indexes)
     }
@@ -126,6 +127,12 @@ SummarizeMultiToolsMultiDatasets <-
 
       }
 
+      ## Calculate total number of signatures extracted in each run by each computational approach
+      ## It always equal to falsePos (number of false positives) + truePos (number of true positives)
+      FinalExtr$NumSigsExtracted <- FinalExtr$falsePos
+      FinalExtr$NumSigsExtracted$value <- 
+        FinalExtr$NumSigsExtracted$value + FinalExtr$truePos$value
+
       ## Calculate composite measure for each computational approach.
       ## It equals to:
       ## True Positive Rate (TPR) + Positive Predictive Value (PPV)
@@ -162,7 +169,7 @@ SummarizeMultiToolsMultiDatasets <-
     ## and cosine similarities.
     {
       ## Output combined extraction
-      for(index in c(indexes,"compositeMeasure")){
+      for(index in c(indexes,"NumSigsExtracted","compositeMeasure")){
 
         output <- FinalExtr[[index]]
 
