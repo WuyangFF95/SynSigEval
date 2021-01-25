@@ -8,6 +8,7 @@ SummarizeMultiToolsMultiDatasets(
   toolSummaryPaths,
   out.dir,
   display.datasetName = FALSE,
+  sort.by.composite.extraction.measure = "descending",
   overwrite = FALSE
 )
 }
@@ -23,6 +24,16 @@ Note: \code{OneToolSummary.RDa} are expected to be exist under
 
 \item{display.datasetName}{Whether to put the name of spectra datasets inside of
 the csv outputs of summary tables.}
+
+\item{sort.by.composite.extraction.measure}{Whether to re-order the computational
+approaches on violin plots, based on the mean of composite measure.
+
+\code{"descending"}: Put the computational approach with the highest mean composite
+measure to the left, and arrange approaches in descending order.
+\code{"ascending"}:  Put the computational approach with the lowest mean composite
+measure to the left, and arrange approaches in ascending order.
+Anything else: Keep the computational approaches in a smart alphabetical order embedded with numbers,
+defined by \code{\link[gtools](mixedsort)}.}
 
 \item{overwrite}{Whether to overwrite the contents in out.dir if
 it already exists. (Default: FALSE)}
