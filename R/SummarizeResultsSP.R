@@ -3,25 +3,18 @@
 #' Assessment is restricted to v0.0.5.43+,
 #' because different version has different folder structure.
 #'
-#' @param run.dir Lowest level path to results, e.g.
-#' \code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SigProExtractor.results/seed.1/}
-#' Here, \code{<top.dir>} refers to a top-level directory which contains the
-#' full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
+#' @inheritParams SummarizeSigOneSubdir
+#'
+#' @param run.dir A directory which contains output of SigProExtractor in one
+#' run on a specific dataset, possibly with a specified seed. E.g.
+#' \code{2b.Full_output_K_as_2/SigProExtractor.results/S.0.1.Rsq.0.1/seed.1/}.
+#'
 #' This code depends on a conventional directory structure documented
-#' elsewhere. However there should be a directory
-#' \code{<run.dir>}\code{/SBS96} which
-#' stores SigProfiler results.
-#'
-#' @param ground.truth.exposure.dir TODO(Wu Yang): Fix this
-#' File name which stores ground-truth exposures;
-#' defaults to \code{"ground.truth.syn.exposures.csv"}.
-#' This file can be found in the \code{sub.dir}, i.e. \code{<run.dir>/../../../}
-#'
-#' @param overwrite If TRUE overwrite existing directories and files.
+#' in \code{NEWS.md}.
 #'
 #' @param hierarchy Whether the user have enabled hierarchy = True when running SigProExtractor.
 #' specifying True or False into SigProExtractor will cause the program
-#' to generate different folder structure. (Default: \code{FALSE})
+#' to generate different folder structure.
 #'
 #' @export
 #'
@@ -33,6 +26,7 @@
 SummarizeSigOneSigProExtractorSubdir <-
   function(run.dir,
            ground.truth.exposure.dir = paste0(run.dir,"/../../../"),
+           summarize.exp = TRUE,
            overwrite = FALSE,
            hierarchy = FALSE) {
 
@@ -90,10 +84,7 @@ SummarizeSigOneSigProExtractorSubdir <-
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = extracted.sigs.path,
         inferred.exp.path = inferred.exp.path,
-        #read.extracted.sigs.fn = ReadCatalog,
-        #read.ground.truth.sigs.fn = ReadCatalog,
-        #write.cat.fn = WriteCatalog,
-        #plot.pdf.fn = PlotCatalogToPdf,
+        summarize.exp = summarize.exp,
         overwrite = overwrite)
 
     # Copy stability.pdf and result_stat.csv
@@ -129,18 +120,17 @@ SummarizeSigOneSigProExtractorSubdir <-
 #' the \code{sp.sp} subdirectory
 #' (as is the case for the correlated SBS1-and-SBS5-containing data sets).
 #'
-#' @param overwrite whether to overwrite the existing \code{run.dir/summary}
-#' folder? If chosen to be FALSE and there is an existing summary folder, an error
-#' will be raised.
+#' @inheritParams SummarizeSigOneSubdir
 #'
 #' @export
 #'
 #' @details Results are put in standardized subdirectories of \code{top.dir}.
 
 SummarizeSigProExtractor <-
-  function(top.dir,
-           sub.dir = c("sa.sa.96","sp.sp"),
-		   overwrite = FALSE) {
+  function(
+    top.dir,
+    sub.dir = c("sa.sa.96","sp.sp"),
+		overwrite = FALSE) {
 
   ## If sub.dir are unexpected, throw an error
   expected.sub.dir <- c("sa.sa.96","sp.sp")

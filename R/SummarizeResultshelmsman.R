@@ -1,25 +1,14 @@
-#' Assess/evaluate results from SigProfiler-python (a.k.a. SigProExtractor)
-#' Assessment is restricted to v0.0.5.43,
-#' because different version has different folder structure.
+#' Assess/evaluate results from helmsman.NMF
 #'
-#' @param run.dir Lowest level path to results, e.g.
-#' \code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SigProExtractor.results/seed.1/}
-#' Here, \code{<top.dir>} refers to a top-level directory which contains the
-#' full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
+#' @inheritParams SummarizeSigOneSubdir
+#'
+#' @param run.dir A directory which contains output of helmsman.NMF in one
+#' run on a specific dataset, possibly with a specified seed. E.g.
+#' \code{2b.Full_output_K_as_2/helmsman.NMF.results/S.0.1.Rsq.0.1/seed.1/}.
+#'
 #' This code depends on a conventional directory structure documented
-#' elsewhere. However there should be a directory
-#' \code{<run.dir>}\code{/SBS96} which
-#' stores SigProfiler results.
+#' in \code{NEWS.md}.
 #'
-#' @param ground.truth.exposure.dir Folder which stores ground-truth exposures.
-#' Usually, it refers to \code{sub.dir}, i.e. \code{run.dir}/../../../
-#'
-#' @param overwrite If TRUE overwrite existing directories and files.
-#'
-#' @param hierarchy Whether the user have enabled hierarchy = True
-#' when running SigProExtractor.
-#' specifying True or False into SigProExtractor will cause the program
-#' to generate different folder structure. (Default: \code{FALSE})
 #'
 #' @export
 #'
@@ -31,8 +20,8 @@
 SummarizeSigOnehelmsmanSubdir <-
   function(run.dir,
            ground.truth.exposure.dir = paste0(run.dir,"/../../../"),
-           overwrite = FALSE,
-           hierarchy = FALSE) {
+           summarize.exp = TRUE,
+           overwrite = FALSE) {
 
     # Location of SigProfiler output, which is our input
     # inputPath may change if SigProExtractor updates!
@@ -87,6 +76,7 @@ SummarizeSigOnehelmsmanSubdir <-
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = extracted.sigs.path,
         inferred.exp.path = inferred.exp.path,
+        summarize.exp = summarize.exp,
         overwrite = overwrite)
 
     invisible(retval) # So we can test without looking at a file.

@@ -2,39 +2,33 @@
 % Please edit documentation in R/SummarizeResultshelmsman.R
 \name{SummarizeSigOnehelmsmanSubdir}
 \alias{SummarizeSigOnehelmsmanSubdir}
-\title{Assess/evaluate results from SigProfiler-python (a.k.a. SigProExtractor)
-Assessment is restricted to v0.0.5.43,
-because different version has different folder structure.}
+\title{Assess/evaluate results from helmsman.NMF}
 \usage{
 SummarizeSigOnehelmsmanSubdir(
   run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
-  overwrite = FALSE,
-  hierarchy = FALSE
+  summarize.exp = TRUE,
+  overwrite = FALSE
 )
 }
 \arguments{
-\item{run.dir}{Lowest level path to results, e.g.
-\code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SigProExtractor.results/seed.1/}
-Here, \code{<top.dir>} refers to a top-level directory which contains the
-full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
+\item{run.dir}{A directory which contains output of helmsman.NMF in one
+run on a specific dataset, possibly with a specified seed. E.g.
+\code{2b.Full_output_K_as_2/helmsman.NMF.results/S.0.1.Rsq.0.1/seed.1/}.
+
 This code depends on a conventional directory structure documented
-elsewhere. However there should be a directory
-\code{<run.dir>}\code{/SBS96} which
-stores SigProfiler results.}
+in \code{NEWS.md}.}
 
-\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures.
-Usually, it refers to \code{sub.dir}, i.e. \code{run.dir}/../../../}
+\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures. Should
+contain a file named \code{ground.truth.syn.exposures.csv}.
+In PCAWG paper: \code{run.dir/../../}
+In SBS1-SBS5 paper: \code{0.Input_datasets/S.0.1.Rsq.0.1/}}
 
-\item{overwrite}{If TRUE overwrite existing directories and files.}
+\item{summarize.exp}{Whether to summarize exposures when the file specified
+by \code{inferred.exp.path} exists.}
 
-\item{hierarchy}{Whether the user have enabled hierarchy = True
-when running SigProExtractor.
-specifying True or False into SigProExtractor will cause the program
-to generate different folder structure. (Default: \code{FALSE})}
+\item{overwrite}{If TRUE overwrite and files in existing \code{run.dir/summary} folder.}
 }
 \description{
-Assess/evaluate results from SigProfiler-python (a.k.a. SigProExtractor)
-Assessment is restricted to v0.0.5.43,
-because different version has different folder structure.
+Assess/evaluate results from helmsman.NMF
 }

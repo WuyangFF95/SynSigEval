@@ -6,19 +6,7 @@
 #' hdp, MutationalPatterns, sigfit,
 #' signeR, SomaticSignatures.
 #'
-#' @param run.dir Lowest level path to result of a run. E.g.
-#' \code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SomaticSignatures.results/seed.1/}
-#' Here, \code{<top.dir>} refers to a top-level directory which contains the
-#' full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
-#' This code depends on a conventional directory structure documented
-#' elsewhere. For packages which can do both extraction and attribution,
-#' we expect two files, \code{extracted.signatures.csv}
-#' and \code{inferred.exposures.csv} are in the folder.
-#'
-#' @param ground.truth.exposure.dir Folder which stores ground-truth exposures.
-#' It defaults to be \code{sub.dir}, i.e. \code{run.dir}/../../../
-#'
-#' @param overwrite If TRUE overwrite existing directories and files.
+#' @inheritParams SummarizeSigOneSubdir
 #'
 #' @export
 #'
@@ -30,6 +18,7 @@
 SummarizeSigOneExtrAttrSubdir <-
   function(run.dir,
            ground.truth.exposure.dir = paste0(run.dir,"/../../../"),
+           summarize.exp = TRUE,
            overwrite = FALSE) {
 
     # Location of SigProfiler output, which is our input
@@ -52,6 +41,7 @@ SummarizeSigOneExtrAttrSubdir <-
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = extracted.sigs.path,
         inferred.exp.path = inferred.exp.path,
+        summarize.exp = summarize.exp,
         overwrite = overwrite)
 
     invisible(retval) # So we can test without looking at a file.

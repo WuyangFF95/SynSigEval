@@ -5,10 +5,17 @@
 \title{Summarize all sub-directories of SignatureAnalyzer results
 on the correlated SBS1 / SBS5.}
 \usage{
-SignatureAnalyzerSummarizeSBS1SBS5(top.level.dir, overwrite = FALSE)
+SignatureAnalyzerSummarizeSBS1SBS5(
+  top.level.dir,
+  summarize.exp = TRUE,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{top.level.dir}{Path to top level directory.}
+
+\item{summarize.exp}{Whether to summarize exposures when the file specified
+by \code{inferred.exp.path} exists.}
 
 \item{overwrite}{If TRUE overwrite existing directories and files.}
 }

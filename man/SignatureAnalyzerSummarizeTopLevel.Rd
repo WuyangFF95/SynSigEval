@@ -5,7 +5,11 @@
 \title{Summarize all subdirectories of SignatureAnalyzer results
 on a major dataset.}
 \usage{
-SignatureAnalyzerSummarizeTopLevel(top.level.dir, overwrite = FALSE)
+SignatureAnalyzerSummarizeTopLevel(
+  top.level.dir,
+  summarize.exp = TRUE,
+  overwrite = FALSE
+)
 }
 \arguments{
 \item{top.level.dir}{Path to top level directory, which
@@ -21,7 +25,10 @@ additional subdirectories, one for each SignatureAnalyzer
 run, names \code{sa.run.<n>}, where <n> is an integer
 (string of digits).}
 
-\item{overwrite}{If TRUE overwrite existing summary files.}
+\item{summarize.exp}{Whether to summarize exposures when the
+\code{<run.dir>/<which.run>/sa.output.exp.csv} exists.}
+
+\item{overwrite}{If TRUE overwrite and files in existing \code{run.dir/summary} folder.}
 }
 \description{
 This function depends on a particular directory structure: see

@@ -27,7 +27,7 @@
 #' \code{"ascending"}:  Put the computational approach with the lowest mean composite
 #' measure to the left, and arrange approaches in ascending order.
 #' Anything else: Keep the computational approaches in a smart alphabetical order embedded with numbers,
-#' defined by \code{\link[gtools](mixedsort)}.
+#' defined by \code{\link[gtools]{mixedsort}}.
 #'
 #' @param overwrite Whether to overwrite the contents in out.dir if
 #' it already exists. (Default: FALSE)
@@ -130,7 +130,7 @@ SummarizeMultiToolsMultiDatasets <-
       ## Calculate total number of signatures extracted in each run by each computational approach
       ## It always equal to falsePos (number of false positives) + truePos (number of true positives)
       FinalExtr$NumSigsExtracted <- FinalExtr$falsePos
-      FinalExtr$NumSigsExtracted$value <- 
+      FinalExtr$NumSigsExtracted$value <-
         FinalExtr$NumSigsExtracted$value + FinalExtr$truePos$value
 
       ## Calculate composite measure for each computational approach.

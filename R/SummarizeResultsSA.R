@@ -1,10 +1,16 @@
 #' Summarize results (SBS96, DBS, ID or COMPOSITE) from SignatureAnalyzer
 #'
-#' @param run.dir Lowest level path to results, that is
-#' \code{<top.dir>}\code{/sa.sa.96/sa.results/},
-#' \code{<top.dir>}\code{/sp.sp/sa.results/},
-#' \code{<top.dir>}\code{/sa.sa.COMPOSITE/sa.results/}, or
-#' \code{<top.dir>}\code{/sp.sa.COMPOSITE/sa.results/}.
+#' @inheritParams SummarizeSigOneSubdir
+#'
+#' @param run.dir Lowest level path to results, for example in PCAWG paper:
+#' \code{<top.dir>/sa.sa.96/sa.results/},
+#' \code{<top.dir>/sp.sp/sa.results/},
+#' \code{<top.dir>/sa.sa.COMPOSITE/sa.results/}, or
+#' \code{<top.dir>/sp.sa.COMPOSITE/sa.results/}.
+#'
+#' In SBS1-SBS5 paper:
+#' \code{2b.Full_output_K_as_2/SignatureAnalyzer.results/S.0.1.Rsq.0.1/seed.1/}
+#'
 #'
 #' We expect \code{run.dir} contain the best-run subdirectory (e.g. "best.run").
 #' The name of the subdirectory needs to be given to \code{which.run} parameter.
@@ -14,13 +20,11 @@
 #' This code depends on a conventional directory structure documented
 #' elsewhere.
 #'
-#' @param ground.truth.exposure.dir Folder which stores ground-truth exposures.
-#' It defaults to be \code{sub.dir}, i.e. \code{run.dir}/../../
-#'
 #' @param which.run Name of subdirectory under \code{run.dir}
 #' containing the run to summarize.
 #'
-#' @param overwrite If TRUE overwrite existing directories and files.
+#' @param summarize.exp Whether to summarize exposures when the
+#' \code{<run.dir>/<which.run>/sa.output.exp.csv} exists.
 #'
 #' @keywords internal
 #'
@@ -31,6 +35,7 @@ SummarizeSigOneSASubdir <-
   function(run.dir,
            ground.truth.exposure.dir = paste0(run.dir,"/../../"),
            which.run = "/best.run/",
+           summarize.exp = TRUE,
            overwrite = FALSE) {
     # Location of SigProfiler output, which is our input
     # inputPath may change if SigProExtractor updates!
@@ -44,6 +49,7 @@ SummarizeSigOneSASubdir <-
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = paste0(inputPath,"/sa.output.sigs.csv"),
         inferred.exp.path = paste0(inputPath,"/sa.output.exp.csv"),
+        summarize.exp = summarize.exp,
         overwrite = overwrite)
 
     invisible(retval)
@@ -70,12 +76,14 @@ SummarizeSigOneSASubdir <-
 #' run, names \code{sa.run.<n>}, where <n> is an integer
 #' (string of digits).
 #'
-#' @param overwrite If TRUE overwrite existing summary files.
+#' @inheritParams SummarizeSigOneSASubdir
 #'
 #' @export
 
 SignatureAnalyzerSummarizeTopLevel <-
-  function(top.level.dir, overwrite = FALSE) {
+  function(top.level.dir,
+           summarize.exp = TRUE,
+           overwrite = FALSE) {
     stopifnot(dir.exists(top.level.dir))
 
     assign("last.warning", NULL, envir = baseenv())
@@ -101,16 +109,16 @@ SignatureAnalyzerSummarizeTopLevel <-
     retval <-
       list(sa.sa.96 =
              SummarizeSigOneSASubdir(
-               sa.sa.96.dir, overwrite = overwrite),
+               sa.sa.96.dir, summarize.exp = summarize.exp, overwrite = overwrite),
            sp.sp =
              SummarizeSigOneSASubdir(
-               sp.sp.dir, overwrite = overwrite),
+               sp.sp.dir, summarize.exp = summarize.exp, overwrite = overwrite),
            sa.sa.COMPOSITE =
              SummarizeSigOneSASubdir(
-               sa.sa.COMPOSITE.dir, overwrite = overwrite),
+               sa.sa.COMPOSITE.dir, summarize.exp = summarize.exp, overwrite = overwrite),
            sp.sa.COMPOSITE =
              SummarizeSigOneSASubdir(
-               sp.sa.COMPOSITE.dir, overwrite = overwrite))
+               sp.sa.COMPOSITE.dir, summarize.exp = summarize.exp, overwrite = overwrite))
 
     capture.output(print(retval), file = paste0(top.level.dir, "/retval.txt"))
     invisible(retval)
@@ -126,11 +134,14 @@ SignatureAnalyzerSummarizeTopLevel <-
 #'
 #' @param top.level.dir Path to top level directory.
 #'
+#' @param summarize.exp Whether to summarize exposures when the file specified
+#' by \code{inferred.exp.path} exists.
+#'
 #' @param overwrite If TRUE overwrite existing directories and files.
 #'
 #' @export
 SignatureAnalyzerSummarizeSBS1SBS5 <-
-  function(top.level.dir, overwrite = FALSE) {
+  function(top.level.dir, summarize.exp = TRUE, overwrite = FALSE) {
     stopifnot(dir.exists(top.level.dir))
 
     assign("last.warning", NULL, envir = baseenv())
@@ -148,7 +159,7 @@ SignatureAnalyzerSummarizeSBS1SBS5 <-
       sa.results.path <- paste0(sp.sp.path, "sa.results/")
       if (!dir.exists(sa.results.path)) stop(sa.results.path, "does not exist")
       CopyBestSignatureAnalyzerResult(sa.results.path, overwrite = overwrite)
-      SummarizeSigOneSASubdir(sa.results.path, overwrite = overwrite)
+      SummarizeSigOneSASubdir(sa.results.path, summarize.exp = summarize.exp, overwrite = overwrite)
     }
 
     retval <- lapply(subdirs, Summarize1)

@@ -10,30 +10,32 @@ because different version has different folder structure.}
 SummarizeSigOneSigProExtractorSubdir(
   run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
+  summarize.exp = TRUE,
   overwrite = FALSE,
   hierarchy = FALSE
 )
 }
 \arguments{
-\item{run.dir}{Lowest level path to results, e.g.
-\code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SigProExtractor.results/seed.1/}
-Here, \code{<top.dir>} refers to a top-level directory which contains the
-full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
+\item{run.dir}{A directory which contains output of SigProExtractor in one
+run on a specific dataset, possibly with a specified seed. E.g.
+\code{2b.Full_output_K_as_2/SigProExtractor.results/S.0.1.Rsq.0.1/seed.1/}.
+
 This code depends on a conventional directory structure documented
-elsewhere. However there should be a directory
-\code{<run.dir>}\code{/SBS96} which
-stores SigProfiler results.}
+in \code{NEWS.md}.}
 
-\item{ground.truth.exposure.dir}{TODO(Wu Yang): Fix this
-File name which stores ground-truth exposures;
-defaults to \code{"ground.truth.syn.exposures.csv"}.
-This file can be found in the \code{sub.dir}, i.e. \code{<run.dir>/../../../}}
+\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures. Should
+contain a file named \code{ground.truth.syn.exposures.csv}.
+In PCAWG paper: \code{run.dir/../../}
+In SBS1-SBS5 paper: \code{0.Input_datasets/S.0.1.Rsq.0.1/}}
 
-\item{overwrite}{If TRUE overwrite existing directories and files.}
+\item{summarize.exp}{Whether to summarize exposures when the file specified
+by \code{inferred.exp.path} exists.}
+
+\item{overwrite}{If TRUE overwrite and files in existing \code{run.dir/summary} folder.}
 
 \item{hierarchy}{Whether the user have enabled hierarchy = True when running SigProExtractor.
 specifying True or False into SigProExtractor will cause the program
-to generate different folder structure. (Default: \code{FALSE})}
+to generate different folder structure.}
 }
 \description{
 Assess/evaluate results from SigProExtractor

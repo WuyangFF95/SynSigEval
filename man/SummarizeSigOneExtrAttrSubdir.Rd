@@ -9,23 +9,27 @@ excluding SigProfiler-Python and SignatureAnalyzer.}
 SummarizeSigOneExtrAttrSubdir(
   run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
+  summarize.exp = TRUE,
   overwrite = FALSE
 )
 }
 \arguments{
-\item{run.dir}{Lowest level path to result of a run. E.g.
-\code{<top.dir>}\code{/sa.sa.96/ExtrAttr/SomaticSignatures.results/seed.1/}
-Here, \code{<top.dir>} refers to a top-level directory which contains the
-full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
+\item{run.dir}{A directory which contains output of computational approach in one
+run on a specific dataset, possibly with a specified seed. E.g.
+\code{2b.Full_output_K_as_2/hdp.results/S.0.1.Rsq.0.1/seed.1/}.
+
 This code depends on a conventional directory structure documented
-elsewhere. For packages which can do both extraction and attribution,
-we expect two files, \code{extracted.signatures.csv}
-and \code{inferred.exposures.csv} are in the folder.}
+in \code{NEWS.md}.}
 
-\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures.
-It defaults to be \code{sub.dir}, i.e. \code{run.dir}/../../../}
+\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures. Should
+contain a file named \code{ground.truth.syn.exposures.csv}.
+In PCAWG paper: \code{run.dir/../../}
+In SBS1-SBS5 paper: \code{0.Input_datasets/S.0.1.Rsq.0.1/}}
 
-\item{overwrite}{If TRUE overwrite existing directories and files.}
+\item{summarize.exp}{Whether to summarize exposures when the file specified
+by \code{inferred.exp.path} exists.}
+
+\item{overwrite}{If TRUE overwrite and files in existing \code{run.dir/summary} folder.}
 }
 \description{
 Packages including but not limited to:

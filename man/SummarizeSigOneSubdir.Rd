@@ -9,29 +9,68 @@ SummarizeSigOneSubdir(
   ground.truth.exposure.dir,
   extracted.sigs.path,
   inferred.exp.path = NULL,
+  summarize.exp = TRUE,
   overwrite = FALSE,
   summary.folder.name = "summary"
 )
 }
 \arguments{
-\item{run.dir}{Lowest level path to result of a run. That is,
-\code{top.dir}/sp.sp/ExtrAttr/SignatureAnalyzer.results/seed.1/. or
-\code{top.dir}/sa.sa.96/Attr/YAPSA.results/seed.691/
-Here, \code{top.dir} refers to a top-level directory which contains the
-full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
+\item{run.dir}{A directory which contains output of computational approach in one
+run on a specific dataset, possibly with a specified seed. E.g.
+\code{2b.Full_output_K_as_2/hdp.results/S.0.1.Rsq.0.1/seed.1/}.
+
 This code depends on a conventional directory structure documented
-elsewhere. However there should be a directory within the \code{run.dir}
-which stores the software output.}
+in \code{NEWS.md}.}
 
-\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures.
-Usually, it refers to \code{sub.dir}, i.e. \code{run.dir}/../../../}
+\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures. Should
+contain a file named \code{ground.truth.syn.exposures.csv}.
+In PCAWG paper: \code{run.dir/../../}
+In SBS1-SBS5 paper: \code{0.Input_datasets/S.0.1.Rsq.0.1/}}
 
-\item{extracted.sigs.path}{Path to extracted sigs file, e.g.
-\code{<run.dir>/SBS96/Selected_Solution/De_Novo_Solution/signatures.PCAWG.format.csv}.}
+\item{extracted.sigs.path}{Path to extracted sigs file, For most computational approaches,
+it's in:
+\code{<run.dir>/extracted.signatures.csv}.
 
-\item{inferred.exp.path}{Path to inferred exposures file.}
+For SigProExtractor, it's in:
+\code{<run.dir>/<catalog.type>/Selected_Solution/De_Novo_Solution/De_Novo_Solution_Signatures_<catalog.type>.txt}
+, and is converted to
+\code{<run.dir>/extracted.signatures.csv} by
+wrapper function \code{\link{SummarizeSigProExtractor}}.
 
-\item{overwrite}{If TRUE overwrite existing directories and files.}
+For SignatureAnalyzer, it's in:
+ \code{<run.dir>/sa.output.sigs.csv}
+
+For EMu, helmsman.NMF, MultiModalMuSig.LDA and MultiModalMuSig.CTM, their extracted signature
+files are not standard \code{ICAMS} catalog format. These non-standard extracted signatures
+are converted to \code{extracted.signatures.csv}, a standard \code{ICAMS} catalog by their
+respective wrapper functions:
+(\code{\link{ReadEMuCatalog}}, \code{\link{helmsmanCatalog2ICAMS}}, \code{\link{MMCatalog2ICAMS}}).
+They are dumped into \code{extracted.sigs.csv} same as most approaches.}
+
+\item{inferred.exp.path}{Path to inferred exposures file. For most computational approaches,
+it's in:
+\code{<run.dir>/inferred.exposures.csv}.
+
+For SigProExtractor, it's in
+\code{<run.dir>/<catalog.type>/Selected_Solution/De_Novo_Solution/De_Novo_Solution_Activities_<catalog.type>.txt}
+, and is converted to
+\code{<run.dir>/inferred.exposures.csv} by
+wrapper function \code{\link{SummarizeSigProExtractor}}.
+
+For SignatureAnalyzer, it's in:
+ \code{<run.dir>/sa.output.exp.csv}
+
+For EMu, helmsman.NMF, MultiModalMuSig.LDA and MultiModalMuSig.CTM, their extracted signature
+files are not standard \code{ICAMSxtra} catalog format. These non-standard extracted signatures
+are converted to \code{extracted.signatures.csv}, a standard \code{ICAMSxtra} exposures by their
+respective wrapper functions:
+(\code{\link{ReadEMuExposureFile}}, \code{\link{ReadhelmsmanExposure}}, \code{\link{ReadExposureMM}}).
+They are dumped into \code{inferred.exposures.csv} same as most approaches.}
+
+\item{summarize.exp}{Whether to summarize exposures when the file specified
+by \code{inferred.exp.path} exists.}
+
+\item{overwrite}{If TRUE overwrite and files in existing \code{run.dir/summary} folder.}
 
 \item{summary.folder.name}{The name of the folder containing summary results.
 Usually, it equals to "summary".}
