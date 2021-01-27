@@ -250,7 +250,7 @@ SummarizeMultiToolsMultiDatasets <-
       ## Combine all extraction measurements, FinalExtr[[index]] into FinalExtr$Combined
       ## combined all one-signature cosine similarity, FinalExtr[[gtSigName]] into FinalExtr$Combined
       FinalExtr$combined <- data.frame()
-      for(index in c("TPR","PPV")){
+      for(index in c("NumSigsExtracted","TPR","PPV")){
         plotDFOneMeasure <- data.frame(
           FinalExtr[[index]], indexLabel = indexLabels[index],
           row.names = NULL)
@@ -267,6 +267,14 @@ SummarizeMultiToolsMultiDatasets <-
       for(gtSigName in gtSigNames){
         plotDFOneMeasure <- data.frame(
           FinalExtr$cosSim[[gtSigName]], indexLabel = paste0("Cosine similarity to ",gtSigName),
+          row.names = NULL)
+        rownames(plotDFOneMeasure) <- NULL
+        FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
+      }
+
+      for(gtSigName in gtSigNames){
+        plotDFOneMeasure <- data.frame(
+          FinalExtr$NumSigsSimilar[[gtSigName]], indexLabel = paste0("Number of extracted signatures with cosine similarity > 0.9 to ",gtSigName),
           row.names = NULL)
         rownames(plotDFOneMeasure) <- NULL
         FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
@@ -300,29 +308,34 @@ SummarizeMultiToolsMultiDatasets <-
         ## True positive rate, Positive predictive value)
         ## and combine them using ggpubr::ggarrange
         plotDFList <- list()
-        plotDFList$Extr <- list()
-        plotLabels <- character(0)
+        plotLabels <- list()
+        for(subList in c("cosSim","NumSigsSimilar")){
+          plotDFList[[subList]] <- list()
+          plotLabels[[subList]] <- list()
+        }
 
         ## Composite measure needs to be plotted separately.
         {
           ## data.frame to be plotted in the panel
           plotDFList$compositeMeasure <- FinalExtr$compositeMeasure
           ## Text on Y axis
-          plotLabels["compositeMeasure"] <- indexLabels["compositeMeasure"]
+          plotLabels$compositeMeasure <- indexLabels["compositeMeasure"]
         }
 
-        for(measure in c("TPR","PPV")){
+        for(measure in c("NumSigsExtracted","TPR","PPV")){
           ## data.frame to be plotted in the panel
-          plotDFList$Extr[[measure]] <- FinalExtr[[measure]]
+          plotDFList[[measure]] <- FinalExtr[[measure]]
           ## Text on Y axis
-          plotLabels[measure] <- indexLabels[measure]
+          plotLabels[[measure]] <- indexLabels[measure]
         }
 
         for(gtSigName in gtSigNames){
           ## data.frame to be plotted in the panel
-          plotDFList$Extr[[gtSigName]] <- FinalExtr$cosSim[[gtSigName]]
-
-          plotLabels[gtSigName] <- paste0("Cosine similarity to ",gtSigName)
+          plotDFList$cosSim[[gtSigName]] <- FinalExtr$cosSim[[gtSigName]]
+          plotDFList$NumSigsSimilar[[gtSigName]] <- FinalExtr$NumSigsSimilar[[gtSigName]]
+          ## Text on Y axis
+          plotLabels$cosSim[[gtSigName]] <- paste0("Cosine similarity to ",gtSigName)
+          plotLabels$NumSigsSimilar[[gtSigName]] <- paste0("# sigs resembling ",gtSigName)
         }
       }
 
@@ -376,25 +389,26 @@ SummarizeMultiToolsMultiDatasets <-
           return(ggObj)
         }
 
-        ggplotsExtr <- list()
-        ggplotsExtr$Measures <- list()
-        for(gtSigName in gtSigNames){
-          ggplotsExtr$Measures[[gtSigName]] <- plottingFunc(plotDFList$Extr[[gtSigName]],paste0("Cosine similarity to ",gtSigName))
-        }
-        for(measure in c("TPR","PPV")){
-          ggplotsExtr$Measures[[measure]] <- plottingFunc(plotDFList$Extr[[measure]],indexLabels[measure])
-        }
-
         ## ggplotObj for PDF 1: Composite measure
+		    ggplotsExtr <- list()
         ggplotsExtr$compositeMeasure <- plottingFunc(plotDFList$compositeMeasure,indexLabels["compositeMeasure"])
 
         ## ggplotObj for PDF 2: combination of measures,
         ## excluding composite measure.
+        ggplotsExtr$WOComposite <- list()
+        for(gtSigName in gtSigNames){
+          ggplotsExtr$WOComposite[[paste0("cosSimTo",gtSigName)]] <- plottingFunc(plotDFList$cosSim[[gtSigName]],plotLabels$cosSim[[gtSigName]])
+          ggplotsExtr$WOComposite[[paste0("NumSigsSimilarTo",gtSigName)]] <- plottingFunc(plotDFList$NumSigsSimilar[[gtSigName]],plotLabels$NumSigsSimilar[[gtSigName]])
+        }
+        for(measure in c("NumSigsExtracted","TPR","PPV")){
+          ggplotsExtr$WOComposite[[measure]] <- plottingFunc(plotDFList[[measure]],indexLabels[measure])
+        }
+
         ggplotsExtr$combinedWOComp <- ggpubr::ggarrange(
-          plotlist = ggplotsExtr$Measures,
+          plotlist = ggplotsExtr$WOComposite,
           font.label = list(size = 14, color = "black", face = "bold", family = "sans"),
           ncol = 2,
-          nrow = ceiling(length(plotDFList$Extr)/2),
+          nrow = ceiling(length(ggplotsExtr$WOComposite)/2),
           legend = "right",
           common.legend = T
         )
@@ -410,7 +424,7 @@ SummarizeMultiToolsMultiDatasets <-
           bys <- c("datasetGroup")
         }
 
-        ## PDF3 with two pages,
+        ## PDF 3 with two pages:
         ## combination of all measures,
         ## as a function of datasetGroup or datasetSubGroup
         ggplotsExtr$combined <- list()
@@ -490,16 +504,16 @@ SummarizeMultiToolsMultiDatasets <-
         ## PDF 2: Cosine similarity to ground-truth, TPR, PPV
         grDevices::pdf(paste0(out.dir,"/combined.measures.wo.composite.pdf"),
                        width = 7,
-                       height = 7,
+                       height = 3.5 * ceiling(length(ggplotsExtr$WOComposite) / 2),
                        pointsize = 1)
         plot(ggplotsExtr$combinedWOComp)
         grDevices::dev.off()
 
 
-        ## PDF 3 and 4: all measures, against datasetGroupName or datsetSubGroupName
+        ## PDF 3: all measures, against datasetGroupName or datsetSubGroupName
         grDevices::pdf(paste0(out.dir,"/combined.measures.additional.pdf"),
                        width = 7,
-                       height = 10.5,
+                       height = 1.75 * (length(ggplotsExtr$WOComposite) + 1),
                        pointsize = 1)
         for(by in names(ggplotsExtr$combined)){
           print(ggplotsExtr$combined[[by]])
