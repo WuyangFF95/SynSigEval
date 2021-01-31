@@ -57,13 +57,13 @@ SummarizeMultiToolsMultiDatasets <-
     ## all runs and for all datasets
     {
       indexes <- c("averCosSim","falseNeg","falsePos",
-                   "truePos","TPR","PPV")
+                   "truePos","PPV","TPR")
       indexLabels <- c("averCosSim" = "Average cosine similarity of all signatures",
                        "falseNeg" = "False negatives",
                        "falsePos" = "False positives",
                        "truePos" = "True positives",
+					   "PPV" = "Positive predictive value",
                        "TPR" = "True positive rate",
-                       "PPV" = "Positive predictive value",
                        "NumSigsExtracted" = "Number of signatures extracted",
                        "compositeMeasure" = "Composite measure")
       indexNums <- length(indexes)
@@ -135,10 +135,10 @@ SummarizeMultiToolsMultiDatasets <-
 
       ## Calculate composite measure for each computational approach.
       ## It equals to:
-      ## True Positive Rate (TPR) + Positive Predictive Value (PPV)
+      ## Positive Predictive Value (PPV) + True Positive Rate (TPR)
       ## Cosine similarity to each of signature (SBS1 and SBS5 in SBS1-SBS5 paper)
       FinalExtr$compositeMeasure <- FinalExtr$TPR
-      FinalExtr$compositeMeasure$value <- FinalExtr$TPR$value + FinalExtr$PPV$value
+      FinalExtr$compositeMeasure$value <- FinalExtr$PPV$value + FinalExtr$TPR$value
       for(gtSigName in gtSigNames){
         FinalExtr$compositeMeasure$value <- FinalExtr$compositeMeasure$value + FinalExtr$cosSim[[gtSigName]]$value
       }
@@ -250,7 +250,7 @@ SummarizeMultiToolsMultiDatasets <-
       ## Combine all extraction measurements, FinalExtr[[index]] into FinalExtr$Combined
       ## combined all one-signature cosine similarity, FinalExtr[[gtSigName]] into FinalExtr$Combined
       FinalExtr$combined <- data.frame()
-      for(index in c("NumSigsExtracted","TPR","PPV")){
+      for(index in c("NumSigsExtracted","PPV","TPR")){
         plotDFOneMeasure <- data.frame(
           FinalExtr[[index]], indexLabel = indexLabels[index],
           row.names = NULL)
@@ -322,7 +322,7 @@ SummarizeMultiToolsMultiDatasets <-
           plotLabels$compositeMeasure <- indexLabels["compositeMeasure"]
         }
 
-        for(measure in c("NumSigsExtracted","TPR","PPV")){
+        for(measure in c("NumSigsExtracted","PPV","TPR")){
           ## data.frame to be plotted in the panel
           plotDFList[[measure]] <- FinalExtr[[measure]]
           ## Text on Y axis
@@ -343,7 +343,7 @@ SummarizeMultiToolsMultiDatasets <-
       ## Plot violin plots for extraction summary.
       ##
       ## Page 1: composite measure
-      ## Page 2: combination of measures (Cosine similarity to ground-truth signatures, TPR, PPV)
+      ## Page 2: combination of measures (Cosine similarity to ground-truth signatures, PPV, TPR)
       ## Page 3: extraction measures as a function of correlation
       ## Page 4: extraction measures as a function of signature counts ratio
       {
@@ -400,7 +400,7 @@ SummarizeMultiToolsMultiDatasets <-
           ggplotsExtr$WOComposite[[paste0("cosSimTo",gtSigName)]] <- plottingFunc(plotDFList$cosSim[[gtSigName]],plotLabels$cosSim[[gtSigName]])
           ggplotsExtr$WOComposite[[paste0("NumSigsSimilarTo",gtSigName)]] <- plottingFunc(plotDFList$NumSigsSimilar[[gtSigName]],plotLabels$NumSigsSimilar[[gtSigName]])
         }
-        for(measure in c("NumSigsExtracted","TPR","PPV")){
+        for(measure in c("NumSigsExtracted","PPV","TPR")){
           ggplotsExtr$WOComposite[[measure]] <- plottingFunc(plotDFList[[measure]],indexLabels[measure])
         }
 
@@ -501,7 +501,7 @@ SummarizeMultiToolsMultiDatasets <-
         grDevices::dev.off()
 
 
-        ## PDF 2: Cosine similarity to ground-truth, TPR, PPV
+        ## PDF 2: Cosine similarity to ground-truth, PPV, TPR 
         grDevices::pdf(paste0(out.dir,"/combined.measures.wo.composite.pdf"),
                        width = 7,
                        height = 3.5 * ceiling(length(ggplotsExtr$WOComposite) / 2),
