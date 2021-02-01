@@ -1,6 +1,7 @@
 AggManhattanDist
 Alexandrov
 Attr
+CTM
 DBS
 DNS
 De
@@ -13,7 +14,9 @@ Jaegil
 MatchSigsAndRelabel
 MultiModalMuSig
 MutationalPatterns
+NMF
 NumSigsSimilar
+PCAWG
 PPV
 QP
 README
