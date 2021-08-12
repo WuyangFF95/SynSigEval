@@ -45,14 +45,16 @@ SummarizeMultiToolsMultiDatasets <- function(
   sort.by.composite.extraction.measure = "descending",
   overwrite = FALSE){
 
-  ## Create output directory
+  #### I. Create output directory
   if (dir.exists(out.dir)) {
     if (!overwrite) stop(out.dir, " already exits")
   } else {
     dir.create(out.dir, recursive = T)
   }
 
-  ## For each measure,
+  #### II. Summarize extraction performance
+
+  ## II.1. For each measure of extraction performance,
   ## Create a data.frame integrating results of
   ## all runs and for all datasets
   {
@@ -70,7 +72,7 @@ SummarizeMultiToolsMultiDatasets <- function(
   }
 
 
-  ## Combining measures for extraction performance
+  ## II.2 Combining measures for extraction performance
   ## into list "FinalExtr".
   ## Showing individual values rather than
   ## only showing mean and standard deviation of multiple runs
@@ -165,7 +167,7 @@ SummarizeMultiToolsMultiDatasets <- function(
   }
 
 
-  ## Generating csv tables for extraction performance measure
+  ## II.3 Generating csv tables for extraction performance measure
   ## and cosine similarities.
   {
     ## Output combined extraction
@@ -242,292 +244,11 @@ SummarizeMultiToolsMultiDatasets <- function(
   }
 
 
-  ## To generate page 3 and page 4 in
-  ## extraction summary plots,
-  ## values of different measures need to be
-  ## merged into one data.frame.
+  #### III. Check whether OneToolSummary$AggManhattanDist exists.
+  #### Summarize aggregated scaled Manhattan distance only if
+  #### it exists; otherwise, return results of extraction measures
+  #### and exit the function.
   {
-    ## Combine all extraction measurements, FinalExtr[[index]] into FinalExtr$Combined
-    ## combined all one-signature cosine similarity, FinalExtr[[gtSigName]] into FinalExtr$Combined
-    FinalExtr$combined <- data.frame()
-    for(index in c("NumSigsExtracted","PPV","TPR")){
-      plotDFOneMeasure <- data.frame(
-        FinalExtr[[index]], indexLabel = indexLabels[index],
-        row.names = NULL)
-      rownames(plotDFOneMeasure) <- NULL
-      FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
-    }
-
-    plotDFOneMeasure <- data.frame(
-      FinalExtr$compositeMeasure, indexLabel = "Composite measure",
-      row.names = NULL)
-    rownames(plotDFOneMeasure) <- NULL
-    FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
-
-    for(gtSigName in gtSigNames){
-      plotDFOneMeasure <- data.frame(
-        FinalExtr$cosSim[[gtSigName]], indexLabel = paste0("Cosine similarity to ",gtSigName),
-        row.names = NULL)
-      rownames(plotDFOneMeasure) <- NULL
-      FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
-    }
-
-    for(gtSigName in gtSigNames){
-      plotDFOneMeasure <- data.frame(
-        FinalExtr$NumSigsSimilar[[gtSigName]], indexLabel = paste0("Number of extracted signatures with cosine similarity > 0.9 to ",gtSigName),
-        row.names = NULL)
-      rownames(plotDFOneMeasure) <- NULL
-      FinalExtr$combined <- rbind(FinalExtr$combined,plotDFOneMeasure)
-    }
-
-
-    ## Convert FinalExtr$combined$datasetGroup and
-    ## Let their levels follow gtools::mixedsort() fashion
-    ## So that the order of the facet labels will be more reasonable for readers.
-    FinalExtr$combined$datasetGroup <- factor(
-      FinalExtr$combined$datasetGroup,
-      levels = gtools::mixedsort(unique(FinalExtr$combined$datasetGroup)))
-
-    if(!is.null(OneToolSummary$datasetSubGroupName)) {
-      FinalExtr$combined$datasetSubGroup <- factor(
-        FinalExtr$combined$datasetSubGroup,
-        levels = gtools::mixedsort(unique(FinalExtr$combined$datasetSubGroup)))
-    }
-  }
-
-
-
-  ## Plot general pdf for all extraction measures
-  ## Plot a general violin plot for multiple measures
-  ## in all runs and in all datasets.
-  {
-    ## Specify the titles of each measure.
-    {
-      ## Generate separate panels (Composite measure,
-      ## Cosine similarity to ground-truth signatures,
-      ## True positive rate, Positive predictive value)
-      ## and combine them using ggpubr::ggarrange
-      plotDFList <- list()
-      plotLabels <- list()
-      for(subList in c("cosSim","NumSigsSimilar")){
-        plotDFList[[subList]] <- list()
-        plotLabels[[subList]] <- list()
-      }
-
-      ## Composite measure needs to be plotted separately.
-      {
-        ## data.frame to be plotted in the panel
-        plotDFList$compositeMeasure <- FinalExtr$compositeMeasure
-        ## Text on Y axis
-        plotLabels$compositeMeasure <- indexLabels["compositeMeasure"]
-      }
-
-      for(measure in c("NumSigsExtracted","PPV","TPR")){
-        ## data.frame to be plotted in the panel
-        plotDFList[[measure]] <- FinalExtr[[measure]]
-        ## Text on Y axis
-        plotLabels[[measure]] <- indexLabels[measure]
-      }
-
-      for(gtSigName in gtSigNames){
-        ## data.frame to be plotted in the panel
-        plotDFList$cosSim[[gtSigName]] <- FinalExtr$cosSim[[gtSigName]]
-        plotDFList$NumSigsSimilar[[gtSigName]] <- FinalExtr$NumSigsSimilar[[gtSigName]]
-        ## Text on Y axis
-        plotLabels$cosSim[[gtSigName]] <- paste0("Cosine similarity to ",gtSigName)
-        plotLabels$NumSigsSimilar[[gtSigName]] <- paste0("# sigs resembling ",gtSigName)
-      }
-    }
-
-
-    ## Plot violin plots for extraction summary.
-    ##
-    ## Page 1: composite measure
-    ## Page 2: combination of measures (Cosine similarity to ground-truth signatures, PPV, TPR)
-    ## Page 3: extraction measures as a function of correlation
-    ## Page 4: extraction measures as a function of signature counts ratio
-    {
-      plottingFunc <- function(PlotDF,YCaption) {
-        ggObj <- ggplot2::ggplot(
-          PlotDF,
-          ggplot2::aes(x = .data$toolName, y = .data$value)) +
-          ## Draw geom_violin and geom_quasirandom
-          ggplot2::geom_violin(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            #ggplot2::aes(fill = index),
-            ## Maximize the violin plot width
-            scale = "width",
-            ## Make bandwidth larger
-            #position = "dodge",
-            #width = 1.2
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          ## Set the order of computational approaches to the
-          ## reordered-vector toolNames
-          ggplot2::scale_x_discrete(limits = toolNames) +
-          ## Show median of the extraction measure distribution, as a solid dot.
-          ggplot2::stat_summary(fun="median", geom="point", fill = "red", shape = 21) +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun="mean", geom="point", fill="blue", shape = 23) +
-          ## Change axis titles
-          ggplot2::labs(x = "Approach", y = YCaption) +
-          ## Rotate axis.text.x 90 degrees,
-          ## move axis.text.x right below the tick marks,
-          ## and remove legends.
-          ggplot2::theme(
-            axis.text.x = ggplot2::element_text(
-              ## Rotate the axis.text.x
-              angle = 90,
-              ## move axis.text.x right below the tick marks
-              hjust = 1,vjust = 0.5),
-            ## Make font size of facet label smaller.
-            strip.text = ggplot2::element_text(size = 10),
-            ## remove legends.
-            legend.position = "none")
-        return(ggObj)
-      }
-
-      ## ggplotObj for PDF 1: Composite measure
-      ggplotsExtr <- list()
-      ggplotsExtr$compositeMeasure <- plottingFunc(plotDFList$compositeMeasure,indexLabels["compositeMeasure"])
-
-      ## ggplotObj for PDF 2: combination of measures,
-      ## excluding composite measure.
-      ggplotsExtr$WOComposite <- list()
-      for(gtSigName in gtSigNames){
-        ggplotsExtr$WOComposite[[paste0("cosSimTo",gtSigName)]] <- plottingFunc(plotDFList$cosSim[[gtSigName]],plotLabels$cosSim[[gtSigName]])
-        ggplotsExtr$WOComposite[[paste0("NumSigsSimilarTo",gtSigName)]] <- plottingFunc(plotDFList$NumSigsSimilar[[gtSigName]],plotLabels$NumSigsSimilar[[gtSigName]])
-      }
-      for(measure in c("NumSigsExtracted","PPV","TPR")){
-        ggplotsExtr$WOComposite[[measure]] <- plottingFunc(plotDFList[[measure]],indexLabels[measure])
-      }
-
-      ggplotsExtr$combinedWOComp <- ggpubr::ggarrange(
-        plotlist = ggplotsExtr$WOComposite,
-        font.label = list(size = 14, color = "black", face = "bold", family = "sans"),
-        ncol = 2,
-        nrow = ceiling(length(ggplotsExtr$WOComposite)/2),
-        legend = "right",
-        common.legend = T
-      )
-
-      ## Plot a multi-facet ggplot,
-      ## facets are separated by measures and datasetGroup
-      ## (in example, it refers to slope.)
-      if(!is.null(OneToolSummary$datasetSubGroupName)) {
-        ## Generate page 3 and page 4
-        bys <- c("datasetGroup","datasetSubGroup")
-      } else{
-        ## Generate page 3 only.
-        bys <- c("datasetGroup")
-      }
-
-      ## PDF 3 with two pages:
-      ## combination of all measures,
-      ## as a function of datasetGroup or datasetSubGroup
-      ggplotsExtr$combined <- list()
-      for(by in bys)  {
-
-        ## The value of "datasetGroupName" or "datasetSubGroupName"
-        ## which is the caption of "datasetGroup"
-        byCaption <- eval(parse(text = paste0("OneToolSummary$",by,"Name")))
-
-        ## Generate a ggplot object based on FinalExtr$combined
-        ggplotsExtr$combined[[by]] <- ggplot2::ggplot(
-          FinalExtr$combined,
-          ggplot2::aes(x = .data$toolName, y = .data$value)) +
-          ## Draw geom_violin and geom_quasirandom
-          ggplot2::geom_violin(
-            ## Change filling color to white
-            fill = "#FFFFFF",
-            #ggplot2::aes(fill = index),
-            ## Maximize the violin plot width
-            scale = "width",
-            ## Make bandwidth larger
-            #position = "dodge",
-            #width = 1.2
-            ## Hide outliers
-            #outlier.shape = NA
-          ) +
-          ## Let the names of computational approaches
-          ## follow the order in toolNames.
-          ggplot2::scale_x_discrete(limits = toolNames) +
-          ## Show median of the extraction measure distribution, as a solid dot.
-          ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
-          ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-          ## Change axis titles
-          ggplot2::labs(x = "Approach") +
-          ## Remove axis.title.y (defaults to be "value", meaningless)
-          ## Rotate the axis.text.x (names of tools),
-          ## move axis.text.x right below the tick marks
-          ## and remove legends
-          ggplot2::theme(
-            ## Remove axis.title.y
-            axis.title.y = ggplot2::element_blank(),
-            axis.text.x = ggplot2::element_text(
-              ## Rotate the axis.text.x (names of tools)
-              angle = 90,
-              ## move axis.text.x right below the tick marks
-              hjust = 1, vjust = 0.5),
-            ## remove legends
-            legend.position = "none") +
-          ## Split the plot into multiple facets,
-          ## according to different measures
-          ggplot2::facet_grid(
-            rows =  ggplot2::vars(.data$indexLabel),
-            cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
-            scales = "free",
-            ## Let facet label to be print on multiple lines
-            labeller = ggplot2::label_wrap_gen(multi_line = T)
-          ) +
-          ## Make facet label font size smaller
-          ggplot2::theme(strip.text.y = ggplot2::element_text(size = 4)) +
-          ## Add title for general violin plot
-          ggplot2::ggtitle(
-            label = paste0("Measures of extraction performance as a function of"),
-            subtitle = paste0(byCaption,"."))
-      }
-      ## Plot violin plots in pdf format
-
-      ## PDF 1: Composite measure
-      grDevices::pdf(paste0(out.dir,"/compositeMeasure.pdf"),
-                     width = 3.5,
-                     height = 3.5, ## Make height larger
-                     pointsize = 1)
-      plot(ggplotsExtr$compositeMeasure)
-      grDevices::dev.off()
-
-
-      ## PDF 2: Cosine similarity to ground-truth, PPV, TPR
-      grDevices::pdf(paste0(out.dir,"/combined.measures.wo.composite.pdf"),
-                     width = 7,
-                     height = 3.5 * ceiling(length(ggplotsExtr$WOComposite) / 2),
-                     pointsize = 1)
-      plot(ggplotsExtr$combinedWOComp)
-      grDevices::dev.off()
-
-
-      ## PDF 3: all measures, against datasetGroupName or datsetSubGroupName
-      grDevices::pdf(paste0(out.dir,"/combined.measures.additional.pdf"),
-                     width = 7,
-                     height = 1.75 * (length(ggplotsExtr$WOComposite) + 1),
-                     pointsize = 1)
-      for(by in names(ggplotsExtr$combined)){
-        print(ggplotsExtr$combined[[by]])
-      }
-      grDevices::dev.off()
-    }
-
-  }
-
-
-  ## Summarize aggregated scaled Manhattan distance only if
-  ## OneToolSummary$AggManhattanDist exists.
-  {
-    flagExposure <- TRUE
     ## Combine attribution assessment onto multiple sheets.
     ## Each sheet shows Scaled Manhattan distance for one mutational signature.
     for(toolSummaryPath in toolSummaryPaths){
@@ -535,220 +256,67 @@ SummarizeMultiToolsMultiDatasets <- function(
       OneToolSummary <- NULL
       load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
       if(is.null(OneToolSummary$AggManhattanDist)){
-        flagExposure <- FALSE
         message("Skip summarizing scaled Manhattan distance...\n")
-        break
+        ## Exit the function if AggManhattanDist does not
+        ## exist in OneToolSummary
+        FinalSummary <- list()
+        FinalSummary$FinalExtr <- FinalExtr
+        save(FinalSummary,file = paste0(out.dir,"/FinalSummary.RDa"))
+        invisible(FinalSummary)
       }
     }
   }
 
+  #### IV. Summarize scaled Manhattan distance
   ## Summarizing aggregated Scaled Manhattan distance results
-  if(flagExposure){
-    {
-      FinalAttr <- list()
-      FinalAttr$AggManhattanDist <- list()
-      ## Combine attribution assessment onto multiple sheets.
-      ## Each sheet shows Scaled Manhattan distance for one mutational signature.
-      for(toolSummaryPath in toolSummaryPaths){
-        ## Add OneToolSummary <- NULL to please R check
-        OneToolSummary <- NULL
-        load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
+  {
 
-        if(length(FinalAttr$AggManhattanDist) == 0){
-          for(gtSigName in gtSigNames) {
-            FinalAttr$AggManhattanDist[[gtSigName]] <- data.frame()
-          }
-        }
+    FinalAttr <- list()
+    FinalAttr$AggManhattanDist <- list()
+    ## Combine attribution assessment onto multiple sheets.
+    ## Each sheet shows Scaled Manhattan distance for one mutational signature.
+    for(toolSummaryPath in toolSummaryPaths){
+      ## Add OneToolSummary <- NULL to please R check
+      OneToolSummary <- NULL
+      load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
 
-        ## Combine Scaled Manhattan distance
-        for(gtSigName in gtSigNames){
-          FinalAttr$AggManhattanDist[[gtSigName]] <- rbind(
-            FinalAttr$AggManhattanDist[[gtSigName]],
-            OneToolSummary$AggManhattanDist[[gtSigName]])
+      if(length(FinalAttr$AggManhattanDist) == 0){
+        for(gtSigName in gtSigNames) {
+          FinalAttr$AggManhattanDist[[gtSigName]] <- data.frame()
         }
       }
 
-      ## For the purpose of SBS1-SBS5 paper,
-      ## don't output summary tables for aggregated scaled Manhattan distance.
-      if(FALSE){
-        for(gtSigName in gtSigNames){
-          output <- FinalAttr$AggManhattanDist[[gtSigName]]
-
-          colnames(output)[1] <- "Seed or run number"
-          colnames(output)[2] <- paste0("Scaled distance of ",gtSigName)
-          colnames(output)[3] <- "Name of computational approach"
-          colnames(output)[4] <- datasetGroupName
-          colnames(output)[5] <- datasetSubGroupName
-
-          write.csv(output,
-                    file = paste0(out.dir,"/Agg.ManhattanDist.",gtSigName,".csv"))
-        }
+      ## Combine Scaled Manhattan distance
+      for(gtSigName in gtSigNames){
+        FinalAttr$AggManhattanDist[[gtSigName]] <- rbind(
+          FinalAttr$AggManhattanDist[[gtSigName]],
+          OneToolSummary$AggManhattanDist[[gtSigName]])
       }
+    }
 
-      ## Plot general png and pdf for attribution Scaled Manhattan distance summary
-      ## Plot a general violin plot for multiple signatures
-      ## in all runs and in all datasets.
-      {
+    ## For the purpose of SBS1-SBS5 paper,
+    ## don't output summary tables for aggregated scaled Manhattan distance.
+    if(FALSE){
+      for(gtSigName in gtSigNames){
+        output <- FinalAttr$AggManhattanDist[[gtSigName]]
 
-        ## Combine all FinalAttr$AggManhattanDist[[gtSigName]] into FinalAttr$AggManhattanDist$Combined
-        FinalAttr$AggManhattanDist$combined <- data.frame()
-        for(gtSigName in gtSigNames){
-          plotDFOneMeasure <- data.frame(FinalAttr$AggManhattanDist[[gtSigName]], gtSigName = gtSigName)
-          FinalAttr$AggManhattanDist$combined <- rbind(FinalAttr$AggManhattanDist$combined,plotDFOneMeasure)
-        }
+        colnames(output)[1] <- "Seed or run number"
+        colnames(output)[2] <- paste0("Scaled distance of ",gtSigName)
+        colnames(output)[3] <- "Name of computational approach"
+        colnames(output)[4] <- datasetGroupName
+        colnames(output)[5] <- datasetSubGroupName
 
-        ## Convert FinalAttr$AggManhattanDist$combined$datasetGroup and
-        ## Let their levels follow gtools::mixedsort() fashion
-        ## So that the order of the facet labels will be more reasonable for readers.
-        FinalAttr$AggManhattanDist$combined$datasetGroup <- factor(
-          FinalAttr$AggManhattanDist$combined$datasetGroup,
-          levels = gtools::mixedsort(unique(FinalAttr$AggManhattanDist$combined$datasetGroup)))
-
-        if(!is.null(OneToolSummary$datasetSubGroupName)) {
-          FinalAttr$AggManhattanDist$combined$datasetSubGroup <- factor(
-            FinalAttr$AggManhattanDist$combined$datasetSubGroup,
-            levels = gtools::mixedsort(unique(FinalAttr$AggManhattanDist$combined$datasetSubGroup)))
-        }
-
-        ggplotList <- list()
-        ## Plot a multi-facet ggplot for all gtSigNames and all runs.
-        {
-          ## Generate a ggplot object based on FinalAttr$AggManhattanDist$combined
-          ggplotList$general <- ggplot2::ggplot(
-            FinalAttr$AggManhattanDist$combined,
-            ggplot2::aes(x = .data$toolName, y = .data$value)) +
-            ## Draw geom_violin and geom_quasirandom
-            ggplot2::geom_violin(
-              ## Change filling color to white
-              fill = "#FFFFFF",
-              #ggplot2::aes(fill = gtSigName),
-              ## Maximize the violin plot width
-              scale = "width",
-              ## Make bandwidth larger
-              #position = "dodge",
-              #width = 1.2
-              ## Hide outliers
-              #outlier.shape = NA
-            ) +
-            ## Show median of the Scaled Manhattan distance distribution
-            ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
-            ## Show mean of the extraction meaasure distribution, as a blue diamond.
-            ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-            ## Add title for general violin plot
-            ggplot2::ggtitle(label = "Scaled aggregated Manhattan distance between inferred and ground-truth",
-                             subtitle = "exposures for all computational approaches, ratios and correlation values.") +
-            ## Change axis titles
-            ggplot2::labs(x = "Computational approach",
-                          y = "Scaled aggregated Manhattan distance") +
-            ## Rotate the names of tools,
-            ## move axis.text.x right below the tick marks
-            ## and remove legends
-            ggplot2::theme(axis.text.x = ggplot2::element_text(
-              ## Rotate the axis.text.x (names of tools),
-              angle = 90,
-              ## move axis.text.x right below the tick marks
-              hjust = 1, vjust = 0.5),
-              ## remove legends.
-              legend.position = "none") +
-            ## Split the plot into multiple facets,
-            ## according to different gtSigNames
-            ggplot2::facet_wrap(
-              ggplot2::vars(gtSigName),
-              ## Force facet_wrap to have 2 columns
-              ncol = 2,
-              scales = "free",
-              ## Let facets be plotted vertically
-              dir = "v"
-            ) +
-            ## Restrict the decimal numbers of values of measures to be 2
-            ggplot2::scale_y_continuous(
-              ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-              limits = c(0, max(FinalAttr$AggManhattanDist$combined$value)),
-              labels =function(x) sprintf("%.2f", x))
-        }
-        ## Plot a multi-facet ggplot,
-        ## facets are separated by gtSigNames and datasetGroup
-        ## (in example, it refers to slope.)
-        if(!is.null(OneToolSummary$datasetSubGroupName)) {
-          bys <- c("datasetGroup","datasetSubGroup")
-        } else {
-          bys <- c("datasetGroup")
-        }
-
-        for(by in bys)  {
-
-          ## The value of "datasetGroupName" or "datasetSubGroupName"
-          ## which is the caption of "datasetGroup"
-          byCaption <- eval(parse(
-            text = paste0("OneToolSummary$",by,"Name")))
-
-
-          ## Generate a ggplot object based on FinalAttr$AggManhattanDist$combined
-          ggplotList[[by]] <- ggplot2::ggplot(
-            FinalAttr$AggManhattanDist$combined,
-            ggplot2::aes(x = .data$toolName, y = .data$value))
-          ## Draw geom_violin and geom_quasirandom
-          ggplotList[[by]] <- ggplotList[[by]] +
-            ggplot2::geom_violin(
-              ## Change filling color to white
-              fill = "#FFFFFF",
-              #ggplot2::aes(fill = gtSigName),
-              ## Maximize the violin plot width
-              scale = "width"
-              #,
-              ## Make bandwidth larger
-              #position = "dodge",
-              #width = 1.2
-              ## Hide outliers
-              #outlier.shape = NA
-            ) +
-            ## Show median of the Scaled Manhattan distance distribution
-            ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
-            ## Show mean of the extraction meaasure distribution, as a blue diamond.
-            ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-            ## Add title for general violin plot
-            ggplot2::ggtitle(
-              label = paste0("Scaled aggregated Manhattan distance summary plot as a function of "),
-              subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
-            ## Change axis titles
-            ggplot2::labs(x = "Computational approach",
-                          y = "Scaled aggregated Manhattan distance") +
-            ## Rotate the axis.text.x (names of tools),
-            ## move axis.text.x right below the tick marks
-            ## and remove legends
-            ggplot2::theme(axis.text.x = ggplot2::element_text(
-              ## Rotate the axis.text.x (names of tools),
-              angle = 90,
-              ## move axis.text.x right below the tick marks
-              hjust = 1, vjust = 0.5),
-              ## remove legends.
-              legend.position = "none") +
-            ## Split the plot into multiple facets,
-            ## according to different gtSigNames
-            ggplot2::facet_grid(rows =  ggplot2::vars(gtSigName),
-                                cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
-                                scales = "free") +
-            ## Restrict the decimal numbers of values of measures to be 2
-            ggplot2::scale_y_continuous(
-              ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-              limits = c(0, max(FinalAttr$AggManhattanDist$combined$value)),
-              labels =function(x) sprintf("%.2f", x))
-        }
-
-        ## Plot violin plots in pdf format
-        grDevices::pdf(paste0(out.dir,"/Aggregated.Scaled.Manhattan.Dist.violins.pdf"), pointsize = 1)
-        for(by in names(ggplotList)){
-          print(ggplotList[[by]])
-        }
-        grDevices::dev.off()
+        write.csv(output,
+                  file = paste0(out.dir,"/Agg.ManhattanDist.",gtSigName,".csv"))
       }
     }
 
 
+
   }
 
-  ## Summarizing results for mean and stdev of separated Manhattan distance
-  if(flagExposure){
+  #### V. Summarizing results for mean and stdev of separated Manhattan distance
+  {
 
     fileNames = c(
       "meanSepMD" = "mean.of.sep.Scaled.Manhattan.dist",
@@ -758,8 +326,7 @@ SummarizeMultiToolsMultiDatasets <- function(
       "sdSepMD" = "Standard deviation of Manhattan distances of individual tumors"
     )
 
-    for(measure in c("meanSepMD", "sdSepMD"))
-    {
+    for(measure in c("meanSepMD", "sdSepMD")){
       FinalAttr[[measure]] <- list()
       ## Combine attribution assessment onto multiple sheets.
       ## Each sheet shows Scaled Manhattan distance for one mutational signature.
@@ -798,178 +365,16 @@ SummarizeMultiToolsMultiDatasets <- function(
                     file = paste0(out.dir,"/",fileNames[measure],".",gtSigName,".csv"))
         }
       }
-
-      ## Plot general png and pdf for attribution Scaled Manhattan distance summary
-      ## Plot a general violin plot for multiple signatures
-      ## in all runs and in all datasets.
-      {
-
-        ## Combine all FinalAttr[[measure]][[gtSigName]] into FinalAttr[[measure]]$Combined
-        FinalAttr[[measure]]$combined <- data.frame()
-        for(gtSigName in gtSigNames){
-          plotDFOneMeasure <- data.frame(FinalAttr[[measure]][[gtSigName]], gtSigName = gtSigName)
-          FinalAttr[[measure]]$combined <- rbind(FinalAttr[[measure]]$combined,plotDFOneMeasure)
-        }
-
-        ## Convert FinalAttr[[measure]]$combined$datasetGroup and
-        ## Let their levels follow gtools::mixedsort() fashion
-        ## So that the order of the facet labels will be more reasonable for readers.
-        FinalAttr[[measure]]$combined$datasetGroup <- factor(
-          FinalAttr[[measure]]$combined$datasetGroup,
-          levels = gtools::mixedsort(unique(FinalAttr[[measure]]$combined$datasetGroup)))
-
-        if(!is.null(OneToolSummary$datasetSubGroupName)) {
-          FinalAttr[[measure]]$combined$datasetSubGroup <- factor(
-            FinalAttr[[measure]]$combined$datasetSubGroup,
-            levels = gtools::mixedsort(unique(FinalAttr[[measure]]$combined$datasetSubGroup)))
-        }
-
-        ggplotList <- list()
-        ## Plot a multi-facet ggplot for all gtSigNames and all runs.
-        {
-          ## Generate a ggplot object based on FinalAttr[[measure]]$combined
-          ggplotList$general <- ggplot2::ggplot(
-            FinalAttr[[measure]]$combined,
-            ggplot2::aes(x = .data$toolName, y = .data$value)) +
-            ## Draw geom_violin and geom_quasirandom
-            ggplot2::geom_violin(
-              ## Change filling color to white
-              fill = "#FFFFFF",
-              #ggplot2::aes(fill = gtSigName),
-              ## Maximize the violin plot width
-              scale = "width",
-              ## Make bandwidth larger
-              #position = "dodge",
-              #width = 1.2
-              ## Hide outliers
-              #outlier.shape = NA
-            ) +
-            ## Show median of the Scaled Manhattan distance distribution
-            ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
-            ## Show mean of the extraction meaasure distribution, as a blue diamond.
-            ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-            ## Add title for general violin plot
-            ggplot2::ggtitle(label = titles[measure],
-                             subtitle = " between inferred and ground-truth exposures.") +
-            ## Change axis titles
-            ggplot2::labs(x = "Computational approach",
-                          y = titles[measure]) +
-            ## Rotate the names of tools,
-            ## move axis.text.x right below the tick marks
-            ## and remove legends
-            ggplot2::theme(axis.text.x = ggplot2::element_text(
-              ## Rotate the axis.text.x (names of tools),
-              angle = 90,
-              ## move axis.text.x right below the tick marks
-              hjust = 1, vjust = 0.5),
-              ## remove legends.
-              legend.position = "none") +
-            ## Split the plot into multiple facets,
-            ## according to different gtSigNames
-            ggplot2::facet_wrap(
-              ggplot2::vars(gtSigName),
-              ## Force facet_wrap to have 2 columns
-              ncol = 2,
-              scales = "free",
-              ## Let facets be plotted vertically
-              dir = "v"
-            ) +
-            ## Restrict the decimal numbers of values of measures to be 2
-            ggplot2::scale_y_continuous(
-              ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-              limits = c(0, max(FinalAttr[[measure]]$combined$value)),
-              labels =function(x) sprintf("%.2f", x))
-        }
-        ## Plot a multi-facet ggplot,
-        ## facets are separated by gtSigNames and datasetGroup
-        ## (in example, it refers to slope.)
-        if(!is.null(OneToolSummary$datasetSubGroupName)) {
-          bys <- c("datasetGroup","datasetSubGroup")
-        } else {
-          bys <- c("datasetGroup")
-        }
-
-        for(by in bys)  {
-
-          ## The value of "datasetGroupName" or "datasetSubGroupName"
-          ## which is the caption of "datasetGroup"
-          byCaption <- eval(parse(
-            text = paste0("OneToolSummary$",by,"Name")))
-
-
-          ## Generate a ggplot object based on FinalAttr[[measure]]$combined
-          ggplotList[[by]] <- ggplot2::ggplot(
-            FinalAttr[[measure]]$combined,
-            ggplot2::aes(x = .data$toolName, y = .data$value))
-          ## Draw geom_violin and geom_quasirandom
-          ggplotList[[by]] <- ggplotList[[by]] +
-            ggplot2::geom_violin(
-              ## Change filling color to white
-              fill = "#FFFFFF",
-              #ggplot2::aes(fill = gtSigName),
-              ## Maximize the violin plot width
-              scale = "width"
-              #,
-              ## Make bandwidth larger
-              #position = "dodge",
-              #width = 1.2
-              ## Hide outliers
-              #outlier.shape = NA
-            ) +
-            ## Show median of the Scaled Manhattan distance distribution
-            ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
-            ## Show mean of the extraction meaasure distribution, as a blue diamond.
-            ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-            ## Add title for general violin plot
-            ggplot2::ggtitle(
-              label = paste0(titles[measure]," as a function of "),
-              subtitle = paste0("ground-truth signature names and ",byCaption,".")) +
-            ## Change axis titles
-            ggplot2::labs(x = "Computational approach",
-                          y = titles[measure]) +
-            ## Rotate the axis.text.x (names of tools),
-            ## move axis.text.x right below the tick marks
-            ## and remove legends
-            ggplot2::theme(axis.text.x = ggplot2::element_text(
-              ## Rotate the axis.text.x (names of tools),
-              angle = 90,
-              ## move axis.text.x right below the tick marks
-              hjust = 1, vjust = 0.5),
-              ## remove legends.
-              legend.position = "none") +
-            ## Split the plot into multiple facets,
-            ## according to different gtSigNames
-            ggplot2::facet_grid(rows =  ggplot2::vars(gtSigName),
-                                cols = eval(parse(text = paste0("ggplot2::vars(",by,")"))),
-                                scales = "free") +
-            ## Restrict the decimal numbers of values of measures to be 2
-            ggplot2::scale_y_continuous(
-              ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
-              limits = c(0, max(FinalAttr[[measure]]$combined$value)),
-              labels =function(x) sprintf("%.2f", x))
-        }
-
-        ## Plot violin plots in pdf format
-        grDevices::pdf(paste0(out.dir,"/",fileNames[measure],".pdf"), pointsize = 1)
-        for(by in names(ggplotList)){
-          print(ggplotList[[by]])
-        }
-        grDevices::dev.off()
-      }
     }
-
   }
 
 
-
+  #### VI. Return the list "FinalSummary" if
+  #### scaled Manhattan distance exists.
   FinalSummary <- list()
   FinalSummary$FinalExtr <- FinalExtr
-  if(flagExposure) {
-    FinalSummary$FinalAttr <- FinalAttr
-  }
-
+  FinalSummary$FinalAttr <- FinalAttr
   save(FinalSummary,file = paste0(out.dir,"/FinalSummary.RDa"))
-
   invisible(FinalSummary)
 }
 
