@@ -109,8 +109,8 @@ SummarizeOneToolMultiDatasets <-
                        "falseNeg" = "False negatives",
                        "falsePos" = "False positives",
                        "truePos" = "True positives",
-                       "TPR" = "True positive rate (TPR, sensitivity)",
-                       "PPV" = "Positive predictive value (PPV, precision)")
+                       "TPR" = "True positive rate",
+                       "PPV" = "Positive predictive value")
       subtitles <- c("averCosSim" = "",
                      "falseNeg" = "Number of missing ground-truth signatures",
                      "falsePos" = "Number of artefact signatures extracted, but different from ground-truth signatures",
