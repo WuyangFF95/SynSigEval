@@ -5,9 +5,7 @@
 
 <!-- badges: start -->
 
-[![Travis build
-status](https://travis-ci.com/WuyangFF95/SynSigEval.svg?branch=master)](https://travis-ci.com/WuyangFF95/SynSigEval)
-
+[![R-CMD-check](https://github.com/WuyangFF95/SynSigEval/workflows/R-CMD-check/badge.svg)](https://github.com/WuyangFF95/SynSigEval/actions)
 <!-- badges: end -->
 
 Assess the performance of mutational-signature analysis programs using
