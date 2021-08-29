@@ -35,7 +35,7 @@ jobs:
 
       - name: Setup R from r-lib
         uses: r-lib/actions/setup-r@v1
-          with:
+        with:
           r-version: ${{ matrix.config.r }}
           http-user-agent: ${{ matrix.config.http-user-agent }}
           use-public-rspm: true
