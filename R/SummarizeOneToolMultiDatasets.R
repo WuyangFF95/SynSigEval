@@ -189,7 +189,7 @@ SummarizeOneToolMultiDatasets <-
           ggplot2::facet_grid(
             rows = ggplot2::vars(datasetSubGroup),
             cols = ggplot2::vars(datasetGroup),
-            ## Move x facet labels to the right,
+            ## Move x facet labels to the bottom,
             ## This is to let the facet labels correspond to axis.title.
             switch = "x") +
           ## Draw violin and beeswarm plots on multi-facets.
@@ -350,7 +350,7 @@ SummarizeOneToolMultiDatasets <-
           ggplot2::facet_grid(
             rows = ggplot2::vars(datasetSubGroup),
             cols = ggplot2::vars(datasetGroup),
-            ## Move x facet labels to the right,
+            ## Move x facet labels to the bottom,
             ## This is to let the facet labels correspond to axis.title.
             switch = "x") +
           ## Draw beeswarm plots on multiple facets
@@ -509,7 +509,7 @@ SummarizeOneToolMultiDatasets <-
             ggplot2::facet_grid(
               rows = ggplot2::vars(datasetSubGroup),
               cols = ggplot2::vars(datasetGroup),
-              ## Move x facet labels to the right,
+              ## Move x facet labels to the bottom,
               ## This is to let the facet labels correspond to axis.title.
               switch = "x") +
             ## Draw beeswarm plots on multiple facets
@@ -650,7 +650,7 @@ SummarizeOneToolMultiDatasets <-
             ggplot2::facet_grid(
               rows = ggplot2::vars(datasetSubGroup),
               cols = ggplot2::vars(datasetGroup),
-              ## Move x facet labels to the right,
+              ## Move x facet labels to the bottom,
               ## This is to let the facet labels correspond to axis.title.
               switch = "x") +
             ## Draw beeswarm plots on multiple facets
@@ -790,7 +790,7 @@ SummarizeOneToolMultiDatasets <-
             ggplot2::facet_grid(
               rows = ggplot2::vars(datasetSubGroup),
               cols = ggplot2::vars(datasetGroup),
-              ## Move x facet labels to the right,
+              ## Move x facet labels to the bottom,
               ## This is to let the facet labels correspond to axis.title.
               switch = "x") +
             ## Draw beeswarm plots on multiple facets
