@@ -53,195 +53,13 @@ SummarizeMultiToolsMultiDatasets <- function(
   }
 
   #### II. Summarize extraction performance
+  FinalExtr <- SummarizeMultiToolsMultiDatasetsExtr(
+    toolSummaryPaths,
+    out.dir,
+    display.datasetName = FALSE,
+    sort.by.composite.extraction.measure = "descending",
+    overwrite = FALSE)
 
-  ## II.1. For each measure of extraction performance,
-  ## Create a data.frame integrating results of
-  ## all runs and for all datasets
-  {
-    indexes <- c("averCosSim","falseNeg","falsePos",
-                 "truePos","PPV","TPR")
-    indexLabels <- c("averCosSim" = "Average cosine similarity of all signatures",
-                     "falseNeg" = "False negatives",
-                     "falsePos" = "False positives",
-                     "truePos" = "True positives",
-                     "PPV" = "Positive predictive value",
-                     "TPR" = "True positive rate",
-                     "NumSigsExtracted" = "Number of signatures extracted",
-                     "compositeMeasure" = "Composite measure")
-    indexNums <- length(indexes)
-  }
-
-
-  ## II.2 Combining measures for extraction performance
-  ## into list "FinalExtr".
-  ## Showing individual values rather than
-  ## only showing mean and standard deviation of multiple runs
-  {
-    FinalExtr <- list()
-    toolNames <- character(0)
-    for(index in indexes) {
-      FinalExtr[[index]] <- data.frame()
-    }
-    FinalExtr$cosSim <- list()
-    FinalExtr$NumSigsSimilar <- list()
-
-
-    ## Combine extraction measures of different computational approaches:
-    toolNames <- character(0)
-    for(toolSummaryPath in toolSummaryPaths){
-      ## Add OneToolSummary <- NULL to please R check
-      OneToolSummary <- NULL
-      load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
-
-      datasetGroupName <- OneToolSummary$datasetGroupName
-      datasetSubGroupName <- OneToolSummary$datasetSubGroupName
-
-
-      ## Find tool names
-      toolName <- unique(OneToolSummary[["averCosSim"]][,"toolName"])
-      toolNames <- c(toolNames, toolName)
-
-      ## For each extraction measures,
-      ## merge values from multiple runs
-      ## into one data.frame FinalExtr$<measure_name>
-      ## and computational approaches for easier plotting.
-      for(index in indexes){
-        FinalExtr[[index]] <- rbind(FinalExtr[[index]],OneToolSummary[[index]])
-      }
-
-      ## Bind values of cosine similarity in OneToolSummary$cosSim into FinalExtr$cosSim
-      gtSigNames <- gtools::mixedsort(setdiff(names(OneToolSummary$cosSim),"combined"))
-
-      for(measure in c("cosSim","NumSigsSimilar")){
-
-        if(length(FinalExtr[[measure]]) == 0){
-          for(gtSigName in gtSigNames) {
-            FinalExtr[[measure]][[gtSigName]] <- data.frame()
-          }
-        }
-        for(gtSigName in gtSigNames){
-          FinalExtr[[measure]][[gtSigName]] <-
-            rbind(FinalExtr[[measure]][[gtSigName]],
-                  OneToolSummary[[measure]][[gtSigName]])
-        }
-
-      }
-
-    }
-
-    ## Calculate total number of signatures extracted in each run by each computational approach
-    ## It always equal to falsePos (number of false positives) + truePos (number of true positives)
-    FinalExtr$NumSigsExtracted <- FinalExtr$falsePos
-    FinalExtr$NumSigsExtracted$value <-
-      FinalExtr$NumSigsExtracted$value + FinalExtr$truePos$value
-
-    ## Calculate composite measure for each computational approach.
-    ## It equals to:
-    ## Positive Predictive Value (PPV) + True Positive Rate (TPR)
-    ## Cosine similarity to each of signature (SBS1 and SBS5 in SBS1-SBS5 paper)
-    FinalExtr$compositeMeasure <- FinalExtr$TPR
-    FinalExtr$compositeMeasure$value <- FinalExtr$PPV$value + FinalExtr$TPR$value
-    for(gtSigName in gtSigNames){
-      FinalExtr$compositeMeasure$value <- FinalExtr$compositeMeasure$value + FinalExtr$cosSim[[gtSigName]]$value
-    }
-
-    ## Order computational approaches according to their mean of composite measure
-    if(sort.by.composite.extraction.measure %in% c("ascending","descending")){
-
-      meanCOMPOSITE <- numeric(0)
-      for(tool in toolNames){
-        rowNums <- which(FinalExtr$compositeMeasure$toolName == tool)
-        meanVal <- mean(FinalExtr$compositeMeasure$value[rowNums])
-        names(meanVal) <- tool
-        meanCOMPOSITE <- c(meanCOMPOSITE, meanVal)
-      }
-      if(sort.by.composite.extraction.measure == "descending") {
-        meanCOMPOSITE <- gtools::mixedsort(meanCOMPOSITE,decreasing = T)
-      } else {
-        meanCOMPOSITE <- gtools::mixedsort(meanCOMPOSITE,decreasing = F)
-      }
-      ## Update order of toolNames.
-      toolNames <- names(meanCOMPOSITE)
-    }
-
-  }
-
-
-  ## II.3 Generating csv tables for extraction performance measure
-  ## and cosine similarities.
-  {
-    ## Output combined extraction
-    for(index in c(indexes,"NumSigsExtracted","compositeMeasure")){
-
-      output <- FinalExtr[[index]]
-
-      colnames(output)[1] <- "Seed or run number"
-      colnames(output)[2] <- indexLabels[index]
-      colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- "Name of mutational spectra dataset"
-      colnames(output)[5] <- datasetGroupName
-      colnames(output)[6] <- datasetSubGroupName
-
-      if(!display.datasetName){
-        ## Delete the 4th column,
-        ## which refers to the name of the corresponding
-        ## spectra dataset.
-        output <- output[,-4]
-      }
-
-      write.csv(output,
-                file = paste0(out.dir,"/",index,".csv"))
-    }
-
-
-    for(gtSigName in gtSigNames){
-
-      output <- FinalExtr$cosSim[[gtSigName]]
-
-      colnames(output)[1] <- "Seed or run number"
-      colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
-      colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- "Name of mutational spectra dataset"
-      colnames(output)[5] <- datasetGroupName
-      colnames(output)[6] <- datasetSubGroupName
-
-      if(!display.datasetName){
-        ## Delete the 4th column,
-        ## which refers to the name of the corresponding
-        ## spectra dataset.
-        output <- output[,-4]
-      }
-
-      write.csv(output,
-                file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"))
-    }
-
-    for(gtSigName in gtSigNames){
-
-      output <- FinalExtr$NumSigsSimilar[[gtSigName]]
-
-      colnames(output)[1] <- "Seed or run number"
-      colnames(output)[2] <- paste0("Number of software-reported signatures with ",
-                                    "cosine similarity > 0.9 to ",gtSigName)
-      colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- "Name of mutational spectra dataset"
-      colnames(output)[5] <- datasetGroupName
-      colnames(output)[6] <- datasetSubGroupName
-
-      if(!display.datasetName){
-        ## Delete the 4th column,
-        ## which refers to the name of the corresponding
-        ## spectra dataset.
-        output <- output[,-4]
-      }
-
-      write.csv(output,
-                file = paste0(out.dir,"/num.sigs.similar.to.",
-                              gtSigName,".csv"))
-    }
-
-
-  }
 
 
   #### III. Check whether OneToolSummary$AggManhattanDist exists.
@@ -262,111 +80,21 @@ SummarizeMultiToolsMultiDatasets <- function(
         FinalSummary <- list()
         FinalSummary$FinalExtr <- FinalExtr
         save(FinalSummary,file = paste0(out.dir,"/FinalSummary.RDa"))
-        invisible(FinalSummary)
+        return(FinalSummary)
       }
     }
   }
 
   #### IV. Summarize scaled Manhattan distance
   ## Summarizing aggregated Scaled Manhattan distance results
-  {
-
-    FinalAttr <- list()
-    FinalAttr$AggManhattanDist <- list()
-    ## Combine attribution assessment onto multiple sheets.
-    ## Each sheet shows Scaled Manhattan distance for one mutational signature.
-    for(toolSummaryPath in toolSummaryPaths){
-      ## Add OneToolSummary <- NULL to please R check
-      OneToolSummary <- NULL
-      load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
-
-      if(length(FinalAttr$AggManhattanDist) == 0){
-        for(gtSigName in gtSigNames) {
-          FinalAttr$AggManhattanDist[[gtSigName]] <- data.frame()
-        }
-      }
-
-      ## Combine Scaled Manhattan distance
-      for(gtSigName in gtSigNames){
-        FinalAttr$AggManhattanDist[[gtSigName]] <- rbind(
-          FinalAttr$AggManhattanDist[[gtSigName]],
-          OneToolSummary$AggManhattanDist[[gtSigName]])
-      }
-    }
-
-    ## For the purpose of SBS1-SBS5 paper,
-    ## don't output summary tables for aggregated scaled Manhattan distance.
-    if(FALSE){
-      for(gtSigName in gtSigNames){
-        output <- FinalAttr$AggManhattanDist[[gtSigName]]
-
-        colnames(output)[1] <- "Seed or run number"
-        colnames(output)[2] <- paste0("Scaled distance of ",gtSigName)
-        colnames(output)[3] <- "Name of computational approach"
-        colnames(output)[4] <- datasetGroupName
-        colnames(output)[5] <- datasetSubGroupName
-
-        write.csv(output,
-                  file = paste0(out.dir,"/Agg.ManhattanDist.",gtSigName,".csv"))
-      }
-    }
-
-
-
-  }
-
+  ##
   #### V. Summarizing results for mean and stdev of separated Manhattan distance
-  {
-
-    fileNames = c(
-      "meanSepMD" = "mean.of.sep.Scaled.Manhattan.dist",
-      "sdSepMD" = "stdev.of.sep.Scaled.Manhattan.dist")
-    titles = c(
-      "meanSepMD" = "Mean of Manhattan distances of individual tumors",
-      "sdSepMD" = "Standard deviation of Manhattan distances of individual tumors"
-    )
-
-    for(measure in c("meanSepMD", "sdSepMD")){
-      FinalAttr[[measure]] <- list()
-      ## Combine attribution assessment onto multiple sheets.
-      ## Each sheet shows Scaled Manhattan distance for one mutational signature.
-      for(toolSummaryPath in toolSummaryPaths){
-        ## Add OneToolSummary <- NULL to please R check
-        OneToolSummary <- NULL
-        load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
-
-        if(length(FinalAttr[[measure]]) == 0){
-          for(gtSigName in gtSigNames) {
-            FinalAttr[[measure]][[gtSigName]] <- data.frame()
-          }
-        }
-
-        ## Combine Scaled Manhattan distance
-        for(gtSigName in gtSigNames){
-          FinalAttr[[measure]][[gtSigName]] <- rbind(
-            FinalAttr[[measure]][[gtSigName]],
-            OneToolSummary[[measure]][[gtSigName]])
-        }
-      }
-
-      ## For the purpose of SBS1-SBS5 paper,
-      ## don't output summary tables for scaled Manhattan distance.
-      if(FALSE){
-        for(gtSigName in gtSigNames){
-          output <- FinalAttr[[measure]][[gtSigName]]
-
-          colnames(output)[1] <- "Seed or run number"
-          colnames(output)[2] <- paste0("Scaled distance of ",gtSigName)
-          colnames(output)[3] <- "Name of computational approach"
-          colnames(output)[4] <- datasetGroupName
-          colnames(output)[5] <- datasetSubGroupName
-
-          write.csv(output,
-                    file = paste0(out.dir,"/",fileNames[measure],".",gtSigName,".csv"))
-        }
-      }
-    }
-  }
+  FinalAttr <- SummarizeMultiToolsMultiDatasetsAttr(
+    toolSummaryPaths,
+    out.dir,
+    display.datasetName = FALSE,
+    sort.by.composite.extraction.measure = "descending",
+    overwrite = FALSE)
 
 
   #### VI. Return the list "FinalSummary" if
@@ -375,6 +103,6 @@ SummarizeMultiToolsMultiDatasets <- function(
   FinalSummary$FinalExtr <- FinalExtr
   FinalSummary$FinalAttr <- FinalAttr
   save(FinalSummary,file = paste0(out.dir,"/FinalSummary.RDa"))
-  invisible(FinalSummary)
+  return(FinalSummary)
 }
 
