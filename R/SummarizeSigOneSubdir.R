@@ -190,6 +190,13 @@ SummarizeSigOneSubdir <-
         write.csv(exposureDiff$aggregated,
                   file = paste0(outputPath,"/aggregatedExposureDifference.csv"),
                   quote = T)
+
+        ## Write TPR, PPV, and F1 sscore
+        ## for exposure inference measures.
+        write.csv(data.frame(exposureDiff$PPV, exposureDiff$TPR, exposureDiff$F1),
+                  file = paste0(outputPath,"/F1.measures.csv"),
+                  quote = T)
+
         # Write results of exposure inference measures,
         # in aggregated format for each tumor and each
         # ground-truth signature.

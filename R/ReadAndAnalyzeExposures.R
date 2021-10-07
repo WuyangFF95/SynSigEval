@@ -181,9 +181,47 @@ ReadAndAnalyzeExposures <-
 
     }
 
+    ## PPV: Positive Predictive Value for one tumor.
+    ## TPR: True Positive Rate for one tumor.
+    ## F1 score:
+    {
+      PPV <- TPR <- F1 <- numeric(length = ncol(inferredExposures))
+      names(PPV) <- names(TPR) <- names(F1) <- colnames(inferredExposures)
+
+      for (nTumor in 1:ncol(inferredExposures)) {
+
+        ## Ground-truth positive signatures
+        P <- names(which(gtExposures[,nTumor] > 0))
+        ## Discovered signatures
+        D <- names(which(inferredExposures[,nTumor]>0))
+
+        ## Calculate FP, FN and TP.
+        FP <- setdiff(D,P)
+        FN <- setdiff(P,D)
+        TP <- setdiff(P,FN)
+
+        ## Fetch the name of tumor.
+        tumor.name <- colnames(inferredExposures)[nTumor]
+
+        ## PPV (precision) = #TP / (#TP + # FP)
+        PPV[tumor.name] <- length(TP) / (length(TP) + length(FP))
+        ## TPR (recall) = #TP / #P = #TP / (#TP + #FN)
+        TPR[tumor.name] <- length(TP) / length(P)
+        ## F1 score, harmonic mean of PPV (precision) and TPR (recall),
+        ## also equals to #TP / [#TP + (#FP + #FN) / 2].
+        F1[tumor.name] <-
+          length(TP) / (length(TP) + (length(FP) + length(FN))/2 )
+      }
+
+
+    }
+
     exposureDiff <- list(
       aggregated = aggregated,
-      separated = separated
+      separated = separated,
+      PPV = PPV,
+      TPR = TPR,
+      F1 = F1
     )
 
     return(exposureDiff)
