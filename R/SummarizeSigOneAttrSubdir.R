@@ -10,6 +10,8 @@
 #' algorithms. Therefore the naming of the results are slightly
 #' different from the other two packages.
 #'
+#' @inheritParams SummarizeSigOneSubdir
+#'
 #' @param run.dir Lowest level path to results, e.g.
 #' \code{<top.dir>}\code{/sa.sa.96/Attr/YAPSA.results/seed.1/}
 #' Here, \code{<top.dir>} refers to a top-level directory which contains the
@@ -34,7 +36,9 @@
 SummarizeSigOneAttrSubdir <-
   function(run.dir,
            ground.truth.exposure.dir = paste0(run.dir,"/../../../"),
-           overwrite = FALSE) {
+           overwrite = FALSE,
+           summary.folder.name = "summary",
+           export.Manhattan.each.spectrum = FALSE) {
 
     # Location of SigProfiler output, which is our input
     # inputPath may change if SigProExtractor updates!
@@ -53,7 +57,10 @@ SummarizeSigOneAttrSubdir <-
         ground.truth.exposure.dir = ground.truth.exposure.dir,
         extracted.sigs.path = ground.truth.sigs.path,
         inferred.exp.path = paste0(inputPath,"/inferred.exposures.csv"),
-        overwrite = overwrite)
+        summarize.exp = TRUE,
+        overwrite = overwrite,
+        summary.folder.name = summary.folder.name,
+        export.Manhattan.each.spectrum = export.Manhattan.each.spectrum)
 
     invisible(retval) # So we can test without looking at a file.
   }

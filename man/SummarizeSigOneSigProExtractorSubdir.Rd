@@ -12,7 +12,9 @@ SummarizeSigOneSigProExtractorSubdir(
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
   summarize.exp = TRUE,
   overwrite = FALSE,
-  hierarchy = FALSE
+  hierarchy = FALSE,
+  summary.folder.name = "summary",
+  export.Manhattan.each.spectrum = FALSE
 )
 }
 \arguments{
@@ -36,6 +38,12 @@ by \code{inferred.exp.path} exists.}
 \item{hierarchy}{Whether the user have enabled hierarchy = True when running SigProExtractor.
 specifying True or False into SigProExtractor will cause the program
 to generate different folder structure.}
+
+\item{summary.folder.name}{The name of the folder containing summary results.
+Usually, it equals to "summary".}
+
+\item{export.Manhattan.each.spectrum}{Whether to export csv files for Manhattan
+distance of each mutational spectrum.}
 }
 \description{
 Assess/evaluate results from SigProExtractor

@@ -77,6 +77,9 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 #' @param summary.folder.name The name of the folder containing summary results.
 #' Usually, it equals to "summary".
 #'
+#' @param export.Manhattan.each.spectrum Whether to export csv files for Manhattan
+#' distance of each mutational spectrum.
+#'
 #' @importFrom utils write.csv capture.output sessionInfo
 #'
 #' @keywords internal
@@ -90,7 +93,8 @@ SummarizeSigOneSubdir <-
            # TODO(Steve): copy this to the summary and do analysis on how much
            # extracted signature contributes to exposures.
            overwrite = FALSE,
-           summary.folder.name = "summary") {
+           summary.folder.name = "summary",
+           export.Manhattan.each.spectrum = FALSE) {
 
     ## Output path - path to dump the ReadAndAnalyzeSigs() results
     outputPath <- paste0(run.dir, "/", summary.folder.name)
@@ -199,13 +203,15 @@ SummarizeSigOneSubdir <-
         # Write results of exposure inference measures,
         # in aggregated format for each tumor and each
         # ground-truth signature.
-        for(spectrumName in names(exposureDiff$Manhattan)){
-          ## Replace all characters unsuitable for filenames.
-          cleanedName <- fs::path_sanitize(spectrumName, replacement = ".")
+        if(export.Manhattan.each.spectrum){
+          for(spectrumName in names(exposureDiff$Manhattan)){
+            ## Replace all characters unsuitable for filenames.
+            cleanedName <- fs::path_sanitize(spectrumName, replacement = ".")
 
-          write.csv(exposureDiff$Manhattan[[spectrumName]],
-                    file = paste0(outputPath,"/Manhattan.",cleanedName,".csv"),
-                    quote = T)
+            write.csv(exposureDiff$Manhattan[[spectrumName]],
+                      file = paste0(outputPath,"/Manhattan.",cleanedName,".csv"),
+                      quote = T)
+          }
         }
 
         # Copy inferred exposures to summary folder.

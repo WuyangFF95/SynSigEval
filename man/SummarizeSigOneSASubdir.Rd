@@ -9,7 +9,9 @@ SummarizeSigOneSASubdir(
   ground.truth.exposure.dir = paste0(run.dir, "/../../"),
   which.run = "/best.run/",
   summarize.exp = TRUE,
-  overwrite = FALSE
+  overwrite = FALSE,
+  summary.folder.name = "summary",
+  export.Manhattan.each.spectrum = FALSE
 )
 }
 \arguments{
@@ -43,6 +45,12 @@ containing the run to summarize.}
 \code{<run.dir>/<which.run>/sa.output.exp.csv} exists.}
 
 \item{overwrite}{If TRUE overwrite and files in existing \code{run.dir/summary} folder.}
+
+\item{summary.folder.name}{The name of the folder containing summary results.
+Usually, it equals to "summary".}
+
+\item{export.Manhattan.each.spectrum}{Whether to export csv files for Manhattan
+distance of each mutational spectrum.}
 }
 \description{
 Summarize results (SBS96, DBS, ID or COMPOSITE) from SignatureAnalyzer

@@ -11,7 +11,8 @@ SummarizeSigOneSubdir(
   inferred.exp.path = NULL,
   summarize.exp = TRUE,
   overwrite = FALSE,
-  summary.folder.name = "summary"
+  summary.folder.name = "summary",
+  export.Manhattan.each.spectrum = FALSE
 )
 }
 \arguments{
@@ -74,6 +75,9 @@ by \code{inferred.exp.path} exists.}
 
 \item{summary.folder.name}{The name of the folder containing summary results.
 Usually, it equals to "summary".}
+
+\item{export.Manhattan.each.spectrum}{Whether to export csv files for Manhattan
+distance of each mutational spectrum.}
 }
 \description{
 Note: For summarizing SigProExtractor or SignatureAnalyzer,

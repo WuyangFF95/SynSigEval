@@ -8,7 +8,9 @@ ONLY do exposure attribution.}
 SummarizeSigOneAttrSubdir(
   run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
-  overwrite = FALSE
+  overwrite = FALSE,
+  summary.folder.name = "summary",
+  export.Manhattan.each.spectrum = FALSE
 )
 }
 \arguments{
@@ -25,6 +27,12 @@ and \code{inferred.exposures.csv} are in the folder.}
 It defaults to be \code{sub.dir}, i.e. \code{run.dir}/../../}
 
 \item{overwrite}{If TRUE overwrite existing directories and files.}
+
+\item{summary.folder.name}{The name of the folder containing summary results.
+Usually, it equals to "summary".}
+
+\item{export.Manhattan.each.spectrum}{Whether to export csv files for Manhattan
+distance of each mutational spectrum.}
 }
 \description{
 Packages including but not limited to:

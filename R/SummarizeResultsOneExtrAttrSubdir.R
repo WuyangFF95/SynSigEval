@@ -19,7 +19,9 @@ SummarizeSigOneExtrAttrSubdir <-
   function(run.dir,
            ground.truth.exposure.dir = paste0(run.dir,"/../../../"),
            summarize.exp = TRUE,
-           overwrite = FALSE) {
+           overwrite = FALSE,
+           summary.folder.name = "summary",
+           export.Manhattan.each.spectrum = FALSE) {
 
     # Location of SigProfiler output, which is our input
     # inputPath may change if SigProExtractor updates!
@@ -42,7 +44,9 @@ SummarizeSigOneExtrAttrSubdir <-
         extracted.sigs.path = extracted.sigs.path,
         inferred.exp.path = inferred.exp.path,
         summarize.exp = summarize.exp,
-        overwrite = overwrite)
+        overwrite = overwrite,
+        summary.folder.name = summary.folder.name,
+        export.Manhattan.each.spectrum = export.Manhattan.each.spectrum)
 
     invisible(retval) # So we can test without looking at a file.
   }

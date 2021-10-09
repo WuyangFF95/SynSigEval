@@ -10,7 +10,9 @@ SummarizeSigOneExtrAttrSubdir(
   run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
   summarize.exp = TRUE,
-  overwrite = FALSE
+  overwrite = FALSE,
+  summary.folder.name = "summary",
+  export.Manhattan.each.spectrum = FALSE
 )
 }
 \arguments{
@@ -30,6 +32,12 @@ In SBS1-SBS5 paper: \code{0.Input_datasets/S.0.1.Rsq.0.1/}}
 by \code{inferred.exp.path} exists.}
 
 \item{overwrite}{If TRUE overwrite and files in existing \code{run.dir/summary} folder.}
+
+\item{summary.folder.name}{The name of the folder containing summary results.
+Usually, it equals to "summary".}
+
+\item{export.Manhattan.each.spectrum}{Whether to export csv files for Manhattan
+distance of each mutational spectrum.}
 }
 \description{
 Packages including but not limited to:

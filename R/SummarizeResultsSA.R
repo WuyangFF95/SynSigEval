@@ -36,7 +36,9 @@ SummarizeSigOneSASubdir <-
            ground.truth.exposure.dir = paste0(run.dir,"/../../"),
            which.run = "/best.run/",
            summarize.exp = TRUE,
-           overwrite = FALSE) {
+           overwrite = FALSE,
+           summary.folder.name = "summary",
+           export.Manhattan.each.spectrum = FALSE) {
     # Location of SigProfiler output, which is our input
     # inputPath may change if SigProExtractor updates!
     inputPath <- paste0(run.dir, "/", which.run)
@@ -50,7 +52,9 @@ SummarizeSigOneSASubdir <-
         extracted.sigs.path = paste0(inputPath,"/sa.output.sigs.csv"),
         inferred.exp.path = paste0(inputPath,"/sa.output.exp.csv"),
         summarize.exp = summarize.exp,
-        overwrite = overwrite)
+        overwrite = overwrite,
+        summary.folder.name = summary.folder.name,
+        export.Manhattan.each.spectrum = export.Manhattan.each.spectrum)
 
     invisible(retval)
   }

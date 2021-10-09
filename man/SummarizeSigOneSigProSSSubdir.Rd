@@ -8,7 +8,9 @@
 SummarizeSigOneSigProSSSubdir(
   run.dir,
   ground.truth.exposure.dir = paste0(run.dir, "/../../../"),
-  overwrite = FALSE
+  overwrite = FALSE,
+  summary.folder.name = "summary",
+  export.Manhattan.each.spectrum = FALSE
 )
 }
 \arguments{
@@ -27,6 +29,12 @@ defaults to \code{"ground.truth.syn.exposures.csv"}.
 This file can be found in the \code{sub.dir}, i.e. \code{<run.dir>/../../../}}
 
 \item{overwrite}{If TRUE overwrite existing directories and files.}
+
+\item{summary.folder.name}{The name of the folder containing summary results.
+Usually, it equals to "summary".}
+
+\item{export.Manhattan.each.spectrum}{Whether to export csv files for Manhattan
+distance of each mutational spectrum.}
 }
 \description{
 Assess/evaluate results from sigproSS
