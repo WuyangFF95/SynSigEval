@@ -63,167 +63,111 @@ ReadAndAnalyzeExposures <-
 
     ## Names of ground-truth signatures
     gtSigsNames <- colnames(sigMatch$gt.sigs)
+    ## Names of spectra
+    spectrumNames <- colnames(inferredExposures)
 
-    ## aggregated: a data.frame for aggregated exposure measures.
+    ## I. Manhattan: Manhattan distance and scaled Manhattan distance
+    ## for each individual spectrum:
     {
-      ## Initialize an empty data.frame for aggregated exposure difference
-      aggregated <- data.frame(matrix(0,nrow = length(gtSigsNames),ncol = 4))
-      rownames(aggregated) <- gtSigsNames
-      colnames(aggregated) <- c("Ground.truth.exposure", ## Sum of all tumor's ground-truth exposure to gtSigName
-                                "Inferred.exposure", ## Sum of all tumor's inferred exposure to gtSigName
-                                "Aggregated.Manhattan.distance", ## Sum of absolute difference (L1-norm) of two exposures to gtSigName for each tumor
-                                "Scaled.Aggregated.Manhattan.distance") ## Aggregated Manhattan Distance, scaled by the sum of
-      ## ground-truth exposures to gtSigName in all tumors
-
-      ## For each of the ground-truth signature, calculate the absolute difference
-      ## between its input (ground-truth) exposure and its inferred exposure.
-      ## Inferred exposure of a ground-truth signature equals to
-      ## exposures of the extracted signature most similar to
-      ## this ground-truth signature, and their cosine similarity needs to
-      ## be > 0.90.
-      for (gtSigName in gtSigsNames) {
-        matchedExtrSigIndex <- intersect(
-          which(rownames(sigMatch$match2) == gtSigName),
-          which(sigMatch$match2[,2] >= 0.9)
-        )
-
-        if (length(matchedExtrSigIndex) > 0)
-          ## 1 extracted signature in match2 matches to gtSigName
-          ## i.e. having highest cosine similarity.
-          matchedExtrSigName <- sigMatch$match2[matchedExtrSigIndex,1]
-        else ## No extracted signatures match to gtSigName
-          matchedExtrSigName <- NULL
-
-        for (nTumor in 1:ncol(inferredExposures)) {
-          ## Variable "nTumor" - the index of tumor scrutinized in this cycle.
-          ## Each cycle traverses one tumor, and calculate the absolute difference
-          ## between its inferred exposures and ground-truth exposures.
-          gtExposureOneTumor <- gtExposures[gtSigName,nTumor]
-          inferredExposureOneTumor <- ifelse(length(matchedExtrSigIndex) > 0,
-                                             yes = sum(inferredExposures[matchedExtrSigName,nTumor]),
-                                             no = 0)
-          aggregated[gtSigName,1] <- aggregated[gtSigName,1] + gtExposureOneTumor
-          aggregated[gtSigName,2] <- aggregated[gtSigName,2] + inferredExposureOneTumor
-          aggregated[gtSigName,3] <- aggregated[gtSigName,3] +
-            abs(gtExposureOneTumor - inferredExposureOneTumor)
-        }
+      Manhattan = list()
+      ## Initialize an empty data.frame for Manhattan distance for each tumor
+      for(spectrumName in spectrumNames){
+        Manhattan[[spectrumName]] <- data.frame(
+          "Ground.truth.exposure" = numeric(), ## ground-truth exposure to one signature in tumor "spectrumName"
+          "Inferred.exposure" = numeric(), ## inferred exposure
+          "Manhattan.distance" = numeric(), ## Absolute difference (L1-norm) of two exposure valuess
+          "Scaled.Manhattan.distance" = numeric()) ## Manhattan Distance, divided by the ground-truth exposure of each tumor to all signatures
       }
-
-      ## Only after the cycle, the aggregated[,c(1,3)] has been fixed.
-      ## The Scaled aggregated Manhattan distance should normalize against
-      ## the sum of exposures of one signature, not sum of exposures of all signatures.
-      ## This can prevent the underestimation of discrepancy between inferred
-      ## exposures and ground-truth exposures.
-      aggregated[,4] <- aggregated[,3] / aggregated[,1]
-    }
-
-    ## separated: Manhattan distance and scaled Manhattan distance
-    ## for each individual tumor:
-    {
-      separated = list()
-
-      ## Initialize an empty data.frame for aggregated exposure difference
-      for(gtSigName in gtSigsNames){
-        separated[[gtSigName]] <- data.frame(
-          "Ground.truth.exposure" = numeric(), ## Sum of all tumor's ground-truth exposure to gtSigsName
-          "Inferred.exposure" = numeric(), ## Sum of all tumor's inferred exposure to gtSigsName
-          "Manhattan.distance" = numeric(), ## Sum of absolute difference (L1-norm) of two exposure values for each tumor
-          "Scaled.Manhattan.distance" = numeric()) ## Manhattan Distance, scaled by the ground-truth exposure of each tumor to gtSigName
-      }
-
-
-      ## exposures of ground-truth signature in all tumors
-
-      for (gtSigName in gtSigsNames) {
-        matchedExtrSigIndex <- intersect(
-          which(rownames(sigMatch$match2) == gtSigName),
-          which(sigMatch$match2[,2] >= 0.9)
-        )
-
-        if (length(matchedExtrSigIndex) > 0)
-          ## 1 extracted signature in match2 matches to gtSigName
-          ## i.e. having highest cosine similarity.
-          matchedExtrSigName <- sigMatch$match2[matchedExtrSigIndex,1]
-        else ## No extracted signatures match to gtSigName
-          matchedExtrSigName <- NULL
-
-        for (nTumor in 1:ncol(inferredExposures)) {
-          ## nTumor refers to which tumor we are scrutinizing
-          ## Each cycle traverses one tumor, and calculate the absolute difference
-          ## between its inferred exposures and ground-truth exposures.
-          gtExposureOneTumor <- gtExposures[gtSigName,nTumor]
-          inferredExposureOneTumor <- ifelse(length(matchedExtrSigIndex) > 0,
-                                             yes = sum(inferredExposures[matchedExtrSigName,nTumor]),
-                                             no = 0)
-          values4OneTumor <- matrix(nrow = 1, ncol = 4)
-          values4OneTumor[1,1] <- gtExposureOneTumor
-          values4OneTumor[1,2] <- inferredExposureOneTumor
-          values4OneTumor[1,3] <- abs(gtExposureOneTumor - inferredExposureOneTumor)
+      for (spectrumName in spectrumNames) {
+        for (gtSigName in gtSigsNames) {
+          matchedExtrSigIndex <- intersect(
+            which(rownames(sigMatch$match2) == gtSigName),
+            which(sigMatch$match2[,2] >= 0.9)
+          )
+          if (length(matchedExtrSigIndex) > 0)
+            ## At least 1 extracted signature in match2 matches to gtSigName
+            ## i.e. having highest cosine similarity.
+            matchedExtrSigNames <- sigMatch$match2[matchedExtrSigIndex,1]
+          else ## No extracted signatures match to gtSigName
+            matchedExtrSigNames <- NULL
+          gtExposureOneSig <- gtExposures[gtSigName,spectrumName]
+          inferredExposureOneSig <- ifelse(length(matchedExtrSigIndex) > 0,
+                                           yes = sum(inferredExposures[matchedExtrSigNames,spectrumName]),
+                                           no = 0)
+          values4OneSig <- matrix(nrow = 1, ncol = 4)
+          values4OneSig[1,1] <- gtExposureOneSig
+          values4OneSig[1,2] <- inferredExposureOneSig
+          values4OneSig[1,3] <- abs(gtExposureOneSig - inferredExposureOneSig)
           ## Initializing 4-th column for Scaled Manhattan distance.
-          values4OneTumor[1,4] <- NA
-
-          colnames(values4OneTumor) <- c(
+          values4OneSig[1,4] <- NA
+          colnames(values4OneSig) <- c(
             "Ground.truth.exposure",
             "Inferred.exposure",
             "Manhattan.distance",
-            "Scaled.Manhattan.distance")
-
+            "Manhattan.distance.Scaled.by.Spectrum")
           ## Scaled Manhattan distance at 4-th column.
-          ## Manhattan distance of signature X / sum of ground-truth exposures of all tumors
-          ## of signature X.
-          separated[[gtSigName]] <- rbind(separated[[gtSigName]],values4OneTumor)
+          ## Manhattan distance of signature X / sum of ground-truth exposures to all signatures
+          ## in tumor "spectrumName".
+          Manhattan[[spectrumName]] <- rbind(Manhattan[[spectrumName]],values4OneSig)
         }
-
-        separated[[gtSigName]][,4] <- separated[[gtSigName]][,3] / colSums(separated[[gtSigName]])[1]
-
-        rownames(separated[[gtSigName]]) <- colnames(inferredExposures)
+        Manhattan[[spectrumName]][,4] <- Manhattan[[spectrumName]][,3] / colSums(Manhattan[[spectrumName]])[1]
+        rownames(Manhattan[[spectrumName]]) <- gtSigsNames
       }
-
     }
 
+    ## II. SumOfManhattan: a data.frame for sum of Manhattan distance for each mutational spectrum.
+    {
+      ## Initialize an empty data.frame for sum of Manhattan distance
+      SumOfManhattan <- data.frame(matrix(NA,nrow = length(spectrumNames),ncol = 4))
+      rownames(SumOfManhattan) <- spectrumNames
+      colnames(SumOfManhattan) <- c("Ground.truth.exposure", ## Sum of ground-truth exposure to all signatures' in one tumor
+                                "Inferred.exposure", ##Sum of inferred exposure to all signatures' in one tumor
+                                "Manhattan.distance", ## Sum of absolute difference (L1-norm) of ground-truth and inferred signatures to each of the signatures
+                                "Manhattan.distance.Scaled.by.Spectrum") ## Manhattan distance, divided by total ground-truth mutations in one spectrum
+      for (spectrumName in spectrumNames) {
+        SumOfManhattan[spectrumName,] <- colSums(Manhattan[[spectrumName]])
+      }
+    }
+
+    ## III. F1 score related measures: 
+	##
     ## PPV: Positive Predictive Value for one tumor.
     ## TPR: True Positive Rate for one tumor.
-    ## F1 score:
+    ## F1 score: Harmonic mean of PPV and TPR.
     {
       PPV <- TPR <- F1 <- numeric(length = ncol(inferredExposures))
       names(PPV) <- names(TPR) <- names(F1) <- colnames(inferredExposures)
-
-      for (nTumor in 1:ncol(inferredExposures)) {
-
+      for (spectrumName in spectrumNames) {
         ## Ground-truth positive signatures
-        P <- names(which(gtExposures[,nTumor] > 0))
+        P <- names(which(gtExposures[,spectrumName] > 0))
         ## Discovered signatures
-        D <- names(which(inferredExposures[,nTumor]>0))
+        D <- names(which(inferredExposures[,spectrumName] > 0))
 
         ## Calculate FP, FN and TP.
         FP <- setdiff(D,P)
         FN <- setdiff(P,D)
         TP <- setdiff(P,FN)
 
-        ## Fetch the name of tumor.
-        tumor.name <- colnames(inferredExposures)[nTumor]
-
         ## PPV (precision) = #TP / (#TP + # FP)
-        PPV[tumor.name] <- length(TP) / (length(TP) + length(FP))
+        PPV[spectrumName] <- length(TP) / (length(TP) + length(FP))
         ## TPR (recall) = #TP / #P = #TP / (#TP + #FN)
-        TPR[tumor.name] <- length(TP) / length(P)
+        TPR[spectrumName] <- length(TP) / length(P)
         ## F1 score, harmonic mean of PPV (precision) and TPR (recall),
         ## also equals to #TP / [#TP + (#FP + #FN) / 2].
-        F1[tumor.name] <-
+        F1[spectrumName] <-
           length(TP) / (length(TP) + (length(FP) + length(FN))/2 )
       }
-
-
     }
 
+    ## Final return value - exposureDiff.
     exposureDiff <- list(
-      aggregated = aggregated,
-      separated = separated,
-      PPV = PPV,
-      TPR = TPR,
-      F1 = F1
+      Manhattan = Manhattan,
+      SumOfManhattan = SumOfManhattan,
+	  F1.measures = data.frame(
+	   PPV = PPV,
+	   TPR = TPR,
+	   F1 = F1)
     )
-
     return(exposureDiff)
   }
 

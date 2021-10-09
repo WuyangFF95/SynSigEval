@@ -185,24 +185,26 @@ SummarizeSigOneSubdir <-
           ground.truth.exposures =
             paste0(ground.truth.exposure.dir,"/ground.truth.syn.exposures.csv"))
 
-        # Write results of exposure inference measures,
-        # in aggregated format
-        write.csv(exposureDiff$aggregated,
-                  file = paste0(outputPath,"/aggregatedExposureDifference.csv"),
+        # Write results of sum of Manhattan distance
+        write.csv(exposureDiff$SumOfManhattan,
+                  file = paste0(outputPath,"/SumOfManhattan.csv"),
                   quote = T)
 
         ## Write TPR, PPV, and F1 sscore
         ## for exposure inference measures.
-        write.csv(data.frame(exposureDiff$PPV, exposureDiff$TPR, exposureDiff$F1),
+        write.csv(exposureDiff$F1.measures,
                   file = paste0(outputPath,"/F1.measures.csv"),
                   quote = T)
 
         # Write results of exposure inference measures,
         # in aggregated format for each tumor and each
         # ground-truth signature.
-        for(gtSigName in names(exposureDiff$separated)){
-          write.csv(exposureDiff$separated[[gtSigName]],
-                    file = paste0(outputPath,"/separatedExposureDifference.",gtSigName,".csv"),
+        for(spectrumName in names(exposureDiff$Manhattan)){
+          ## Replace all characters unsuitable for filenames.
+          cleanedName <- fs::path_sanitize(spectrumName, replacement = ".")
+
+          write.csv(exposureDiff$Manhattan[[spectrumName]],
+                    file = paste0(outputPath,"/Manhattan.",cleanedName,".csv"),
                     quote = T)
         }
 
