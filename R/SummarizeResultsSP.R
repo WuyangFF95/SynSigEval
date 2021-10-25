@@ -1,7 +1,11 @@
-#' Assess/evaluate results from SigProExtractor
+#' Assess/evaluate results from SigProExtractor (v0.0.5.45+)
+#'
 #' SigProfiler-python de novo extraction and attribution package.
-#' Assessment is restricted to v0.0.5.43+,
+#' Assessment is restricted to v0.0.5.43 ~ v0.0.5.77,
 #' because different version has different folder structure.
+#'
+#' This function cannot be used on new SigProfilerExtractor
+#' (v1+) as the folder structure has been changed markedly
 #'
 #' @inheritParams SummarizeSigOneSubdir
 #'
@@ -40,6 +44,9 @@ SummarizeSigOneSigProExtractorSubdir <-
     } else if(dir.exists(paste0(run.dir,"/DBS78/"))) {
       flagDBS78 <- TRUE
       inputPath <- paste0(run.dir,"/DBS78/Suggested_Solution/De_Novo_Solution")
+    } else if (dir.exists(paste0(run.dir,"/DBS78/"))) {
+      flagID83 <- TRUE
+      inputPath <- paste0(run.dir,"/DBS78/Suggested_Solution/De_Novo_Solution")
     }
 
     stopifnot(dir.exists(inputPath))
@@ -52,6 +59,8 @@ SummarizeSigOneSigProExtractorSubdir <-
       extractedSigs <- ReadSigProfilerSigSBS96(paste0(inputPath,"/De_Novo_Solution_Signatures_SBS96.txt"))
     } else if(flagDBS78) {
       extractedSigs <- ReadSigProfilerSigDBS78(paste0(inputPath,"/De_Novo_Solution_Signatures_SBSDINUC.txt"))
+    } else if(flagID83) {
+      extractedSigs <- ReadSigProfilerSigID83(paste0(inputPath,"/De_Novo_Solution_Signatures_ID.txt"))
     }
 
     extractedSigs <- ICAMS::as.catalog(object = extractedSigs,

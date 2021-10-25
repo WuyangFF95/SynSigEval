@@ -58,6 +58,35 @@ ReadSigProfilerSigDBS78 <- function(file) {
   return(x)
 }
 
+#' Read a file containing ID83 signatures extracted by SigProfiler/Python
+#'
+#' @param file The name of the file to read.
+#'
+#' @return The corresponding signature matrix in standard internal
+#' representation.
+#'
+#' @importFrom utils read.table
+#'
+#' @export
+ReadSigProfilerSigID83 <- function(file) {
+  x <- utils::read.table(
+    file, sep = "\t",
+    as.is = TRUE, header = TRUE)
+  n <- x[ ,1]
+  x <- x[ , -1, drop = FALSE] ## x will still be a data.frame if x has only 2 columns
+  ## i.e. Only one signature has been extracted
+
+  # 1:Del:C:0 --> DEL:C:1:0
+  # 4:Del:R:5 --> DEL:repeats:4:5+
+  new.n <- ICAMS:::TransRownames.ID.SigPro.PCAWG(n)
+
+  rownames(x) <- new.n
+
+  x <- x[ICAMS::catalog.row.order[["ID"]], ,drop = FALSE]
+
+  return(x)
+}
+
 
 
 ## Turn this into a test

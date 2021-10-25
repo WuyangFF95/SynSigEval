@@ -2,10 +2,7 @@
 % Please edit documentation in R/SummarizeResultsSP.R
 \name{SummarizeSigOneSigProExtractorSubdir}
 \alias{SummarizeSigOneSigProExtractorSubdir}
-\title{Assess/evaluate results from SigProExtractor
-SigProfiler-python de novo extraction and attribution package.
-Assessment is restricted to v0.0.5.43+,
-because different version has different folder structure.}
+\title{Assess/evaluate results from SigProExtractor (v0.0.5.45+)}
 \usage{
 SummarizeSigOneSigProExtractorSubdir(
   run.dir,
@@ -46,8 +43,11 @@ Usually, it equals to "summary".}
 distance of each mutational spectrum.}
 }
 \description{
-Assess/evaluate results from SigProExtractor
 SigProfiler-python de novo extraction and attribution package.
-Assessment is restricted to v0.0.5.43+,
+Assessment is restricted to v0.0.5.43 ~ v0.0.5.77,
 because different version has different folder structure.
+}
+\details{
+This function cannot be used on new SigProfilerExtractor
+(v1+) as the folder structure has been changed markedly
 }
