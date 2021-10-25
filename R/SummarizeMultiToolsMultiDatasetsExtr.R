@@ -65,7 +65,9 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
 
 
       datasetGroupName <- OneToolSummary$datasetGroupName
-      datasetSubGroupName <- OneToolSummary$datasetSubGroupName
+      if(!is.null(OneToolSummary$datasetSubGroupName)) {
+        datasetSubGroupName <- OneToolSummary$datasetSubGroupName
+      }
 
 
       ## Find tool names
@@ -81,7 +83,7 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
       }
 
       ## Bind values of cosine similarity in OneToolSummary$cosSim into FinalExtr$cosSim
-	  if(!exists("gtSigNames"))
+      if(!exists("gtSigNames"))
         gtSigNames <- gtools::mixedsort(setdiff(names(OneToolSummary$cosSim),"combined"))
 
       for(measure in c("cosSim","NumSigsSimilar")){
@@ -152,7 +154,8 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
       colnames(output)[3] <- "Name of computational approach"
       colnames(output)[4] <- "Name of mutational spectra dataset"
       colnames(output)[5] <- datasetGroupName
-      colnames(output)[6] <- datasetSubGroupName
+      if(exists("datasetSubGroupName"))
+        colnames(output)[6] <- datasetSubGroupName
 
       if(!display.datasetName){
         ## Delete the 4th column,
@@ -175,7 +178,8 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
       colnames(output)[3] <- "Name of computational approach"
       colnames(output)[4] <- "Name of mutational spectra dataset"
       colnames(output)[5] <- datasetGroupName
-      colnames(output)[6] <- datasetSubGroupName
+      if(exists("datasetSubGroupName"))
+        colnames(output)[6] <- datasetSubGroupName
 
       if(!display.datasetName){
         ## Delete the 4th column,
@@ -198,7 +202,8 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
       colnames(output)[3] <- "Name of computational approach"
       colnames(output)[4] <- "Name of mutational spectra dataset"
       colnames(output)[5] <- datasetGroupName
-      colnames(output)[6] <- datasetSubGroupName
+      if(exists("datasetSubGroupName"))
+        colnames(output)[6] <- datasetSubGroupName
 
       if(!display.datasetName){
         ## Delete the 4th column,

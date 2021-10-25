@@ -56,7 +56,7 @@ SummarizeMultiToolsMultiDatasets <- function(
   FinalExtr <- SummarizeMultiToolsMultiDatasetsExtr(
     toolSummaryPaths,
     out.dir,
-    display.datasetName = FALSE,
+    display.datasetName = display.datasetName,
     sort.by.composite.extraction.measure = "descending",
     overwrite = FALSE)
 
@@ -92,7 +92,7 @@ SummarizeMultiToolsMultiDatasets <- function(
   FinalAttr <- SummarizeMultiToolsMultiDatasetsAttr(
     toolSummaryPaths,
     out.dir,
-    display.datasetName = FALSE,
+    display.datasetName = display.datasetName,
     sort.by.composite.extraction.measure = "descending",
     overwrite = FALSE)
 
