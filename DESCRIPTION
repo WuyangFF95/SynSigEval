@@ -2,7 +2,7 @@ Package: SynSigEval
 Type: Package
 Title: Evaluate Results of Mutational Signature Analysis Software 
   on Synthetic Spectra Created by Package SynSigGen
-Version: 0.2.3.9102
+Version: 0.2.3.9103
 Author: Steven G. Rozen, Yang Wu
 Maintainer: Steven G. Rozen <steverozen@gmail.com>
 Description: Examine and evaluate the output of mutational signature analysis computational approaches.
@@ -26,7 +26,7 @@ Imports:
     ggbeeswarm,
     gtools
 Remotes:
-    github::steverozen/ICAMSxtra@*release
+    github::steverozen/ICAMSxtra
 Depends: R (>= 3.5)
 RoxygenNote: 7.1.2
 Suggests: 
