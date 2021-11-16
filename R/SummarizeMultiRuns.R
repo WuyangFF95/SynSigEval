@@ -88,9 +88,6 @@ SummarizeMultiRuns <-
       ## one-signature cosine similarity.
       gtSigNames <- rownames(sigAnalysis$match2)
 
-      ## Concatenate average cosine similarity
-      averCosSim <- c(averCosSim,sigAnalysis$averCosSim)
-
       ## Concatenate true positive, true negative and false positive signatures.
       falseNegNames <- sigAnalysis$ground.truth.with.no.best.match
       falsePosNames <- sigAnalysis$extracted.with.no.best.match
@@ -98,6 +95,12 @@ SummarizeMultiRuns <-
       falseNeg <- c(falseNeg,length(falseNegNames))
       falsePos <- c(falsePos,length(falsePosNames))
       truePos <- c(truePos, length(truePosNames))
+
+      ## Average cosine similarity calculated as follows.
+      ## Different from original value returned from
+      ## ICAMSxtra::MatchSigsAndRelabel().
+      currentaverCosSim <- mean(sigAnalysis$match2[truePosNames,"sim"])
+      averCosSim <- c(averCosSim, currentaverCosSim)
 
       ## Concatenate TPR (True positive rate) and PPV (Positive predictive value)
       currentTPR <- length(truePosNames) / length(gtSigNames)
@@ -109,7 +112,7 @@ SummarizeMultiRuns <-
       for(gtSigName in gtSigNames) {
         if(is.null(cosSim[[gtSigName]]))
           cosSim[[gtSigName]] <- numeric(0)
-        cosSim[[gtSigName]] <- c(cosSim[[gtSigName]],sigAnalysis$cosSim[[gtSigName]])
+        cosSim[[gtSigName]] <- c(cosSim[[gtSigName]],sigAnalysis$match2[gtSigName,"sim"])
       }
 
       ## Concatenating number of extracted signatures
