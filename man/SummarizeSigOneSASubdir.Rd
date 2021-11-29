@@ -33,8 +33,8 @@ full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
 This code depends on a conventional directory structure documented
 elsewhere.}
 
-\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures. Should
-contain a file named \code{ground.truth.syn.exposures.csv}.
+\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures.
+Should contain a file named \code{ground.truth.syn.exposures.csv}.
 In PCAWG paper: \code{run.dir/../../}
 In SBS1-SBS5 paper: \code{0.Input_datasets/S.0.1.Rsq.0.1/}}
 

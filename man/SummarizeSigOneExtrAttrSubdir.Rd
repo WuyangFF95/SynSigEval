@@ -16,15 +16,15 @@ SummarizeSigOneExtrAttrSubdir(
 )
 }
 \arguments{
-\item{run.dir}{A directory which contains output of computational approach in one
-run on a specific dataset, possibly with a specified seed. E.g.
+\item{run.dir}{A directory which contains output of computational approach
+in one run on a specific dataset, possibly with a specified seed. E.g.
 \code{2b.Full_output_K_as_2/hdp.results/S.0.1.Rsq.0.1/seed.1/}.
 
 This code depends on a conventional directory structure documented
 in \code{NEWS.md}.}
 
-\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures. Should
-contain a file named \code{ground.truth.syn.exposures.csv}.
+\item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures.
+Should contain a file named \code{ground.truth.syn.exposures.csv}.
 In PCAWG paper: \code{run.dir/../../}
 In SBS1-SBS5 paper: \code{0.Input_datasets/S.0.1.Rsq.0.1/}}
 
