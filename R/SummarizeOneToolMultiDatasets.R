@@ -266,7 +266,7 @@ SummarizeOneToolMultiDatasets <-
     ## Summarize cosine similarity to each ground-truth signature
     ## and number of extracted signatures similar to each ground-truth
     ## signature for one tool.
-    {
+    if (FALSE) { # Temporarily disabled.
       OneToolSummary$cosSim <- list()
       OneToolSummary$NumSigsSimilar <- list()
 
@@ -322,7 +322,8 @@ SummarizeOneToolMultiDatasets <-
 
     ## Plot one-signature cosine similarity violin + beeswarm plot for one tool
     ## Only if there are two groupings.
-    if(!is.null(datasetSubGroup)) { ## debug
+    # if(!is.null(datasetSubGroup))
+    if (FALSE)  { ## debug
       ## Create a list to store ggplot2 violin + beeswarm plot objects
       ggplotList$cosSim <- list()
       ## Plot a value~datasetSubGroup beeswarm plot for each signature.
@@ -599,58 +600,60 @@ SummarizeOneToolMultiDatasets <-
                 quote = F, row.names = F)
     }
 
-    ## Write Summary tables for signature cosine similarity.
-    for(gtSigName in gtSigNames){
-      output <- OneToolSummary$cosSim[[gtSigName]]
+    # Temporarily disabled.
+    if (FALSE) {
+      ## Write Summary tables for signature cosine similarity.
+      for(gtSigName in gtSigNames){
+        output <- OneToolSummary$cosSim[[gtSigName]]
 
-      ## Change "value" to label of measure.
-      colnames(output)[1] <- "Seed or run number"
-      colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
-      colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- "Name of mutational spectra dataset"
-      colnames(output)[5] <- datasetGroupName
-      if(!is.null(datasetSubGroup))
-        colnames(output)[6] <- datasetSubGroupName
+        ## Change "value" to label of measure.
+        colnames(output)[1] <- "Seed or run number"
+        colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
+        colnames(output)[3] <- "Name of computational approach"
+        colnames(output)[4] <- "Name of mutational spectra dataset"
+        colnames(output)[5] <- datasetGroupName
+        if(!is.null(datasetSubGroup))
+          colnames(output)[6] <- datasetSubGroupName
 
-      if(!display.datasetName){
-        ## Delete the 4th column,
-        ## which refers to the name of the corresponding
-        ## spectra dataset.
-        output <- output[,-4]
+        if(!display.datasetName){
+          ## Delete the 4th column,
+          ## which refers to the name of the corresponding
+          ## spectra dataset.
+          output <- output[,-4]
+        }
+
+        write.csv(output,
+                  file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"),
+                  quote = F, row.names = F)
       }
 
-      write.csv(output,
-                file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"),
-                quote = F, row.names = F)
-    }
+      ## Write Summary tables for number of extracted sigs similar to
+      ## each ground-truth sig.
+      for(gtSigName in gtSigNames){
+        output <- OneToolSummary$NumSigsSimilar[[gtSigName]]
 
-    ## Write Summary tables for number of extracted sigs similar to
-    ## each ground-truth sig.
-    for(gtSigName in gtSigNames){
-      output <- OneToolSummary$NumSigsSimilar[[gtSigName]]
+        ## Change "value" to label of measure.
+        colnames(output)[1] <- "Seed or run number"
+        colnames(output)[2] <- paste0("Number of software-reported signatures with ",
+                                      "cosine similarity > 0.9 to ",gtSigName)
+        colnames(output)[3] <- "Name of computational approach"
+        colnames(output)[4] <- "Name of mutational spectra dataset"
+        colnames(output)[5] <- datasetGroupName
+        if(!is.null(datasetSubGroup))
+          colnames(output)[6] <- datasetSubGroupName
 
-      ## Change "value" to label of measure.
-      colnames(output)[1] <- "Seed or run number"
-      colnames(output)[2] <- paste0("Number of software-reported signatures with ",
-                                    "cosine similarity > 0.9 to ",gtSigName)
-      colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- "Name of mutational spectra dataset"
-      colnames(output)[5] <- datasetGroupName
-      if(!is.null(datasetSubGroup))
-        colnames(output)[6] <- datasetSubGroupName
+        if(!display.datasetName){
+          ## Delete the 4th column,
+          ## which refers to the name of the corresponding
+          ## spectra dataset.
+          output <- output[,-4]
+        }
 
-      if(!display.datasetName){
-        ## Delete the 4th column,
-        ## which refers to the name of the corresponding
-        ## spectra dataset.
-        output <- output[,-4]
+        write.csv(output,
+                  file = paste0(out.dir,"/num.sigs.similar.to.",gtSigName,".csv"),
+                  quote = F, row.names = F)
       }
-
-      write.csv(output,
-                file = paste0(out.dir,"/num.sigs.similar.to.",gtSigName,".csv"),
-                quote = F, row.names = F)
     }
-
 
     ## Write stat summary information into a text file.
     utils::capture.output(OneToolSummary$stats,file = paste0(out.dir,"/stats.txt"))

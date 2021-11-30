@@ -86,12 +86,12 @@ SummarizeMultiRuns <-
       ## Names of ground-truth signatures
       ## Useful-in calculating the average of
       ## one-signature cosine similarity.
-      gtSigNames <- rownames(sigAnalysis$match2)
+      gtSigNames <- colnames(sigAnalysis$gt.sigs)
 
       ## Concatenate true positive, true negative and false positive signatures.
       falseNegNames <- sigAnalysis$ground.truth.with.no.best.match
       falsePosNames <- sigAnalysis$extracted.with.no.best.match
-      truePosNames <- setdiff(gtSigNames,falseNegNames)
+      truePosNames <- sigAnalysis$ground.truth.with.best.match
       falseNeg <- c(falseNeg,length(falseNegNames))
       falsePos <- c(falsePos,length(falsePosNames))
       truePos <- c(truePos, length(truePosNames))
@@ -99,7 +99,7 @@ SummarizeMultiRuns <-
       ## Average cosine similarity calculated as follows.
       ## Different from original value returned from
       ## ICAMSxtra::MatchSigsAndRelabel().
-      currentaverCosSim <- mean(sigAnalysis$match2[truePosNames,"sim"])
+      currentaverCosSim <- sigAnalysis$averCosSim
       averCosSim <- c(averCosSim, currentaverCosSim)
 
       ## Concatenate TPR (True positive rate) and PPV (Positive predictive value)
@@ -108,28 +108,32 @@ SummarizeMultiRuns <-
       TPR <- c(TPR, currentTPR)
       PPV <- c(PPV, currentPPV)
 
-      ## Concatenating one-signature cosine similarity
-      for(gtSigName in gtSigNames) {
-        if(is.null(cosSim[[gtSigName]]))
-          cosSim[[gtSigName]] <- numeric(0)
-        cosSim[[gtSigName]] <- c(cosSim[[gtSigName]],sigAnalysis$match2[gtSigName,"sim"])
-      }
+      # Temporary disabled calculating one-signature cosine similarity
+      # TODO(Wuyang): Fix this part.
+      if (FALSE) {
+        ## Concatenating one-signature cosine similarity
+        for(gtSigName in gtSigNames) {
+          if(is.null(cosSim[[gtSigName]]))
+            cosSim[[gtSigName]] <- numeric(0)
+          cosSim[[gtSigName]] <- c(cosSim[[gtSigName]],sigAnalysis$match2[gtSigName,"sim"])
+        }
 
-      ## Concatenating number of extracted signatures
-      ## most similar to each ground-truth signature, with
-      ## pairwise cosine similarity greater than threshold
-      ## 0.9.
-      ##
-      ## This is to check oversplitting in results of
-      ## each computational approach.
-      for(gtSigName in gtSigNames) {
-        number.similar.sigs <- length(intersect(
-          which(sigAnalysis$match1$to == gtSigName),
-          which(sigAnalysis$match1$sim > 0.9)
-        ))
-        if(is.null(NumSigsSimilar[[gtSigName]]))
-          NumSigsSimilar[[gtSigName]] <- numeric(0)
-        NumSigsSimilar[[gtSigName]] <- c(NumSigsSimilar[[gtSigName]],number.similar.sigs)
+        ## Concatenating number of extracted signatures
+        ## most similar to each ground-truth signature, with
+        ## pairwise cosine similarity greater than threshold
+        ## 0.9.
+        ##
+        ## This is to check oversplitting in results of
+        ## each computational approach.
+        for(gtSigName in gtSigNames) {
+          number.similar.sigs <- length(intersect(
+            which(sigAnalysis$match1$to == gtSigName),
+            which(sigAnalysis$match1$sim > 0.9)
+          ))
+          if(is.null(NumSigsSimilar[[gtSigName]]))
+            NumSigsSimilar[[gtSigName]] <- numeric(0)
+          NumSigsSimilar[[gtSigName]] <- c(NumSigsSimilar[[gtSigName]],number.similar.sigs)
+        }
       }
     }
 
@@ -140,9 +144,11 @@ SummarizeMultiRuns <-
     names(truePos) <- run.names
     names(TPR) <- run.names
     names(PPV) <- run.names
-    for(gtSigName in gtSigNames){
-      names(cosSim[[gtSigName]]) <- run.names
-      names(NumSigsSimilar[[gtSigName]]) <- run.names
+    if (FALSE) {
+      for (gtSigName in gtSigNames) {
+        names(cosSim[[gtSigName]]) <- run.names
+        names(NumSigsSimilar[[gtSigName]]) <- run.names
+      }
     }
 
 
@@ -157,12 +163,13 @@ SummarizeMultiRuns <-
     multiRun$truePos <- truePos
     multiRun$TPR <- TPR
     multiRun$PPV <- PPV
-    ## Save one-signature cosine similarity on multiple runs
-    multiRun$cosSim <- cosSim
-    ## Save number of sigs similar to each ground-truth signature,
-    ## with cosine similarity > 0.9
-    multiRun$NumSigsSimilar <- NumSigsSimilar
-
+    if (FALSE) {
+      ## Save one-signature cosine similarity on multiple runs
+      multiRun$cosSim <- cosSim
+      ## Save number of sigs similar to each ground-truth signature,
+      ## with cosine similarity > 0.9
+      multiRun$NumSigsSimilar <- NumSigsSimilar
+    }
 
 
     ## Calculate mean and SD for indexes of signature extraction

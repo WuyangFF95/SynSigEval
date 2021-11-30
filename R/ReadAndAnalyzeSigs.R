@@ -36,7 +36,7 @@ ReadAndAnalyzeSigs <-
       ground.truth.exposures,check.names = F)
     # Rows are signatures, columns are samples.
 
-    retval <- ICAMSxtra::MatchSigsAndRelabel(ex.sigs, gt.sigs, exposure)
+    retval <- NewMatchSigsAndRelabel(ex.sigs, gt.sigs, exposure)
 
     ## If input gt.sigs is a ICAMS catalog,
     ## Move all the attributes of gt.sigs to retval::gt.sigs.

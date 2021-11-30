@@ -52,9 +52,10 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
     for(index in indexes) {
       FinalExtr[[index]] <- data.frame()
     }
-    FinalExtr$cosSim <- list()
-    FinalExtr$NumSigsSimilar <- list()
-
+    if (FALSE) { # Temporarily disabled.
+      FinalExtr$cosSim <- list()
+      FinalExtr$NumSigsSimilar <- list()
+    }
 
     ## Combine extraction measures of different computational approaches:
     toolNames <- character(0)
@@ -82,25 +83,26 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
         FinalExtr[[index]] <- rbind(FinalExtr[[index]],OneToolSummary[[index]])
       }
 
-      ## Bind values of cosine similarity in OneToolSummary$cosSim into FinalExtr$cosSim
-      if(!exists("gtSigNames"))
-        gtSigNames <- gtools::mixedsort(setdiff(names(OneToolSummary$cosSim),"combined"))
+      if (FALSE) { # Temporarily disabled
+        ## Bind values of cosine similarity in OneToolSummary$cosSim into FinalExtr$cosSim
+        if(!exists("gtSigNames"))
+          gtSigNames <- gtools::mixedsort(setdiff(names(OneToolSummary$cosSim),"combined"))
 
-      for(measure in c("cosSim","NumSigsSimilar")){
+        for(measure in c("cosSim","NumSigsSimilar")){
 
-        if(length(FinalExtr[[measure]]) == 0){
-          for(gtSigName in gtSigNames) {
-            FinalExtr[[measure]][[gtSigName]] <- data.frame()
+          if(length(FinalExtr[[measure]]) == 0){
+            for(gtSigName in gtSigNames) {
+              FinalExtr[[measure]][[gtSigName]] <- data.frame()
+            }
           }
-        }
-        for(gtSigName in gtSigNames){
-          FinalExtr[[measure]][[gtSigName]] <-
-            rbind(FinalExtr[[measure]][[gtSigName]],
-                  OneToolSummary[[measure]][[gtSigName]])
-        }
+          for(gtSigName in gtSigNames){
+            FinalExtr[[measure]][[gtSigName]] <-
+              rbind(FinalExtr[[measure]][[gtSigName]],
+                    OneToolSummary[[measure]][[gtSigName]])
+          }
 
+        }
       }
-
     }
 
     ## Calculate total number of signatures extracted in each run by each computational approach
@@ -115,8 +117,16 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
     ## Cosine similarity to each of signature (SBS1 and SBS5 in SBS1-SBS5 paper)
     FinalExtr$compositeMeasure <- FinalExtr$TPR
     FinalExtr$compositeMeasure$value <- FinalExtr$PPV$value + FinalExtr$TPR$value
-    for(gtSigName in gtSigNames){
-      FinalExtr$compositeMeasure$value <- FinalExtr$compositeMeasure$value + FinalExtr$cosSim[[gtSigName]]$value
+
+    # Counting average cosine similarity, rather than individual cosine similarity
+    # into the composite measure
+    if (TRUE) {
+      FinalExtr$compositeMeasure$value <-
+        FinalExtr$compositeMeasure$value + FinalExtr$averCosSim$value
+    } else {
+      for(gtSigName in gtSigNames){
+        FinalExtr$compositeMeasure$value <- FinalExtr$compositeMeasure$value + FinalExtr$cosSim[[gtSigName]]$value
+      }
     }
 
     ## Order computational approaches according to their mean of composite measure
@@ -168,53 +178,54 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
                 file = paste0(out.dir,"/",index,".csv"))
     }
 
+    if (FALSE) {
+      for(gtSigName in gtSigNames){
 
-    for(gtSigName in gtSigNames){
+        output <- FinalExtr$cosSim[[gtSigName]]
 
-      output <- FinalExtr$cosSim[[gtSigName]]
+        colnames(output)[1] <- "Seed or run number"
+        colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
+        colnames(output)[3] <- "Name of computational approach"
+        colnames(output)[4] <- "Name of mutational spectra dataset"
+        colnames(output)[5] <- datasetGroupName
+        if(exists("datasetSubGroupName"))
+          colnames(output)[6] <- datasetSubGroupName
 
-      colnames(output)[1] <- "Seed or run number"
-      colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
-      colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- "Name of mutational spectra dataset"
-      colnames(output)[5] <- datasetGroupName
-      if(exists("datasetSubGroupName"))
-        colnames(output)[6] <- datasetSubGroupName
+        if(!display.datasetName){
+          ## Delete the 4th column,
+          ## which refers to the name of the corresponding
+          ## spectra dataset.
+          output <- output[,-4]
+        }
 
-      if(!display.datasetName){
-        ## Delete the 4th column,
-        ## which refers to the name of the corresponding
-        ## spectra dataset.
-        output <- output[,-4]
+        write.csv(output,
+                  file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"))
       }
 
-      write.csv(output,
-                file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"))
-    }
+      for(gtSigName in gtSigNames){
 
-    for(gtSigName in gtSigNames){
+        output <- FinalExtr$NumSigsSimilar[[gtSigName]]
 
-      output <- FinalExtr$NumSigsSimilar[[gtSigName]]
+        colnames(output)[1] <- "Seed or run number"
+        colnames(output)[2] <- paste0("Number of software-reported signatures with ",
+                                      "cosine similarity > 0.9 to ",gtSigName)
+        colnames(output)[3] <- "Name of computational approach"
+        colnames(output)[4] <- "Name of mutational spectra dataset"
+        colnames(output)[5] <- datasetGroupName
+        if(exists("datasetSubGroupName"))
+          colnames(output)[6] <- datasetSubGroupName
 
-      colnames(output)[1] <- "Seed or run number"
-      colnames(output)[2] <- paste0("Number of software-reported signatures with ",
-                                    "cosine similarity > 0.9 to ",gtSigName)
-      colnames(output)[3] <- "Name of computational approach"
-      colnames(output)[4] <- "Name of mutational spectra dataset"
-      colnames(output)[5] <- datasetGroupName
-      if(exists("datasetSubGroupName"))
-        colnames(output)[6] <- datasetSubGroupName
+        if(!display.datasetName){
+          ## Delete the 4th column,
+          ## which refers to the name of the corresponding
+          ## spectra dataset.
+          output <- output[,-4]
+        }
 
-      if(!display.datasetName){
-        ## Delete the 4th column,
-        ## which refers to the name of the corresponding
-        ## spectra dataset.
-        output <- output[,-4]
+        write.csv(output,
+                  file = paste0(out.dir,"/num.sigs.similar.to.",
+                                gtSigName,".csv"))
       }
-
-      write.csv(output,
-                file = paste0(out.dir,"/num.sigs.similar.to.",
-                              gtSigName,".csv"))
     }
   }
 

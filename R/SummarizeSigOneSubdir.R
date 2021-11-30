@@ -133,31 +133,34 @@ SummarizeSigOneSubdir <-
       to.dir = outputPath,
       overwrite = TRUE)
 
-    # Writes bi-directional matching and cos.sim calculation
-    write.csv(sigAnalysis$match1,
-              file = paste(outputPath,"match1.csv",sep = "/"))
-    write.csv(sigAnalysis$match2,
-              file = paste(outputPath,"match2.csv",sep = "/"))
+    # Export matching table from ground-truth to extracted sigs
+    write.csv(sigAnalysis$table,
+              file = paste(outputPath,"match.gt.to.ex.csv",sep = "/"),
+              row.names = F)
+    # Export full cosine similarity table
+    write.csv(sigAnalysis$orig.matrix,
+              file = paste(outputPath,"full.cossims.gt.to.ex.csv",sep = "/"),
+              row.names = F)
 
     # Writes ground truth and extracted signatures
-    # write.cat.fn(
     ICAMS::WriteCatalog(
       sigAnalysis$gt.sigs,
       paste(outputPath,"ground.truth.sigs.csv",sep = "/"),
     )
-    # write.cat.fn
     ICAMS::WriteCatalog(
       sigAnalysis$ex.sigs,
       paste(outputPath,"extracted.sigs.csv",sep = "/"))
 
     # Dumps other outputs into "other.results.txt"
     capture.output(
-      cat("Cosine similarity to each ground-truth signature\n"),
-      sigAnalysis$cosSim,
+      cat("Average cosine similarity, only best matches are considered\n"),
+      sigAnalysis$averCosSim,
       cat("\nNumber of ground-truth signatures\n"),
       ncol(sigAnalysis$gt.sigs),
       cat("\nNumber of extracted signatures\n"),
       ncol(sigAnalysis$ex.sigs),
+      cat("\nTrue positive signatures\n"),
+      sigAnalysis$ground.truth.with.best.match,
       cat("\nFalse positive signatures\n"),
       sigAnalysis$extracted.with.no.best.match,
       cat("\nFalse negative signatures\n"),
