@@ -89,6 +89,7 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 #' distance of each mutational spectrum.
 #'
 #' @importFrom utils write.csv capture.output sessionInfo
+#' @importFrom gtools mixedsort
 #'
 #' @keywords internal
 
@@ -104,10 +105,18 @@ SummarizeSigOneSubdir <-
            summary.folder.name = "summary",
            export.Manhattan.each.spectrum = FALSE) {
 
-    ## Output path - path to dump the ReadAndAnalyzeSigs() results
-    outputPath <- paste0(run.dir, "/", summary.folder.name)
+    # Specify and create output directory -------------------------------------
 
-    ## Analyze signature extraction similarity
+    outputPath <- paste0(run.dir, "/", summary.folder.name)
+    if (dir.exists(outputPath)) {
+      if (!overwrite) stop(outputPath, " already exists")
+    }
+    suppressWarnings(dir.create(outputPath))
+
+
+
+    # Calculate signature extraction measures ---------------------------------
+
     sigAnalysis <-
       ReadAndAnalyzeSigs(
         extracted.sigs = extracted.sigs.path,
@@ -117,41 +126,80 @@ SummarizeSigOneSubdir <-
           paste0(ground.truth.exposure.dir,"/ground.truth.syn.exposures.csv")
       )
 
-    ## Workout for not breaking the downstream summarizing code
-    sigAnalysis$cosSim <- sigAnalysis$gt.mean.cos.sim
-    sigAnalysis$gt.mean.cos.sim <- NULL
+     # Temporary workaround.
+     # table does not have a correct column name.
+     # replace "gt,sig" with "gt.sig"
+     colnames(sigAnalysis$table)[2] <- "gt.sig"
 
-    if (dir.exists(outputPath)) {
-      if (!overwrite) stop(outputPath, " already exists")
-    }
-    suppressWarnings(dir.create(outputPath))
+     sigAnalysis$TP.ex.names <- sigAnalysis$table$ex.sig
+     sigAnalysis$TP.gt.names <- sigAnalysis$table$gt.sig
+     sigAnalysis$FP.names <-
+       setdiff(colnames(sigAnalysis$ex.sigs), sigAnalysis$table$ex.sig)
+     sigAnalysis$FN.names <-
+       setdiff(colnames(sigAnalysis$gt.sigs), sigAnalysis$table$gt.sig)
 
-    # Copies ground.truth exposures from second.level.dir
+     sigAnalysis$averCosSim <- sigAnalysis$avg.cos.sim
+     sigAnalysis$avg.cos.sim <- NULL
+     sigAnalysis$PPV <- sigAnalysis$TP / (sigAnalysis$TP + sigAnalysis$FP)
+     sigAnalysis$TPR <- sigAnalysis$TP / (sigAnalysis$TP + sigAnalysis$FN)
+
+
+
+     # Calculate best cosine similarity for each gt sig -----------------------
+
+     # gt sigs in sigAnalysis$table are gt sigs with best match.
+     # For these sigs, we directly record the cosSim values in $table.
+     cosSim_TP_gt <- numeric(0)
+     if(nrow(sigAnalysis$table) > 0) {
+       cosSim_TP_gt <- sigAnalysis$table$sim
+       names(cosSim_TP_gt) <- sigAnalysis$table$gt.sig
+     }
+
+     # For gt sigs which do not have a best match (and thus FN sigs),
+     # their best cosine similarity values are calculated in cosSim_FN
+     cosSim_FN <- numeric(0)
+     if(sigAnalysis$FN > 0) {
+       cosSim_FN <- numeric(sigAnalysis$FN)
+       names(cosSim_FN) <- sigAnalysis$FN.names
+       for(gt_sig_name in sigAnalysis$FN.names) {
+         cosSim_FN[gt_sig_name] <- max(sigAnalysis$sim.matrix[, gt_sig_name])
+       }
+     }
+     sigAnalysis$cosSim <- c(cosSim_TP_gt, cosSim_FN)
+
+
+
+
+
+    # Export results summary from sigAnalysis ---------------------------------
+
+    # Copy ground.truth exposures from second.level.dir
     # to outputPath == run.dir/<summary.folder.name>.
     CopyWithChecks(
-      from = paste0(ground.truth.exposure.dir,"/ground.truth.syn.exposures.csv"),
+      from = paste0(ground.truth.exposure.dir, "/ground.truth.syn.exposures.csv"),
       to.dir = outputPath,
       overwrite = TRUE)
 
-    # Export matching table from ground-truth to extracted sigs
+    # Export bi-lateral matching table between ground-truth amd extracted sigs
     write.csv(sigAnalysis$table,
               file = paste(outputPath,"match.gt.to.ex.csv",sep = "/"),
               row.names = F)
     # Export full cosine similarity table
-    write.csv(sigAnalysis$orig.matrix,
-              file = paste(outputPath,"full.cossims.gt.to.ex.csv",sep = "/"),
-              row.names = F)
+    write.csv(sigAnalysis$sim.matrix,
+              file = paste(outputPath,"full.cossims.ex.to.gt.csv",sep = "/"),
+              row.names = T)
 
-    # Writes ground truth and extracted signatures
+    # Export ground-truth sigs with non-zero ground-truth exposures
     ICAMS::WriteCatalog(
       sigAnalysis$gt.sigs,
       paste(outputPath,"ground.truth.sigs.csv",sep = "/"),
     )
+    # Export extracted signatures as-is
     ICAMS::WriteCatalog(
       sigAnalysis$ex.sigs,
       paste(outputPath,"extracted.sigs.csv",sep = "/"))
 
-    # Dumps other outputs into "other.results.txt"
+    # Exports other outputs into "other.results.txt"
     capture.output(
       cat("Average cosine similarity, only best matches are considered\n"),
       sigAnalysis$averCosSim,
@@ -159,37 +207,41 @@ SummarizeSigOneSubdir <-
       ncol(sigAnalysis$gt.sigs),
       cat("\nNumber of extracted signatures\n"),
       ncol(sigAnalysis$ex.sigs),
-      cat("\nTrue positive signatures\n"),
-      sigAnalysis$ground.truth.with.best.match,
+      cat("\nTrue positive ground-truth signatures\n"),
+      mixedsort(sigAnalysis$TP.gt.names),
+      cat("\nTrue positive extracted signatures\n"),
+      mixedsort(sigAnalysis$TP.ex.names),
       cat("\nFalse positive signatures\n"),
-      sigAnalysis$extracted.with.no.best.match,
+      mixedsort(sigAnalysis$FP.names),
       cat("\nFalse negative signatures\n"),
-      sigAnalysis$ground.truth.with.no.best.match,
+      mixedsort(sigAnalysis$FN.names),
       file = paste0(outputPath,"/other.results.txt"))
 
-    ## Plot signatures as "counts.signatures" typed catalog
-    ## Currently, ICAMS cannot plot COMPOSITE catalog.
-    ## TODO(Wuyang): To add a ICAMS:::PlotCatalog.COMPOSITECatalog function
 
-    # Output ground-truth sigs to a PDF file
+
+    # Plot signatures to PDF files --------------------------------------------
+
+    # Currently, ICAMS cannot plot COMPOSITE catalog.
+    # TODO(Wuyang): To add a ICAMS:::PlotCatalog.COMPOSITECatalog function
+
+    # Plot ground-truth sigs with non-zero ground-truth exposures
     if("COMPOSITECatalog" %in% class(sigAnalysis$gt.sigs) == FALSE){
       ICAMS::PlotCatalogToPdf(sigAnalysis$gt.sigs,
                               paste0(outputPath,"/ground.truth.sigs.pdf"))
     }
+    # Plot renamed and sorted extracted sigs
     if("COMPOSITECatalog" %in% class(sigAnalysis$ex.sigs) == FALSE){
-      # Output extracted sigs to a PDF file
       ICAMS::PlotCatalogToPdf(sigAnalysis$ex.sigs,
                               paste0(outputPath,"/extracted.sigs.pdf"))
     }
 
-    ## Analyze signature attribution (a.k.a. exposure inference)
-    # To be compatible with PCAWG project which only studies
-    # signature extraction not signature attribution,
-    # errors will not be thrown if !is.null(inferred.exp.path) == F.
-    # Here we shouldn't use "exists("attritbuted.exp.path")" because
-    # inferred.exp.path is defaulted to be NULL, but is always defined
-    # therefore exists.
-    if(!is.null(inferred.exp.path) & summarize.exp) {
+
+
+    # Summarize signature attribution (a.k.a. exposure inference) -------------
+
+    # Only when inferred.exp.path is not empty
+    # AND flag "summarize.exp" is set as TRUE
+    if(!is.null(inferred.exp.path) && summarize.exp == TRUE) {
 
       if(file.exists(inferred.exp.path)) {
         exposureDiff <- ReadAndAnalyzeExposures(
@@ -205,8 +257,8 @@ SummarizeSigOneSubdir <-
                   file = paste0(outputPath,"/SumOfManhattan.csv"),
                   quote = T)
 
-        ## Write TPR, PPV, and F1 sscore
-        ## for exposure inference measures.
+        # Write TPR, PPV, and F1 score
+        # for exposure inference measures.
         write.csv(exposureDiff$F1.measures,
                   file = paste0(outputPath,"/F1.measures.csv"),
                   quote = T)
@@ -235,21 +287,25 @@ SummarizeSigOneSubdir <-
       }
     }
 
-    ## Log of system time and session info
+
+
+    # Save and return result summary lists, and log file ----------------------
+
+    # Log of system time and session info
     capture.output(Sys.time(), sessionInfo(),
                    file = paste0(outputPath,"/assessment.sessionInfo.txt"))
 
-    ## Save Signature extraction summary into RDa file,
-    ## for reuse in SummarizeMultiRuns().
+    # Save Signature extraction summary in an RDa file,
+    # for reuse in SummarizeMultiRuns().
     save(sigAnalysis,
          file = paste0(outputPath,"/sigAnalysis.RDa"))
-    ## Save exposure inference summary into RDa file,
-    ## for reuse in SummarizeMultiRuns().
+    # Save exposure inference summary in an RDa file,
+    # for reuse in SummarizeMultiRuns().
     if(file.exists(inferred.exp.path) & summarize.exp){
       save(exposureDiff,
            file = paste0(outputPath,"/exposureDiff.RDa"))
     }
-
-    invisible(sigAnalysis) # So we have something to check in tests
+    # Returned for checking in tests
+    invisible(sigAnalysis)
   }
 

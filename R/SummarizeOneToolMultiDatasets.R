@@ -74,188 +74,196 @@ SummarizeOneToolMultiDatasets <-
            display.datasetName = FALSE,
            overwrite = FALSE){
 
-    ## Create output directory
+    # Create output directory -------------------------------------------------
     if (dir.exists(out.dir)) {
       if (!overwrite) stop(out.dir, " already exists")
     } else {
       dir.create(out.dir, recursive = T)
     }
 
-    ## Wrap all datasets into one group, if datasetGroup is NULL.
-    ## Re-order the dataset.group for better visualization of
-    ## ggplot facets.
-    {
-      if(is.null(datasetGroup))
-        datasetGroup <- rep("Default",length(datasetNames))
-      datasetGroup <- factor(
-        datasetGroup,
-        levels = gtools::mixedsort(unique(datasetGroup)))
-      names(datasetGroup) <- datasetNames
 
-      if(!is.null(datasetSubGroup)){
-        datasetSubGroup <- factor(
-          datasetSubGroup,
-          levels = gtools::mixedsort(unique(datasetSubGroup)))
-        names(datasetSubGroup) <- datasetNames
-      }
+
+    # Re-order groups (and subgroups if applicable) ---------------------------
+    if(is.null(datasetGroup))
+      datasetGroup <- rep("Default",length(datasetNames))
+    # Re-order the datasetGroup for better visualization of
+    # ggplot facets.
+    datasetGroup <- factor(
+      datasetGroup,
+      levels = gtools::mixedsort(unique(datasetGroup)))
+    names(datasetGroup) <- datasetNames
+
+    if(!is.null(datasetSubGroup)){
+      datasetSubGroup <- factor(
+        datasetSubGroup,
+        levels = gtools::mixedsort(unique(datasetSubGroup)))
+      names(datasetSubGroup) <- datasetNames
     }
 
-    ## Calculate summary tables for measures of extraction performance
-    ## Need to calculate tables for All 6 measures
-    {
-      indexes <- c("averCosSim","falseNeg","falsePos",
-                   "truePos","TPR","PPV")
-      indexLabels <- c("averCosSim" = "Average cosine similarity of all signatures",
-                       "falseNeg" = "False negatives",
-                       "falsePos" = "False positives",
-                       "truePos" = "True positives",
-                       "TPR" = "True positive rate",
-                       "PPV" = "Positive predictive value")
-      subtitles <- c("averCosSim" = "",
-                     "falseNeg" = "Number of missing ground-truth signatures",
-                     "falsePos" = "Number of artefact signatures extracted, but different from ground-truth signatures",
-                     "truePos" = "Number of extracted ground-truth signatures",
-                     "TPR" = "True Positives / (True Positives + False Negatives)",
-                     "PPV" = "True Positives / (True Positives + False Positives)")
-      names(indexLabels) <- indexes
-      names(subtitles) <- indexes
-      indexNums <- length(indexes)
 
-      ## Construct a summary list for storage
-      OneToolSummary <- list()
 
-      ## Combine each measurement for extraction performance for multiple datasets
-      ## in multiple runs onto one summary table:
-      for(datasetName in datasetNames){
-        thirdLevelDir <- paste0(toolPath,"/",datasetName)
-        toolName <- strsplit(basename(toolPath),".results")[[1]]
-        ## Add multiRun <- NULL to please R check
-        multiRun <- NULL
-        load(paste0(thirdLevelDir,"/multiRun.RDa"))
-        for(index in indexes){
-          measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
-                                           value = multiRun[[index]],
-                                           toolName = toolName,
-                                           datasetName = datasetName,
-                                           datasetGroup = datasetGroup[datasetName],
-                                           stringsAsFactors = FALSE)
-          if(!is.null(datasetSubGroup)){
-            measure4OneDataset <- data.frame(measure4OneDataset,
-                                             datasetSubGroup = datasetSubGroup[datasetName],
-                                             stringsAsFactors = FALSE)
-          }
+    # Specify titles and subtitles for plotting summary measures --------------
+    indexes <- c("averCosSim","falseNeg","falsePos",
+                 "truePos","TPR","PPV")
+    indexLabels <- c("averCosSim" = "Average cosine similarity of all signatures",
+                     "falseNeg" = "False negatives",
+                     "falsePos" = "False positives",
+                     "truePos" = "True positives",
+                     "TPR" = "True positive rate",
+                     "PPV" = "Positive predictive value")
+    subtitles <- c("averCosSim" = "",
+                   "falseNeg" = "Number of missing ground-truth signatures",
+                   "falsePos" = "Number of artefact signatures extracted, but different from ground-truth signatures",
+                   "truePos" = "Number of extracted ground-truth signatures",
+                   "TPR" = "True Positives / (True Positives + False Negatives)",
+                   "PPV" = "True Positives / (True Positives + False Positives)")
+    names(indexLabels) <- indexes
+    names(subtitles) <- indexes
+    indexNums <- length(indexes)
 
-          rownames(measure4OneDataset) <- NULL
 
-          ## Create a data.frame for each measure,
-          ## and summarize multi-Run, multiDataset values
-          ## for each measure.
-          if(is.null(OneToolSummary[[index]])){
-            OneToolSummary[[index]] <- data.frame()
-          }
-          OneToolSummary[[index]] <- rbind(OneToolSummary[[index]],measure4OneDataset)
-        }
-      }
 
-      ## Calculate the stats (returned by summary()) of each extraction performance measure.
-      OneToolSummary$stats <- list()
+    # Combine summary measures ------------------------------------------------
+
+    # Construct a summary list for storage
+    OneToolSummary <- list()
+
+    # Combine each measurement for extraction performance for multiple datasets
+    # in multiple runs onto one summary table:
+    for(datasetName in datasetNames){
+      thirdLevelDir <- paste0(toolPath,"/",datasetName)
+      toolName <- strsplit(basename(toolPath),".results")[[1]]
+      # Add multiRun <- NULL to please R check
+      multiRun <- NULL
+      load(paste0(thirdLevelDir,"/multiRun.RDa"))
       for(index in indexes){
-        currentStats <- summary(OneToolSummary[[index]][,"value"])
-        OneToolSummary$stats[[index]] <- currentStats
+        measure4OneDataset <- data.frame(seed = names(multiRun[[index]]),
+                                         value = multiRun[[index]],
+                                         toolName = toolName,
+                                         datasetName = datasetName,
+                                         datasetGroup = datasetGroup[datasetName],
+                                         stringsAsFactors = FALSE)
+        if(!is.null(datasetSubGroup)){
+          measure4OneDataset <- data.frame(measure4OneDataset,
+                                           datasetSubGroup = datasetSubGroup[datasetName],
+                                           stringsAsFactors = FALSE)
+        }
+
+        rownames(measure4OneDataset) <- NULL
+
+        # Create a data.frame for each measure,
+        # and summarize multi-Run, multiDataset values
+        # for each measure.
+        if(is.null(OneToolSummary[[index]])){
+          OneToolSummary[[index]] <- data.frame()
+        }
+        OneToolSummary[[index]] <-
+          rbind(OneToolSummary[[index]],measure4OneDataset)
       }
-
-      ## For TPR (sensitivity), PPV and Number of False Negatives,
-      ## calculate the proportion of 1.
-      OneToolSummary$prop1 <- list()
-      for(index in c("TPR","PPV","falseNeg")){
-        currentProp <- length(which(OneToolSummary[[index]][,"value"] == 1)) / length(OneToolSummary[[index]][,"value"])
-        OneToolSummary$prop1[[index]] <- currentProp
-      }
-
-
     }
 
-    ## Draw violin + beeswarm plot for extraction measures
-    ## Only if there are two groupings.
+    # Calculate the stats (returned by summary())
+    # of each extraction performance measure.
+    OneToolSummary$stats <- list()
+    for(index in indexes){
+      currentStats <- summary(OneToolSummary[[index]][,"value"])
+      OneToolSummary$stats[[index]] <- currentStats
+    }
+
+    # For TPR (sensitivity), PPV and Number of False Negatives,
+    # calculate the proportion of 1.
+    OneToolSummary$prop1 <- list()
+    for(index in c("TPR","PPV","falseNeg")){
+      currentProp <- length(which(OneToolSummary[[index]][,"value"] == 1)) /
+        length(OneToolSummary[[index]][,"value"])
+      OneToolSummary$prop1[[index]] <- currentProp
+    }
+
+
+
+
+
+    # Draw violin + beeswarm plot for extraction measures ---------------------
+    # Only if there are two groupings.
     if(!is.null(datasetSubGroup)) {
-      ## Create a list to store ggplot2 violin + beeswarm plot objects
+      # Create a list to store ggplot2 violin + beeswarm plot objects
       ggplotList <- list()
-      ## Plot a value~datasetSubGroup beeswarm for each measure.
+      # Plot a value~datasetSubGroup beeswarm for each measure.
       for(index in indexes){
         indexNum <- which(indexes == index)
-        ## ggplot2::ggplot() sets coordinates
+        # ggplot2::ggplot() sets coordinates
         ggplotList[[index]] <- ggplot2::ggplot(
           OneToolSummary[[index]],
-          ## Make sure that only one x-label is shown in one small facet.
+          # Make sure that only one x-label is shown in one small facet.
           #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
           ggplot2::aes(x = .data$toolName, y = .data$value)
         )
-        ## Add facets
+        # Add facets
         ggplotList[[index]] <- ggplotList[[index]] +
           ggplot2::facet_grid(
             rows = ggplot2::vars(datasetSubGroup),
             cols = ggplot2::vars(datasetGroup),
-            ## Move x facet labels to the bottom,
-            ## This is to let the facet labels correspond to axis.title.
+            # Move x facet labels to the bottom,
+            # This is to let the facet labels correspond to axis.title.
             switch = "x") +
-          ## Draw violin and beeswarm plots on multi-facets.
-          ## Draw geom_violin
+          # Draw violin and beeswarm plots on multi-facets.
+          # Draw geom_violin
           ggplot2::geom_violin(
-            ## Change filling color to white
+            # Change filling color to white
             fill = "#FFFFFF",
-            ## Maximize the violin plot width
+            # Maximize the violin plot width
             scale = "width"
           ) +
           ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
+          # Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-          ## Draw beeswarm plot
+          # Draw beeswarm plot
           ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
-                                       ## Make dot size smaller
+                                       # Make dot size smaller
                                        size = 0.3
                                        #,
-                                       ## Remove differentiated colors for beeswarm dots
-                                       ## Set groups for the filling functionalities to differentiate
+                                       # Remove differentiated colors for beeswarm dots
+                                       # Set groups for the filling functionalities to differentiate
                                        #ggplot2::aes(color = .data$datasetGroup)
           ) +
-          ## Change filling color
+          # Change filling color
           ggplot2::scale_fill_brewer(palette = "Greys") +
-          ## Change titles
-          ## and change axis titles.
-          ## ggplot2::labs() has stronger function than ggplo2::ggtitle.
+          # Change titles
+          # and change axis titles.
+          # ggplot2::labs() has stronger function than ggplo2::ggtitle.
           ggplot2::labs(
-            ## Add title for value~datasetSubGroup beeswarm plot,
+            # Add title for value~datasetSubGroup beeswarm plot,
             title = paste0(toolName,": ",indexLabels[index]),
             subtitle = subtitles[index],
-            ## Change title of y axis (axis.title.y) into measure info (same as title)
+            # Change title of y axis (axis.title.y) into measure info (same as title)
             y = indexLabels[index],
-            ## Change title of x axis to "Pearson's R squared"
+            # Change title of x axis to "Pearson's R squared"
             x = "Pearson's R squared") +
-          ## Change title of legend to datasetGroupName
+          # Change title of legend to datasetGroupName
           ggplot2::guides(color = ggplot2::guide_legend(title = datasetGroupName)) +
-          ## Change axis.text and tickmarks
+          # Change axis.text and tickmarks
           ggplot2::theme(
-            ## Remove axis.text.x
+            # Remove axis.text.x
             axis.text.x = ggplot2::element_blank(),
-            ## Remove tick marks on x axis (axis.ticks.x)
+            # Remove tick marks on x axis (axis.ticks.x)
             axis.ticks.x = ggplot2::element_blank(),
-            ## Remove entire legend
+            # Remove entire legend
             legend.position = "none"
           ) +
-          ## Restrict the decimal numbers of values of measures (y) to be 2
+          # Restrict the decimal numbers of values of measures (y) to be 2
           ggplot2::scale_y_continuous(
             labels =function(x) sprintf("%.2f", x),
-            ## Add a secondary axis title on the top of the plot
-            ## Showing axis label indicating facets
+            # Add a secondary axis title on the top of the plot
+            # Showing axis label indicating facets
             sec.axis = ggplot2::dup_axis(
-              breaks = NULL, ## Don't show axis breaks
-              labels = NULL, ## Don't show axis tickmarks
+              breaks = NULL, # Don't show axis breaks
+              labels = NULL, # Don't show axis tickmarks
               name = "SBS1:SBS5 mutation count ratio")
           )
       }
 
 
-      ## Output multiple extraction measures in a pdf file
+      # Output multiple extraction measures in a pdf file
       grDevices::pdf(paste0(out.dir,"/extraction.measures.pdf"), pointsize = 1)
       for(index in indexes)
         suppressMessages(suppressWarnings(print(ggplotList[[index]])))
@@ -263,144 +271,137 @@ SummarizeOneToolMultiDatasets <-
     }
 
 
-    ## Summarize cosine similarity to each ground-truth signature
-    ## and number of extracted signatures similar to each ground-truth
-    ## signature for one tool.
-    if (FALSE) { # Temporarily disabled.
-      OneToolSummary$cosSim <- list()
-      OneToolSummary$NumSigsSimilar <- list()
 
-      ## Combine one-signature cosine similarity from different spectra datasets
-      for(datasetName in datasetNames){
-        thirdLevelDir <- paste0(toolPath,"/",datasetName)
-        toolName <- strsplit(basename(toolPath),".results")[[1]]
-        ## Add multiRun <- NULL to please R check
-        multiRun <- NULL
-        load(paste0(thirdLevelDir,"/multiRun.RDa"))
-        gtSigNames <- names(multiRun$cosSim)
-        sigNums <- length(gtSigNames)
+    # Combine best cosine similarity of each ground-truth signature -----------
+    OneToolSummary$cosSim <- list()
 
-        for(measure in c("cosSim","NumSigsSimilar")){
-          for(gtSigName in gtSigNames){
+    # Combine
+    for(datasetName in datasetNames){
+      thirdLevelDir <- paste0(toolPath,"/",datasetName)
+      toolName <- strsplit(basename(toolPath),".results")[[1]]
+      # Add multiRun <- NULL to please R check
+      multiRun <- NULL
+      load(paste0(thirdLevelDir,"/multiRun.RDa"))
+      gtSigNames <- names(multiRun$cosSim)
+      sigNums <- length(gtSigNames)
 
-            gtMeasure4OneDataset <- data.frame(seed = names(multiRun[[measure]][[gtSigName]]),
-                                               value = multiRun[[measure]][[gtSigName]],
-                                               toolName = toolName,
-                                               datasetName = datasetName,
-                                               datasetGroup = datasetGroup[datasetName],
-                                               stringsAsFactors = FALSE)
-            if(!is.null(datasetSubGroup)) {
-              gtMeasure4OneDataset <- data.frame(gtMeasure4OneDataset,
-                                                 datasetSubGroup = datasetSubGroup[datasetName],
-                                                 stringsAsFactors = FALSE)
-            }
-            rownames(gtMeasure4OneDataset) <- NULL
+      for(gtSigName in gtSigNames){
 
-            ## Create a data.frame for each measure,
-            ## and summarize multi-Run, multiDataset values
-            ## for each measure.
-            if(is.null(OneToolSummary[[measure]][[gtSigName]])){
-              OneToolSummary[[measure]][[gtSigName]] <- data.frame()
-            }
-            OneToolSummary[[measure]][[gtSigName]] <- rbind(OneToolSummary[[measure]][[gtSigName]],gtMeasure4OneDataset)
-          }
+        gtMeasure4OneDataset <- data.frame(seed = names(multiRun[["cosSim"]][[gtSigName]]),
+                                           value = multiRun[["cosSim"]][[gtSigName]],
+                                           toolName = toolName,
+                                           datasetName = datasetName,
+                                           datasetGroup = datasetGroup[datasetName],
+                                           stringsAsFactors = FALSE)
+        if(!is.null(datasetSubGroup)) {
+          gtMeasure4OneDataset <- data.frame(gtMeasure4OneDataset,
+                                             datasetSubGroup = datasetSubGroup[datasetName],
+                                             stringsAsFactors = FALSE)
         }
+        rownames(gtMeasure4OneDataset) <- NULL
+
+        # Create a data.frame for each measure,
+        # and summarize multi-Run, multiDataset values
+        # for each measure.
+        if(is.null(OneToolSummary[["cosSim"]][[gtSigName]])){
+          OneToolSummary[["cosSim"]][[gtSigName]] <- data.frame()
+        }
+        OneToolSummary[["cosSim"]][[gtSigName]] <-
+          rbind(OneToolSummary[["cosSim"]][[gtSigName]],gtMeasure4OneDataset)
       }
 
-      ## Calculate the stats (returned by summary()) of cosine similarity to each
-      ## ground-truth signature and
-      ## number of signatures similar to each ground-truth signature.
-      for(measure in c("cosSim","NumSigsSimilar")){
-        OneToolSummary$stats[[measure]] <- list()
-        for(gtSigName in gtSigNames){
-          currentStats <- summary(OneToolSummary[[measure]][[gtSigName]][,"value"])
-          OneToolSummary$stats[[measure]][[gtSigName]] <- currentStats
-        }
-      }
+    }
+
+    # Calculate the stats (returned by summary())
+    OneToolSummary$stats[["cosSim"]] <- list()
+    for(gtSigName in gtSigNames){
+      currentStats <- summary(OneToolSummary[["cosSim"]][[gtSigName]][,"value"])
+      OneToolSummary$stats[["cosSim"]][[gtSigName]] <- currentStats
     }
 
 
-    ## Plot one-signature cosine similarity violin + beeswarm plot for one tool
-    ## Only if there are two groupings.
+
+    # Plot violin + beeswarm plot for best cossim of each gt signature --------
+    # Only if there are two groupings.
     # if(!is.null(datasetSubGroup))
-    if (FALSE)  { ## debug
-      ## Create a list to store ggplot2 violin + beeswarm plot objects
+    if (FALSE)  { # debug
+      # Create a list to store ggplot2 violin + beeswarm plot objects
       ggplotList$cosSim <- list()
-      ## Plot a value~datasetSubGroup beeswarm plot for each signature.
+      # Plot a value~datasetSubGroup beeswarm plot for each signature.
       for(gtSigName in gtSigNames){
         sigNum <- which(gtSigNames == gtSigName)
         ggplotList$cosSim[[gtSigName]] <- ggplot2::ggplot(
           OneToolSummary$cosSim[[gtSigName]],
-          ## Make sure that only one x-label is shown in one small facet.
+          # Make sure that only one x-label is shown in one small facet.
           #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
           ggplot2::aes(x = .data$toolName, y = .data$value)
         )
-        ## Add facets
+        # Add facets
         ggplotList$cosSim[[gtSigName]] <- ggplotList$cosSim[[gtSigName]] +
           ggplot2::facet_grid(
             rows = ggplot2::vars(datasetSubGroup),
             cols = ggplot2::vars(datasetGroup),
-            ## Move x facet labels to the bottom,
-            ## This is to let the facet labels correspond to axis.title.
+            # Move x facet labels to the bottom,
+            # This is to let the facet labels correspond to axis.title.
             switch = "x") +
-          ## Draw beeswarm plots on multiple facets
-          ## Draw geom_violin
+          # Draw beeswarm plots on multiple facets
+          # Draw geom_violin
           ggplot2::geom_violin(
-            ## Change filling color to white
+            # Change filling color to white
             fill = "#FFFFFF",
-            ## Maximize the violin plot width
+            # Maximize the violin plot width
             scale = "width",
-            ## Hide outliers
+            # Hide outliers
             #outlier.shape = NA
           ) +
           ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
-          ## Show mean of the extraction meaasure distribution, as a blue diamond.
+          # Show mean of the extraction meaasure distribution, as a blue diamond.
           ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-          ## Draw beeswarm plot
+          # Draw beeswarm plot
           ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
-                                       size = 0.3 ## Make dot size smaller
+                                       size = 0.3 # Make dot size smaller
                                        #,
-                                       ## Remove differentiated colors for beeswarm dots
-                                       ## Set groups for the filling functionalities to differentiate
+                                       # Remove differentiated colors for beeswarm dots
+                                       # Set groups for the filling functionalities to differentiate
                                        #ggplot2::aes(color = .data$datasetGroup)
           ) +
-          ## Change filling color
+          # Change filling color
           ggplot2::scale_fill_brewer(palette = "Greys") +
-          ## Change axis.text and tickmarks
+          # Change axis.text and tickmarks
           ggplot2::theme(
-            ## Remove axis.text.x
+            # Remove axis.text.x
             axis.text.x = ggplot2::element_blank(),
-            ## Remove tick marks on x axis (axis.ticks.x)
+            # Remove tick marks on x axis (axis.ticks.x)
             axis.ticks.x = ggplot2::element_blank(),
-            ## Remove entire legend
+            # Remove entire legend
             legend.position = "none"
           ) +
-          ## Add titles
+          # Add titles
           ggplot2::labs(
-            ## Add title for value~datasetSubGroup beeswarm plot
+            # Add title for value~datasetSubGroup beeswarm plot
             title = paste0(toolName,": Average cosine similarity between signature ",gtSigName),
             subtitle = paste0("and all extracted signatures resembling ",gtSigName),
-            ## Change title of y axis (axis.title.y) into gtSigName info (same as title)
+            # Change title of y axis (axis.title.y) into gtSigName info (same as title)
             y = paste0("Cosine similarity to signature ",gtSigName),
-            ## Change title of x axis to "Pearson's R squared"
+            # Change title of x axis to "Pearson's R squared"
             x = "Pearson's R squared") +
-          ## Change title of legend to datasetGroupName
+          # Change title of legend to datasetGroupName
           ggplot2::guides(color = ggplot2::guide_legend(title = datasetGroupName)) +
-          ## Restrict the decimal numbers of values of measures (y) to be 2
+          # Restrict the decimal numbers of values of measures (y) to be 2
           ggplot2::scale_y_continuous(
-            ## For one-signature cosine similarity, set ylim from the minimum of Manhattan distance value to 1.
+            # For one-signature cosine similarity, set ylim from the minimum of Manhattan distance value to 1.
             limits = c(min(OneToolSummary$cosSim$combined$value),1),
             labels =function(x) sprintf("%.2f", x),
-            ## Add a secondary axis title on the top of the plot
-            ## Showing axis label indicating facets
+            # Add a secondary axis title on the top of the plot
+            # Showing axis label indicating facets
             sec.axis = ggplot2::dup_axis(
-              breaks = NULL, ## Don't show axis breaks
-              labels = NULL, ## Don't show axis tickmarks
+              breaks = NULL, # Don't show axis breaks
+              labels = NULL, # Don't show axis tickmarks
               name = "SBS1:SBS5 mutation count ratio"))
       }
 
 
-      ## Output multiple extraction measures in a pdf file
+      # Output multiple extraction measures in a pdf file
       grDevices::pdf(paste0(out.dir,"/onesig.cossim.pdf"), pointsize = 1)
       for(gtSigName in gtSigNames)
         suppressMessages(suppressWarnings(print(ggplotList$cosSim[[gtSigName]])))
@@ -408,14 +409,15 @@ SummarizeOneToolMultiDatasets <-
     }
 
 
-    ## Summarize scaled Manhattan distance only if
-    ## scaled Manhattan distance data exists in object multRun
+
+    # Summarize scaled Manhattan distance -------------------------------------
+    # only if scaled Manhattan distance data exists in object multRun
     exposureFlag <- TRUE
     {
       for(datasetName in datasetNames){
         thirdLevelDir <- paste0(toolPath,"/",datasetName)
         toolName <- strsplit(basename(toolPath),".results")[[1]]
-        ## Add multiRun <- NULL to please R check
+        # Add multiRun <- NULL to please R check
         multiRun <- NULL
         load(paste0(thirdLevelDir,"/multiRun.RDa"))
         if(is.null(multiRun$AggManhattanDist)){
@@ -426,16 +428,18 @@ SummarizeOneToolMultiDatasets <-
       }
     }
 
-    ## Summarize aggregated scaled Manhattan distance for one tool.
+
+
+    # Summarize aggregated scaled Manhattan distance for one tool -------------
     if(exposureFlag){
-      ## Summarize aggregated scaled Manhattan distance for one tool.
+      # Summarize aggregated scaled Manhattan distance for one tool.
       {
         OneToolSummary$AggManhattanDist <- list()
 
         for(datasetName in datasetNames){
           thirdLevelDir <- paste0(toolPath,"/",datasetName)
           toolName <- strsplit(basename(toolPath),".results")[[1]]
-          ## Add multiRun <- NULL to please R check
+          # Add multiRun <- NULL to please R check
           multiRun <- NULL
           load(paste0(thirdLevelDir,"/multiRun.RDa"))
 
@@ -454,9 +458,9 @@ SummarizeOneToolMultiDatasets <-
 
             rownames(gtAggManhattanDist4OneDataset) <- NULL
 
-            ## Create a data.frame for each measure,
-            ## and summarize multi-Run, multiDataset values
-            ## for each measure.
+            # Create a data.frame for each measure,
+            # and summarize multi-Run, multiDataset values
+            # for each measure.
             if(is.null(OneToolSummary$AggManhattanDist[[gtSigName]])){
               OneToolSummary$AggManhattanDist[[gtSigName]] <- data.frame()
             }
@@ -464,8 +468,8 @@ SummarizeOneToolMultiDatasets <-
           }
         }
 
-        ## Combine multiple ground-truth signature Manhattan-distance data.frame
-        ## into OneToolSummary$AggManhattanDist$combined.
+        # Combine multiple ground-truth signature Manhattan-distance data.frame
+        # into OneToolSummary$AggManhattanDist$combined.
         OneToolSummary$AggManhattanDist$combined <- data.frame()
         for(gtSigName in gtSigNames){
           gtAggManhattanDist4AllDatasets <- data.frame(OneToolSummary$AggManhattanDist[[gtSigName]],
@@ -483,88 +487,88 @@ SummarizeOneToolMultiDatasets <-
         }
 
       }
-      ## Plot aggregated scaled Manhattan distance violin plot
-      ## + beeswarm plot for one tool
-      ## only if there are two groupings.
-      if(!is.null(datasetSubGroup)) { ## debug
-        ## Create a list to store ggplot2 violin + beeswarm plot objects
+      # Plot aggregated scaled Manhattan distance violin plot
+      # + beeswarm plot for one tool
+      # only if there are two groupings.
+      if(!is.null(datasetSubGroup)) { # debug
+        # Create a list to store ggplot2 violin + beeswarm plot objects
         ggplotList$AggManhattanDist <- list()
-        ## Plot a value~datasetSubGroup beeswarm plot for each signature.
+        # Plot a value~datasetSubGroup beeswarm plot for each signature.
         for(gtSigName in gtSigNames){
           sigNum <- which(gtSigNames == gtSigName)
           ggplotList$AggManhattanDist[[gtSigName]] <- ggplot2::ggplot(
             OneToolSummary$AggManhattanDist[[gtSigName]],
-            ## Make sure that only one x-label is shown in one small facet.
+            # Make sure that only one x-label is shown in one small facet.
             #ggplot2::aes(x = .data$datasetGroup, y = .data$value)
             ggplot2::aes(x = .data$toolName, y = .data$value)
           )
-          ## Add facets
+          # Add facets
           ggplotList$AggManhattanDist[[gtSigName]] <- ggplotList$AggManhattanDist[[gtSigName]] +
             ggplot2::facet_grid(
               rows = ggplot2::vars(datasetSubGroup),
               cols = ggplot2::vars(datasetGroup),
-              ## Move x facet labels to the bottom,
-              ## This is to let the facet labels correspond to axis.title.
+              # Move x facet labels to the bottom,
+              # This is to let the facet labels correspond to axis.title.
               switch = "x") +
-            ## Draw beeswarm plots on multiple facets
-            ## Draw geom_violin
+            # Draw beeswarm plots on multiple facets
+            # Draw geom_violin
             ggplot2::geom_violin(
-              ## Change filling color to white
+              # Change filling color to white
               fill = "#FFFFFF",
-              ## Maximize the violin plot width
+              # Maximize the violin plot width
               scale = "width",
-              ## Hide outliers
+              # Hide outliers
               #outlier.shape = NA
             ) +
             ggplot2::stat_summary(fun="median", geom="point", shape = 21, fill = "red") +
-            ## Show mean of the extraction meaasure distribution, as a blue diamond.
+            # Show mean of the extraction meaasure distribution, as a blue diamond.
             ggplot2::stat_summary(fun="mean", geom="point", shape=23, fill="blue") +
-            ## Draw beeswarm plot
+            # Draw beeswarm plot
             ggbeeswarm::geom_quasirandom(groupOnX = TRUE,
-                                         size = 0.3 ## Make dot size smaller
+                                         size = 0.3 # Make dot size smaller
                                          ,
-                                         ## Remove differentiated colors for beeswarm dots
-                                         ## Set groups for the filling functionalities to differentiate
+                                         # Remove differentiated colors for beeswarm dots
+                                         # Set groups for the filling functionalities to differentiate
                                          #ggplot2::aes(color = .data$datasetGroup)
             ) +
-            ## Change filling color
+            # Change filling color
             ggplot2::scale_fill_brewer(palette = "Greys") +
-            ## Change axis.text and tickmarks
+            # Change axis.text and tickmarks
             ggplot2::theme(
-              ## Remove axis.text.x
+              # Remove axis.text.x
               axis.text.x = ggplot2::element_blank(),
-              ## Remove tick marks on x axis (axis.ticks.x)
+              # Remove tick marks on x axis (axis.ticks.x)
               axis.ticks.x = ggplot2::element_blank(),
-              ## Remove entire legend
+              # Remove entire legend
               legend.position = "none"
             ) +
-            ## Change titles
+            # Change titles
             ggplot2::labs(
-              ## Add title for value~datasetSubGroup beeswarm plot
+              # Add title for value~datasetSubGroup beeswarm plot
               title = paste0(toolName,": Scaled Manhattan distance of ",gtSigName," exposure"),
               subtitle = "Between ground-truth exposure and inferred exposure",
-              ## Change title of y axis (axis.title.y) same as gtSigName info (same as title)
+              # Change title of y axis (axis.title.y) same as gtSigName info (same as title)
               y = paste0("Scaled aggregated Manhattan distance of ",gtSigName," exposure"),
-              ## Change title of x axis to "Pearson's R squared"
+              # Change title of x axis to "Pearson's R squared"
               x = "Pearson's R squared") +
-            ## Change title of legend to datasetGroupName
+            # Change title of legend to datasetGroupName
             ggplot2::guides(color = ggplot2::guide_legend(title = datasetGroupName)) +
-            ## Restrict the decimal numbers of values of measures (y) to be 2
+            # Restrict the decimal numbers of values of measures (y) to be 2
             ggplot2::scale_y_continuous(
-              ## For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
+              # For scaled Manhattan distance, set ylim from 0 to the maximum of Manhattan distance value
               limits = c(0,max(OneToolSummary$AggManhattanDist$combined$value)),
-              ## Restrict the decimal numbers of values of measures (y) to be 2
+              # Restrict the decimal numbers of values of measures (y) to be 2
               labels =function(x) sprintf("%.2f", x),
-              ## Add a secondary axis title on the top of the plot
-              ## Showing axis label indicating facets
+              # Add a secondary axis title on the top of the plot
+              # Showing axis label indicating facets
               sec.axis = ggplot2::dup_axis(
-                breaks = NULL, ## Don't show axis breaks
-                labels = NULL, ## Don't show axis tickmarks
+                breaks = NULL, # Don't show axis breaks
+                labels = NULL, # Don't show axis tickmarks
                 name = "SBS1:SBS5 mutation count ratio"))
         }
 
 
-        ## Output multiple extraction measures in a pdf file
+        # Output multiple extraction measures in a pdf file
         grDevices::pdf(paste0(out.dir,"/aggregated.Manhattan.dist.pdf"), pointsize = 1)
         for(gtSigName in gtSigNames)
           suppressMessages(suppressWarnings(print(ggplotList$AggManhattanDist[[gtSigName]])))
@@ -574,12 +578,12 @@ SummarizeOneToolMultiDatasets <-
 
 
 
+    # Export Summary tables for extraction measures ---------------------------
 
-    ## Write Summary tables for extraction measures
     for(index in indexes){
       output <- OneToolSummary[[index]]
 
-      ## Change "value" to label of measure.
+      # Change "value" to label of measure.
       colnames(output)[1] <- "Seed or run number"
       colnames(output)[2] <- indexLabels[index]
       colnames(output)[3] <- "Name of computational approach"
@@ -589,9 +593,9 @@ SummarizeOneToolMultiDatasets <-
         colnames(output)[6] <- datasetSubGroupName
 
       if(!display.datasetName){
-        ## Delete the 4th column,
-        ## which refers to the name of the corresponding
-        ## spectra dataset.
+        # Delete the 4th column,
+        # which refers to the name of the corresponding
+        # spectra dataset.
         output <- output[,-4]
       }
 
@@ -599,68 +603,44 @@ SummarizeOneToolMultiDatasets <-
                 file = paste0(out.dir,"/",index,".csv"),
                 quote = F, row.names = F)
     }
+    # Best cosine similarity for each ground-truth sig
+    for(gtSigName in gtSigNames){
+      output <- OneToolSummary$cosSim[[gtSigName]]
 
-    # Temporarily disabled.
-    if (FALSE) {
-      ## Write Summary tables for signature cosine similarity.
-      for(gtSigName in gtSigNames){
-        output <- OneToolSummary$cosSim[[gtSigName]]
+      # Change "value" to label of measure.
+      colnames(output)[1] <- "Seed or run number"
+      colnames(output)[2] <-
+        paste0("Cosine similarity to ground-truth signature ",gtSigName)
+      colnames(output)[3] <- "Name of computational approach"
+      colnames(output)[4] <- "Name of mutational spectra dataset"
+      colnames(output)[5] <- datasetGroupName
+      if(!is.null(datasetSubGroup))
+        colnames(output)[6] <- datasetSubGroupName
 
-        ## Change "value" to label of measure.
-        colnames(output)[1] <- "Seed or run number"
-        colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
-        colnames(output)[3] <- "Name of computational approach"
-        colnames(output)[4] <- "Name of mutational spectra dataset"
-        colnames(output)[5] <- datasetGroupName
-        if(!is.null(datasetSubGroup))
-          colnames(output)[6] <- datasetSubGroupName
-
-        if(!display.datasetName){
-          ## Delete the 4th column,
-          ## which refers to the name of the corresponding
-          ## spectra dataset.
-          output <- output[,-4]
-        }
-
-        write.csv(output,
-                  file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"),
-                  quote = F, row.names = F)
+      if(!display.datasetName){
+        # Delete the 4th column,
+        # which refers to the name of the corresponding
+        # spectra dataset.
+        output <- output[,-4]
       }
 
-      ## Write Summary tables for number of extracted sigs similar to
-      ## each ground-truth sig.
-      for(gtSigName in gtSigNames){
-        output <- OneToolSummary$NumSigsSimilar[[gtSigName]]
-
-        ## Change "value" to label of measure.
-        colnames(output)[1] <- "Seed or run number"
-        colnames(output)[2] <- paste0("Number of software-reported signatures with ",
-                                      "cosine similarity > 0.9 to ",gtSigName)
-        colnames(output)[3] <- "Name of computational approach"
-        colnames(output)[4] <- "Name of mutational spectra dataset"
-        colnames(output)[5] <- datasetGroupName
-        if(!is.null(datasetSubGroup))
-          colnames(output)[6] <- datasetSubGroupName
-
-        if(!display.datasetName){
-          ## Delete the 4th column,
-          ## which refers to the name of the corresponding
-          ## spectra dataset.
-          output <- output[,-4]
-        }
-
-        write.csv(output,
-                  file = paste0(out.dir,"/num.sigs.similar.to.",gtSigName,".csv"),
-                  quote = F, row.names = F)
-      }
+      write.csv(output,
+                file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"),
+                quote = F, row.names = F)
     }
 
-    ## Write stat summary information into a text file.
-    utils::capture.output(OneToolSummary$stats,file = paste0(out.dir,"/stats.txt"))
-    utils::capture.output(OneToolSummary$prop1,file = paste0(out.dir,"/prop1.txt"))
+
+    # Write stat summary information into a text file.
+    utils::capture.output(OneToolSummary$stats,
+                          file = paste0(out.dir,"/stats.txt"))
+    utils::capture.output(OneToolSummary$prop1,
+                          file = paste0(out.dir,"/prop1.txt"))
 
 
-    ## Add datasetGroupName and datasetSubGroupName into OneToolSummary
+
+    # Save and return summary list object -------------------------------------
+
+    # Add datasetGroupName and datasetSubGroupName into OneToolSummary
     OneToolSummary$datasetGroupName <- datasetGroupName
     if(!is.null(datasetSubGroup))
       OneToolSummary$datasetSubGroupName <- datasetSubGroupName

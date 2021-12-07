@@ -24,56 +24,46 @@ ReadAndAnalyzeSigs <-
   function(extracted.sigs,
            ground.truth.sigs,
            ground.truth.exposures) {
+
+    # Import ex sigs, gt sigs, and gt exposures -------------------------------
     ex.sigs <- ICAMS::ReadCatalog(extracted.sigs,
                                   region = "unknown",
                                   catalog.type = "counts.signature")
-    # read.extracted.sigs.fn(extracted.sigs)
     gt.sigs <- ICAMS::ReadCatalog(ground.truth.sigs,
                                   region = "unknown",
                                   catalog.type = "counts.signature")
-    # read.ground.truth.sigs.fn(ground.truth.sigs)
+    # Rows are signatures, columns are samples.
     exposure <- ICAMSxtra::ReadExposure(
       ground.truth.exposures,check.names = F)
-    # Rows are signatures, columns are samples.
-
-    retval <- NewMatchSigsAndRelabel(ex.sigs, gt.sigs, exposure)
-
-    ## If input gt.sigs is a ICAMS catalog,
-    ## Move all the attributes of gt.sigs to retval::gt.sigs.
-    ## Otherwise (e.g. gt.sigs is a matrix), do nothing.
-    if(!is.null(attr(gt.sigs, "catalog.type"))){
-
-      catalog.type <- attr(gt.sigs, "catalog.type")
-      region       <- attr(gt.sigs, "region")
-      ref.genome   <- attr(gt.sigs, "ref.genome")
-      abundance    <- attr(gt.sigs, "abundance")
-
-      retval$gt.sigs <-
-        ICAMS::as.catalog(retval$gt.sigs,
-                          catalog.type = catalog.type,
-                          region       = region,
-                          ref.genome   = ref.genome,
-                          abundance    = abundance)
-   }
 
 
-    ## If input ex.sigs is a ICAMS catalog,
-    ## Move all the attributes of ex.sigs to retval::ex.sigs.
-    ## Otherwise (e.g. ex.sigs is a matrix), do nothing.
-    if(!is.null(attr(ex.sigs, "catalog.type"))){
 
-      catalog.type <- attr(ex.sigs, "catalog.type")
-      region       <- attr(ex.sigs, "region")
-      ref.genome   <- attr(ex.sigs, "ref.genome")
-      abundance    <- attr(ex.sigs, "abundance")
+    # Remove gt sigs with zero ground-truth exposures -------------------------
+    # Also rename ex sigs.
+    if (!is.null(exposure)) {
+      # Remove signatures that are have zero exposures
+      # or not present in ground-truth exposure matrix
+      exposed.sig.names <- rownames(exposure)[rowSums(exposure) > 0]
+      # Make sure we do not have any signatures in exposures that
+      # are not in gt.sigs.
+      stopifnot(
+        setequal(setdiff(exposed.sig.names, colnames(gt.sigs)), c()))
+      gt.sigs <- gt.sigs[  , exposed.sig.names]
+    }
 
-      retval$ex.sigs <-
-        ICAMS::as.catalog(retval$ex.sigs,
-                          catalog.type = catalog.type,
-                          region       = region,
-                          ref.genome   = ref.genome,
-                          abundance    = abundance)
-   }
+
+
+    # Calculate extraction measures from ICAMSxtra::TP_FP_FN_avg_sim ----------
+    retval <- ICAMSxtra::TP_FP_FN_avg_sim(ex.sigs, gt.sigs,
+                                          similarity.cutoff = 0.9)
+
+
+
+    # Concatenate filtered gt.sigs and ex.sigs as-is --------------------------
+    retval$ex.sigs <- ex.sigs
+    retval$gt.sigs <- gt.sigs
+
+
 
     return(retval)
   }

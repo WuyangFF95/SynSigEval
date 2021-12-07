@@ -64,3 +64,12 @@ A list with the elements
 A wrapper function around \code{\link[ICAMSxtra]{match_two_sig_sets()}}
 and substitutes deprecate function \code{\link[ICAMSxtra]{MatchSigsAndRelabel()}},
 }
+\examples{
+gt.sigs <- matrix(c(1, 3,   4, 1, 2, 4), ncol = 2)
+ex.sigs <- matrix(c(1, 3.1, 4, 5, 1, 1, 1, 2.8, 4), ncol = 3)
+colnames(gt.sigs) <- c("gt.1", "gt.2")
+colnames(ex.sigs) <- c("ex.1", "ex.2", "ex.3")
+tout <- MatchSigsAndRelabel(gt.sigs = gt.sigs, ex.sigs = ex.sigs)
+tout
+
+}

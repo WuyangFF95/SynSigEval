@@ -22,139 +22,126 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
   sort.by.composite.extraction.measure = "descending",
   overwrite = FALSE){
 
-  #### I. Summarize extraction performance
+  # I. Summarize extraction performance ---------------------------------------
 
-  ## I.1. For each measure of extraction performance,
-  ## Create a data.frame integrating results of
-  ## all runs and for all datasets
-  {
-    indexes <- c("averCosSim","falseNeg","falsePos",
-                 "truePos","PPV","TPR")
-    indexLabels <- c("averCosSim" = "Average cosine similarity of all signatures",
-                     "falseNeg" = "False negatives",
-                     "falsePos" = "False positives",
-                     "truePos" = "True positives",
-                     "PPV" = "Positive predictive value",
-                     "TPR" = "True positive rate",
-                     "NumSigsExtracted" = "Number of signatures extracted",
-                     "compositeMeasure" = "Composite measure")
-    indexNums <- length(indexes)
+  # I.1. Specify titles of each measure in summary tables and plots -----------
+  indexes <- c("averCosSim","falseNeg","falsePos",
+               "truePos","PPV","TPR")
+  indexLabels <- c("averCosSim" = "Average cosine similarity of all signatures",
+                   "falseNeg" = "False negatives",
+                   "falsePos" = "False positives",
+                   "truePos" = "True positives",
+                   "PPV" = "Positive predictive value",
+                   "TPR" = "True positive rate",
+                   "NumSigsExtracted" = "Number of signatures extracted",
+                   "compositeMeasure" = "Composite measure")
+  indexNums <- length(indexes)
+
+
+
+
+  # I.2 Combining extraction performance measures into list "FinalExtr" -------
+
+  FinalExtr <- list()
+  toolNames <- character(0)
+  for(index in indexes) {
+    FinalExtr[[index]] <- data.frame()
+  }
+  FinalExtr$cosSim <- list()
+
+
+  # Combine extraction measures of different computational approaches:
+  toolNames <- character(0)
+  for(toolSummaryPath in toolSummaryPaths){
+    # Add OneToolSummary <- NULL to please R check
+    OneToolSummary <- NULL
+    load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
+
+    datasetGroupName <- OneToolSummary$datasetGroupName
+    if(!is.null(OneToolSummary$datasetSubGroupName)) {
+      datasetSubGroupName <- OneToolSummary$datasetSubGroupName
+    }
+
+    # Find tool names
+    toolName <- unique(OneToolSummary[["averCosSim"]][,"toolName"])
+    toolNames <- c(toolNames, toolName)
+
+    # Merge values for each extraction measure
+    for(index in indexes){
+      FinalExtr[[index]] <- rbind(FinalExtr[[index]],OneToolSummary[[index]])
+    }
+
+    # Merge values of cosine similarity to each gt sig
+    if(!exists("gtSigNames"))
+      gtSigNames <- gtools::mixedsort(setdiff(names(OneToolSummary$cosSim),"combined"))
+    if(length(FinalExtr[["cosSim"]]) == 0){
+      for(gtSigName in gtSigNames) {
+        FinalExtr[["cosSim"]][[gtSigName]] <- data.frame()
+      }
+    }
+    for(gtSigName in gtSigNames){
+      FinalExtr[["cosSim"]][[gtSigName]] <-
+        rbind(FinalExtr[["cosSim"]][[gtSigName]],
+              OneToolSummary[["cosSim"]][[gtSigName]])
+    }
   }
 
+  # Calculate total number of signatures extracted
+  # in each run by each computational approach.
+  #
+  # It always equal to falsePos (number of false positives) +
+  # truePos (number of true positives)
+  FinalExtr$NumSigsExtracted <- FinalExtr$falsePos
+  FinalExtr$NumSigsExtracted$value <-
+    FinalExtr$NumSigsExtracted$value + FinalExtr$truePos$value
 
-  ## I.2 Combining measures for extraction performance
-  ## into list "FinalExtr".
-  ## Showing individual values rather than
-  ## only showing mean and standard deviation of multiple runs
-  {
-    FinalExtr <- list()
-    toolNames <- character(0)
-    for(index in indexes) {
-      FinalExtr[[index]] <- data.frame()
-    }
-    if (FALSE) { # Temporarily disabled.
-      FinalExtr$cosSim <- list()
-      FinalExtr$NumSigsSimilar <- list()
-    }
+  # Calculate composite measure for each computational approach.
+  # It is defined as:
+  # Positive Predictive Value (PPV) + True Positive Rate (TPR)
+  # + Cosine similarity to each of signature (SBS1 and SBS5 in SBS1-SBS5 paper)
+  # OR
+  # PPV + TPR + average cosine similarity (Mo's mSigHdp paper)
+  FinalExtr$compositeMeasure <- FinalExtr$TPR
+  FinalExtr$compositeMeasure$value <- FinalExtr$PPV$value + FinalExtr$TPR$value
 
-    ## Combine extraction measures of different computational approaches:
-    toolNames <- character(0)
-    for(toolSummaryPath in toolSummaryPaths){
-      ## Add OneToolSummary <- NULL to please R check
-      OneToolSummary <- NULL
-      load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
-
-
-      datasetGroupName <- OneToolSummary$datasetGroupName
-      if(!is.null(OneToolSummary$datasetSubGroupName)) {
-        datasetSubGroupName <- OneToolSummary$datasetSubGroupName
-      }
-
-
-      ## Find tool names
-      toolName <- unique(OneToolSummary[["averCosSim"]][,"toolName"])
-      toolNames <- c(toolNames, toolName)
-
-      ## For each extraction measures,
-      ## merge values from multiple runs
-      ## into one data.frame FinalExtr$<measure_name>
-      ## and computational approaches for easier plotting.
-      for(index in indexes){
-        FinalExtr[[index]] <- rbind(FinalExtr[[index]],OneToolSummary[[index]])
-      }
-
-      if (FALSE) { # Temporarily disabled
-        ## Bind values of cosine similarity in OneToolSummary$cosSim into FinalExtr$cosSim
-        if(!exists("gtSigNames"))
-          gtSigNames <- gtools::mixedsort(setdiff(names(OneToolSummary$cosSim),"combined"))
-
-        for(measure in c("cosSim","NumSigsSimilar")){
-
-          if(length(FinalExtr[[measure]]) == 0){
-            for(gtSigName in gtSigNames) {
-              FinalExtr[[measure]][[gtSigName]] <- data.frame()
-            }
-          }
-          for(gtSigName in gtSigNames){
-            FinalExtr[[measure]][[gtSigName]] <-
-              rbind(FinalExtr[[measure]][[gtSigName]],
-                    OneToolSummary[[measure]][[gtSigName]])
-          }
-
-        }
-      }
-    }
-
-    ## Calculate total number of signatures extracted in each run by each computational approach
-    ## It always equal to falsePos (number of false positives) + truePos (number of true positives)
-    FinalExtr$NumSigsExtracted <- FinalExtr$falsePos
-    FinalExtr$NumSigsExtracted$value <-
-      FinalExtr$NumSigsExtracted$value + FinalExtr$truePos$value
-
-    ## Calculate composite measure for each computational approach.
-    ## It equals to:
-    ## Positive Predictive Value (PPV) + True Positive Rate (TPR)
-    ## Cosine similarity to each of signature (SBS1 and SBS5 in SBS1-SBS5 paper)
-    FinalExtr$compositeMeasure <- FinalExtr$TPR
-    FinalExtr$compositeMeasure$value <- FinalExtr$PPV$value + FinalExtr$TPR$value
-
-    # Counting average cosine similarity, rather than individual cosine similarity
-    # into the composite measure
-    if (TRUE) {
+  # Counting average cosine similarity, rather than individual cosine similarity
+  # into the composite measure
+  if (TRUE) {
+    FinalExtr$compositeMeasure$value <-
+      FinalExtr$compositeMeasure$value + FinalExtr$averCosSim$value
+  } else {
+    for(gtSigName in gtSigNames){
       FinalExtr$compositeMeasure$value <-
-        FinalExtr$compositeMeasure$value + FinalExtr$averCosSim$value
+        FinalExtr$compositeMeasure$value + FinalExtr$cosSim[[gtSigName]]$value
+    }
+  }
+
+  # Order computational approaches according to their mean of composite measure
+  if(sort.by.composite.extraction.measure %in% c("ascending","descending")){
+
+    meanCOMPOSITE <- numeric(0)
+    for(tool in toolNames){
+      rowNums <- which(FinalExtr$compositeMeasure$toolName == tool)
+      meanVal <- mean(FinalExtr$compositeMeasure$value[rowNums])
+      names(meanVal) <- tool
+      meanCOMPOSITE <- c(meanCOMPOSITE, meanVal)
+    }
+    if(sort.by.composite.extraction.measure == "descending") {
+      meanCOMPOSITE <- gtools::mixedsort(meanCOMPOSITE,decreasing = T)
     } else {
-      for(gtSigName in gtSigNames){
-        FinalExtr$compositeMeasure$value <- FinalExtr$compositeMeasure$value + FinalExtr$cosSim[[gtSigName]]$value
-      }
+      meanCOMPOSITE <- gtools::mixedsort(meanCOMPOSITE,decreasing = F)
     }
-
-    ## Order computational approaches according to their mean of composite measure
-    if(sort.by.composite.extraction.measure %in% c("ascending","descending")){
-
-      meanCOMPOSITE <- numeric(0)
-      for(tool in toolNames){
-        rowNums <- which(FinalExtr$compositeMeasure$toolName == tool)
-        meanVal <- mean(FinalExtr$compositeMeasure$value[rowNums])
-        names(meanVal) <- tool
-        meanCOMPOSITE <- c(meanCOMPOSITE, meanVal)
-      }
-      if(sort.by.composite.extraction.measure == "descending") {
-        meanCOMPOSITE <- gtools::mixedsort(meanCOMPOSITE,decreasing = T)
-      } else {
-        meanCOMPOSITE <- gtools::mixedsort(meanCOMPOSITE,decreasing = F)
-      }
-      ## Update order of toolNames.
-      toolNames <- names(meanCOMPOSITE)
-    }
-
+    # Update order of toolNames.
+    toolNames <- names(meanCOMPOSITE)
   }
 
 
-  ## I.3 Generating csv tables for extraction performance measure
-  ## and cosine similarities.
+
+
+  # I.3 Generating csv tables for extraction performance measure --------------
+  # and cosine similarities
   {
-    ## Output combined extraction
+    # Export extraction measures
     for(index in c(indexes,"NumSigsExtracted","compositeMeasure")){
 
       output <- FinalExtr[[index]]
@@ -168,9 +155,9 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
         colnames(output)[6] <- datasetSubGroupName
 
       if(!display.datasetName){
-        ## Delete the 4th column,
-        ## which refers to the name of the corresponding
-        ## spectra dataset.
+        # Delete the 4th column,
+        # which refers to the name of the corresponding
+        # spectra dataset.
         output <- output[,-4]
       }
 
@@ -178,57 +165,35 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
                 file = paste0(out.dir,"/",index,".csv"))
     }
 
-    if (FALSE) {
-      for(gtSigName in gtSigNames){
+    # Export BEST cosine similarity of each gt signature
+    for(gtSigName in gtSigNames){
 
-        output <- FinalExtr$cosSim[[gtSigName]]
+      output <- FinalExtr$cosSim[[gtSigName]]
 
-        colnames(output)[1] <- "Seed or run number"
-        colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
-        colnames(output)[3] <- "Name of computational approach"
-        colnames(output)[4] <- "Name of mutational spectra dataset"
-        colnames(output)[5] <- datasetGroupName
-        if(exists("datasetSubGroupName"))
-          colnames(output)[6] <- datasetSubGroupName
+      colnames(output)[1] <- "Seed or run number"
+      colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
+      colnames(output)[3] <- "Name of computational approach"
+      colnames(output)[4] <- "Name of mutational spectra dataset"
+      colnames(output)[5] <- datasetGroupName
+      if(exists("datasetSubGroupName"))
+        colnames(output)[6] <- datasetSubGroupName
 
-        if(!display.datasetName){
-          ## Delete the 4th column,
-          ## which refers to the name of the corresponding
-          ## spectra dataset.
-          output <- output[,-4]
-        }
-
-        write.csv(output,
-                  file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"))
+      if(!display.datasetName){
+        # Delete the 4th column,
+        # which refers to the name of the corresponding
+        # spectra dataset.
+        output <- output[,-4]
       }
 
-      for(gtSigName in gtSigNames){
-
-        output <- FinalExtr$NumSigsSimilar[[gtSigName]]
-
-        colnames(output)[1] <- "Seed or run number"
-        colnames(output)[2] <- paste0("Number of software-reported signatures with ",
-                                      "cosine similarity > 0.9 to ",gtSigName)
-        colnames(output)[3] <- "Name of computational approach"
-        colnames(output)[4] <- "Name of mutational spectra dataset"
-        colnames(output)[5] <- datasetGroupName
-        if(exists("datasetSubGroupName"))
-          colnames(output)[6] <- datasetSubGroupName
-
-        if(!display.datasetName){
-          ## Delete the 4th column,
-          ## which refers to the name of the corresponding
-          ## spectra dataset.
-          output <- output[,-4]
-        }
-
-        write.csv(output,
-                  file = paste0(out.dir,"/num.sigs.similar.to.",
-                                gtSigName,".csv"))
-      }
+      write.csv(output,
+                file = paste0(out.dir,"/cossim.to.",gtSigName,".csv"))
     }
+
   }
 
+
+
+  # I.4 Return extraction list object -----------------------------------------
   return(FinalExtr)
 
 }

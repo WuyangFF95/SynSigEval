@@ -45,14 +45,16 @@ SummarizeMultiToolsMultiDatasets <- function(
   sort.by.composite.extraction.measure = "descending",
   overwrite = FALSE){
 
-  #### I. Create output directory
+  # I. Create output directory ------------------------------------------------
   if (dir.exists(out.dir)) {
     if (!overwrite) stop(out.dir, " already exits")
   } else {
     dir.create(out.dir, recursive = T)
   }
 
-  #### II. Summarize extraction performance
+
+
+  # II. Summarize extraction performance --------------------------------------
   FinalExtr <- SummarizeMultiToolsMultiDatasetsExtr(
     toolSummaryPaths,
     out.dir,
@@ -62,46 +64,41 @@ SummarizeMultiToolsMultiDatasets <- function(
 
 
 
-  #### III. Check whether OneToolSummary$AggManhattanDist exists.
-  #### Summarize aggregated scaled Manhattan distance only if
-  #### it exists; otherwise, return results of extraction measures
-  #### and exit the function.
-  {
-    ## Combine attribution assessment onto multiple sheets.
-    ## Each sheet shows Scaled Manhattan distance for one mutational signature.
-    for(toolSummaryPath in toolSummaryPaths){
-      ## Add OneToolSummary <- NULL to please R check
-      OneToolSummary <- NULL
-      load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
-      if(is.null(OneToolSummary$AggManhattanDist)){
-        message("Skip summarizing scaled Manhattan distance...\n")
-        ## Exit the function if AggManhattanDist does not
-        ## exist in OneToolSummary
-        FinalSummary <- list()
-        FinalSummary$FinalExtr <- FinalExtr
-        save(FinalSummary,file = paste0(out.dir,"/FinalSummary.RDa"))
-        return(FinalSummary)
-      }
+  # III. Combine toolwise summary of exposure inference, if exists ------------
+  #
+  # Here toolwise summary object for exposure inference refers to
+  # "OneToolSummary$AggManhattanDist".
+  #
+  flag_exposure_summary <- TRUE
+
+  for(toolSummaryPath in toolSummaryPaths){
+    ## Add OneToolSummary <- NULL to please R check
+    OneToolSummary <- NULL
+    load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
+    if(is.null(OneToolSummary$AggManhattanDist)){
+      message("Skip summarizing scaled Manhattan distance...\n")
+      flag_exposure_summary <- FALSE
+      break
     }
   }
 
-  #### IV. Summarize scaled Manhattan distance
-  ## Summarizing aggregated Scaled Manhattan distance results
-  ##
-  #### V. Summarizing results for mean and stdev of separated Manhattan distance
-  FinalAttr <- SummarizeMultiToolsMultiDatasetsAttr(
-    toolSummaryPaths,
-    out.dir,
-    display.datasetName = display.datasetName,
-    sort.by.composite.extraction.measure = "descending",
-    overwrite = FALSE)
+  if (flag_exposure_summary == TRUE) {
+    FinalAttr <- SummarizeMultiToolsMultiDatasetsAttr(
+      toolSummaryPaths,
+      out.dir,
+      display.datasetName = display.datasetName,
+      sort.by.composite.extraction.measure = "descending",
+      overwrite = FALSE)
+  }
 
 
-  #### VI. Return the list "FinalSummary" if
-  #### scaled Manhattan distance exists.
+
+  # IV. Return the list "FinalSummary" ----------------------------------------
   FinalSummary <- list()
   FinalSummary$FinalExtr <- FinalExtr
-  FinalSummary$FinalAttr <- FinalAttr
+  if(flag_exposure_summary == TRUE) {
+    FinalSummary$FinalAttr <- FinalAttr
+  }
   save(FinalSummary,file = paste0(out.dir,"/FinalSummary.RDa"))
   return(FinalSummary)
 }
