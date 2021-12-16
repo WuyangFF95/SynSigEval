@@ -180,9 +180,9 @@ SummarizeSigOneSubdir <-
       to.dir = outputPath,
       overwrite = TRUE)
 
-    # Export bi-lateral matching table between ground-truth amd extracted sigs
+    # Export bi-lateral matching table between extracted and ground-truth sigs
     write.csv(sigAnalysis$table,
-              file = paste(outputPath,"match.gt.to.ex.csv",sep = "/"),
+              file = paste(outputPath,"match.ex.to.gt.csv",sep = "/"),
               row.names = F)
     # Export full cosine similarity table
     write.csv(sigAnalysis$sim.matrix,
