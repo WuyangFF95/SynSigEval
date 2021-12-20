@@ -2,27 +2,28 @@
 % Please edit documentation in R/RelabelExSigs.R
 \name{RelabelExSigs}
 \alias{RelabelExSigs}
-\title{Append most similar ground-truth sig and pairwise cosine similarity
-to the name of each extracted sig in matrix of extracted sigs.}
+\title{Append most similar ground-truth signature and pairwise cosine similarity
+to the name of each extracted signature in matrix of extracted signatures.}
 \usage{
 RelabelExSigs(sigAnalysis)
 }
 \arguments{
 \item{sigAnalysis}{A list returned by function \code{\link{ReadAndAnalyzeSigs}},
 at least including: \enumerate{
-  \item \code{ex.sigs}: matrix of extracted sigs
-  \item \code{sim.matrix}: full matrix between extracted sigs and
-    ground-truth sigs
+  \item \code{ex.sigs}: matrix of extracted signatures
+  \item \code{sim.matrix}: full matrix between extracted signatures and
+    ground-truth signatures
   \item \code{table}: matrix include pairs of true positive ground-truth
-  sigs and true positive extracted sigs.
+  signatures and true positive extracted signatures.
  }}
 }
 \value{
 Matrix of extracted sigs, yet the names of signatures changed.
-  New name: <old_name> (<name_of_most_similar_ground_truth_sig> cosine_similarity)
+  New name: <old_name> (<name_of_most_similar_ground_truth_signature>
+  cosine_similarity)
   e.g., Sig.A --> Sig.A (SBS1 0.998)
 }
 \description{
-Append most similar ground-truth sig and pairwise cosine similarity
-to the name of each extracted sig in matrix of extracted sigs.
+Append most similar ground-truth signature and pairwise cosine similarity
+to the name of each extracted signature in matrix of extracted signatures.
 }

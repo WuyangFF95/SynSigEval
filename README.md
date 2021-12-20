@@ -10,7 +10,18 @@
 
 Assess the performance of mutational-signature analysis programs using
 catalogs of synthetic mutational spectra created by package
-[SynSigGen](https://github.com/steverozen/SynSigGen).
+[**`SynSigGen`**](https://github.com/steverozen/SynSigGen).
+
+This version (0.3.1) is suitable for assessing the extraction accuracy
+in paper *mSigHdp: hierarchical Dirichlet processes for mutational
+signature discovery* - Liu et al. (2022).
+
+For assessing extraction accuracy on data sets presented by paper
+*Accuracy of Mutational Signature Software on Correlated Signatures* -
+Wu et al. (2022), please proceed to version
+[0.2.2](https://github.com/WuyangFF95/SynSigEval/tree/0.2.2).
+
+Check NEWS.md for differences between version 0.3.1 and 0.2.2.
 
 ## Installation
 
@@ -19,17 +30,19 @@ Before installation, prerequisites in
 
 ``` r
 install.packages("BiocManager")
-BiocManager::install(c("Biostrings","BSgenome","GenomeInfoDb","GenomicRanges"))
+BiocManager::install(
+  c("Biostrings", "BSgenome", "GenomeInfoDb", "GenomicRanges")
+)
 ```
 
-Install the development version of SynsigEval from
-[GitHub](https://github.com/) with the R command line:
+Install the development version of **`SynSigEval`** from GitHub with the
+R command line:
 
 ``` r
-install.packages("devtools")
-devtools::install_github("WuyangFF95/SynSigEval")
+install.packages("remotes")
+remotes::install_github("WuyangFF95/SynSigEval", ref = "master")
 ```
 
 ## Reference manual
 
-<https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.2.3.pdf>
+<https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.3.1.pdf>

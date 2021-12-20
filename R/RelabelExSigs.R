@@ -1,17 +1,18 @@
-#' Append most similar ground-truth sig and pairwise cosine similarity
-#' to the name of each extracted sig in matrix of extracted sigs.
+#' Append most similar ground-truth signature and pairwise cosine similarity
+#' to the name of each extracted signature in matrix of extracted signatures.
 #'
 #' @param sigAnalysis A list returned by function \code{\link{ReadAndAnalyzeSigs}},
 #' at least including: \enumerate{
-#'   \item \code{ex.sigs}: matrix of extracted sigs
-#'   \item \code{sim.matrix}: full matrix between extracted sigs and
-#'     ground-truth sigs
+#'   \item \code{ex.sigs}: matrix of extracted signatures
+#'   \item \code{sim.matrix}: full matrix between extracted signatures and
+#'     ground-truth signatures
 #'   \item \code{table}: matrix include pairs of true positive ground-truth
-#'   sigs and true positive extracted sigs.
+#'   signatures and true positive extracted signatures.
 #'  }
 #'
 #' @return Matrix of extracted sigs, yet the names of signatures changed.
-#'   New name: <old_name> (<name_of_most_similar_ground_truth_sig> cosine_similarity)
+#'   New name: <old_name> (<name_of_most_similar_ground_truth_signature>
+#'   cosine_similarity)
 #'   e.g., Sig.A --> Sig.A (SBS1 0.998)
 RelabelExSigs <- function(sigAnalysis) {
 
@@ -24,7 +25,7 @@ RelabelExSigs <- function(sigAnalysis) {
 
   # Generate new names
   for (old_name in old_names) {
-    # cosine sim > 0.9 to at least one gt sig
+    # cosine sim > 0.9 to at least one gt signature
     if (old_name %in% sigAnalysis$table[, 1]) {
       index <- which(sigAnalysis$table[, 1] == old_name)
       matched_gt_sig <- sigAnalysis$table[index, 2]
@@ -35,8 +36,8 @@ RelabelExSigs <- function(sigAnalysis) {
         round(cossim, 3), ")"
       )
     } else {
-      # For false positive sig,
-      # find its most similar ground-truth sig.
+      # For each false positive signature,
+      # find its most similar ground-truth signature.
       index <- match(old_name, old_names)
       matched_gt_sig_index <-
         which.max(sigAnalysis$sim.matrix[index, ])

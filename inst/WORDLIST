@@ -1,6 +1,7 @@
 AggManhattanDist
 Alexandrov
 Attr
+CMD
 CTM
 DBS
 DNS
@@ -11,11 +12,11 @@ FN
 FP
 ICAMS
 Jaegil
+Liu
 MatchSigsAndRelabel
 MultiModalMuSig
 MutationalPatterns
 NMF
-NumSigsSimilar
 PCAWG
 PPV
 QP
@@ -23,13 +24,14 @@ README
 Rsq
 SBS
 SNS
+Sig
 SigProExtractor
 SigProfiler
+SigProfilerExtractor
 SignatureAnalyzer
 SignatureEstimation
 SomaticSignatures
 SynSigGen
-SynsigEval
 TP
 TPR
 WuyangFF
@@ -52,6 +54,7 @@ fivenumMD
 github
 hdp
 https
+mSigHdp
 md
 meanSD
 meanSDMD
