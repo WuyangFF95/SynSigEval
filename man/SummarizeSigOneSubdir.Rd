@@ -45,7 +45,7 @@ For EMu, helmsman.NMF, MultiModalMuSig.LDA and MultiModalMuSig.CTM,
 their extracted signature files are not standard \code{ICAMS} catalog format.
 These non-standard extracted signatures are converted to
 \code{extracted.signatures.csv}, a standard \code{ICAMS} catalog
-by their respective wrapper functions: \list{
+by their respective wrapper functions: \itemize{
 \item \code{\link{ReadEMuCatalog}},
 \item \code{\link{helmsmanCatalog2ICAMS}}, and
 \item \code{\link{MMCatalog2ICAMS}}
@@ -69,7 +69,7 @@ For EMu, helmsman.NMF, MultiModalMuSig.LDA and MultiModalMuSig.CTM,
 their extracted signature files are not standard \code{ICAMSxtra} catalog format.
 These non-standard extracted signatures are converted to
 \code{extracted.signatures.csv}, a standard \code{ICAMSxtra} exposures
-by their respective wrapper functions: \list{
+by their respective wrapper functions: \itemize{
 \item \code{\link{ReadEMuExposureFile}}
 \item \code{\link{ReadhelmsmanExposure}}, and
 \item \code{\link{ReadExposureMM}}

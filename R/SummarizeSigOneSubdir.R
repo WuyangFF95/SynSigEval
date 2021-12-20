@@ -45,7 +45,7 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 #' their extracted signature files are not standard \code{ICAMS} catalog format.
 #' These non-standard extracted signatures are converted to
 #' \code{extracted.signatures.csv}, a standard \code{ICAMS} catalog
-#' by their respective wrapper functions: \list{
+#' by their respective wrapper functions: \itemize{
 #' \item \code{\link{ReadEMuCatalog}},
 #' \item \code{\link{helmsmanCatalog2ICAMS}}, and
 #' \item \code{\link{MMCatalog2ICAMS}}
@@ -69,7 +69,7 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 #' their extracted signature files are not standard \code{ICAMSxtra} catalog format.
 #' These non-standard extracted signatures are converted to
 #' \code{extracted.signatures.csv}, a standard \code{ICAMSxtra} exposures
-#' by their respective wrapper functions: \list{
+#' by their respective wrapper functions: \itemize{
 #' \item \code{\link{ReadEMuExposureFile}}
 #' \item \code{\link{ReadhelmsmanExposure}}, and
 #' \item \code{\link{ReadExposureMM}}
@@ -194,7 +194,9 @@ SummarizeSigOneSubdir <-
       sigAnalysis$gt.sigs,
       paste(outputPath,"ground.truth.sigs.csv",sep = "/"),
     )
-    # Export extracted signatures as-is
+    # Export extracted signatures with new names
+    ex.sigs.renamed <- RelabelExSigs(sigAnalysis)
+    sigAnalysis$ex.sigs <- ex.sigs.renamed
     ICAMS::WriteCatalog(
       sigAnalysis$ex.sigs,
       paste(outputPath,"extracted.sigs.csv",sep = "/"))
