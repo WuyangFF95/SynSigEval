@@ -126,11 +126,6 @@ SummarizeSigOneSubdir <-
           paste0(ground.truth.exposure.dir,"/ground.truth.syn.exposures.csv")
       )
 
-     # Temporary workaround.
-     # table does not have a correct column name.
-     # replace "gt,sig" with "gt.sig"
-     colnames(sigAnalysis$table)[2] <- "gt.sig"
-
      sigAnalysis$TP.ex.names <- sigAnalysis$table$ex.sig
      sigAnalysis$TP.gt.names <- sigAnalysis$table$gt.sig
      sigAnalysis$FP.names <-
