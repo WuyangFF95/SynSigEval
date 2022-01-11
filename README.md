@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/WuyangFF95/SynSigEval/workflows/R-CMD-check/badge.svg)](https://github.com/WuyangFF95/SynSigEval/actions)
+[![R-CMD-check](https://github.com/WuyangFF95/SynSigEval/workflows/R-CMD-check/badge.svg?branch=0.3.1-branch)](https://github.com/WuyangFF95/SynSigEval/actions?query=workflow%3AR-CMD-check+branch%3A1.1.1-branch)
 <!-- badges: end -->
 
 Assess the performance of mutational-signature analysis programs using
@@ -45,4 +45,4 @@ remotes::install_github("WuyangFF95/SynSigEval", ref = "master")
 
 ## Reference manual
 
-<https://github.com/WuyangFF95/SynSigEval/blob/master/data-raw/SynSigEval_0.3.1.pdf>
+<https://github.com/WuyangFF95/SynSigEval/blob/0.3.1-branch/data-raw/SynSigEval_0.3.1.pdf>
