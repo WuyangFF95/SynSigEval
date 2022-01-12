@@ -27,7 +27,7 @@ Imports:
     stats, 
     utils
 Remotes:
-    github::steverozen/ICAMSxtra
+    github::steverozen/ICAMSxtra,
     github::steverozen/mSigAct
 Depends: R (>= 3.5)
 RoxygenNote: 7.1.2
