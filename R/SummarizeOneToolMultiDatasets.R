@@ -422,7 +422,7 @@ SummarizeOneToolMultiDatasets <-
         load(paste0(thirdLevelDir,"/multiRun.RDa"))
         if(is.null(multiRun$AggManhattanDist)){
           exposureFlag <- FALSE
-          message("Skip summarizing scaled Manhattan distance...\n")
+          #message("Skip summarizing scaled Manhattan distance...\n")
           break
         }
       }

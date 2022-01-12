@@ -285,7 +285,7 @@ SummarizeMultiRuns <-
       exposureDiffFile <- paste0(summaryDir,"/exposureDiff.RDa")
       if(!file.exists(exposureDiffFile)){
         exposureFlag <- FALSE
-        message("Skip summarizing scaled Manhattan distance...\n")
+        #message("Skip summarizing scaled Manhattan distance...\n")
         break
       }
     }

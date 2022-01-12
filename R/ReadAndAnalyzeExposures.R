@@ -39,7 +39,7 @@
 #'
 #'
 #' @details Generates output files by calling
-#' \code{\link[ICAMSxtra]{MatchSigsAndRelabel}}
+#' \code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
 #'
 #' @export
 
@@ -56,9 +56,9 @@ ReadAndAnalyzeExposures <-
 
 
     ## Read in ground-truth and inferred exposures in ICAMS format
-    gtExposures <- ICAMSxtra::ReadExposure(
+    gtExposures <- mSigAct::ReadExposure(
       ground.truth.exposures,check.names = F)
-    inferredExposures <- ICAMSxtra::ReadExposure(
+    inferredExposures <- mSigAct::ReadExposure(
       inferred.exp.path,check.names = F)
 
     ## Names of ground-truth signatures
@@ -129,7 +129,7 @@ ReadAndAnalyzeExposures <-
       }
     }
 
-    ## III. F1 score related measures: 
+    ## III. F1 score related measures:
 	##
     ## PPV: Positive Predictive Value for one tumor.
     ## TPR: True Positive Rate for one tumor.

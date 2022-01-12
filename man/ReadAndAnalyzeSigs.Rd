@@ -21,7 +21,7 @@ assessment to only those signatures in \code{ground.truth.sigs}
 that were actually represented in the exposures.}
 }
 \value{
-See \code{\link[ICAMSxtra]{MatchSigsAndRelabel}}
+See \code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
 }
 \description{
 Assess how well extracted signatures match input signatures
@@ -31,5 +31,5 @@ outside of R on file inputs and will generate fill outputs.
 }
 \details{
 Generates output files by calling
-\code{\link[ICAMSxtra]{MatchSigsAndRelabel}}
+\code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
 }

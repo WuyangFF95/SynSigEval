@@ -12,21 +12,23 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     data.table, 
-    ICAMS,
-    ICAMSxtra (>= 0.0.8),
-    stats, 
     devtools, 
-    utils, 
-    rlang,
     fs,
     graphics,
     grDevices,
     ggplot2,
     ggpubr,
     ggbeeswarm,
-    gtools
+    gtools,
+    ICAMS (>= 3.0.0),
+    ICAMSxtra (>= 0.1.0),
+    mSigAct (>= 2.2.0),
+    rlang,
+    stats, 
+    utils
 Remotes:
-    github::steverozen/ICAMSxtra
+    github::steverozen/ICAMSxtra@v0.1.0-branch
+    github::steverozen/mSigAct@v2.2.0-branch
 Depends: R (>= 3.5)
 RoxygenNote: 7.1.2
 Suggests: 

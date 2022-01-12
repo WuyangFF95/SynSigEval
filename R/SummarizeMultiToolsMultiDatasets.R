@@ -76,7 +76,7 @@ SummarizeMultiToolsMultiDatasets <- function(
     OneToolSummary <- NULL
     load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
     if(is.null(OneToolSummary$AggManhattanDist)){
-      message("Skip summarizing scaled Manhattan distance...\n")
+      #message("Skip summarizing scaled Manhattan distance...\n")
       flag_exposure_summary <- FALSE
       break
     }

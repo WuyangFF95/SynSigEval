@@ -13,10 +13,10 @@
 #'  assessment to only those signatures in \code{ground.truth.sigs}
 #'  that were actually represented in the exposures.
 #'
-#' @return See \code{\link[ICAMSxtra]{MatchSigsAndRelabel}}
+#' @return See \code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
 #'
 #' @details Generates output files by calling
-#' \code{\link[ICAMSxtra]{MatchSigsAndRelabel}}
+#' \code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
 #'
 #' @export
 
@@ -41,7 +41,7 @@ ReadAndAnalyzeSigs <-
     # Also rename ex sigs.
     if (file.exists(ground.truth.exposures)) {
       # Rows are signatures, columns are samples.
-      exposure <- ICAMSxtra::ReadExposure(
+      exposure <- mSigAct::ReadExposure(
         ground.truth.exposures, check.names = F)
       if (!is.null(exposure)) {
         # Remove signatures that are have zero exposures
