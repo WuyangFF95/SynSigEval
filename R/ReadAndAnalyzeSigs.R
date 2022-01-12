@@ -25,32 +25,35 @@ ReadAndAnalyzeSigs <-
            ground.truth.sigs,
            ground.truth.exposures) {
 
-    # Import ex sigs, gt sigs, and gt exposures -------------------------------
+    # Import ex sigs, gt sigs -------------------------------------------------
     ex.sigs <- ICAMS::ReadCatalog(extracted.sigs,
                                   region = "unknown",
                                   catalog.type = "counts.signature")
     gt.sigs <- ICAMS::ReadCatalog(ground.truth.sigs,
                                   region = "unknown",
                                   catalog.type = "counts.signature")
-    # Rows are signatures, columns are samples.
-    exposure <- ICAMSxtra::ReadExposure(
-      ground.truth.exposures,check.names = F)
 
 
 
-    # Remove gt sigs with zero ground-truth exposures -------------------------
+
+    # If file ground.truth.exposures exists, ----------------------------------
+    # Remove gt sigs with zero ground-truth exposures
     # Also rename ex sigs.
-    if (!is.null(exposure)) {
-      # Remove signatures that are have zero exposures
-      # or not present in ground-truth exposure matrix
-      exposed.sig.names <- rownames(exposure)[rowSums(exposure) > 0]
-      # Make sure we do not have any signatures in exposures that
-      # are not in gt.sigs.
-      stopifnot(
-        setequal(setdiff(exposed.sig.names, colnames(gt.sigs)), c()))
-      gt.sigs <- gt.sigs[  , exposed.sig.names]
+    if (file.exists(ground.truth.exposures)) {
+      # Rows are signatures, columns are samples.
+      exposure <- ICAMSxtra::ReadExposure(
+        ground.truth.exposures, check.names = F)
+      if (!is.null(exposure)) {
+        # Remove signatures that are have zero exposures
+        # or not present in ground-truth exposure matrix
+        exposed.sig.names <- rownames(exposure)[rowSums(exposure) > 0]
+        # Make sure we do not have any signatures in exposures that
+        # are not in gt.sigs.
+        stopifnot(
+          setequal(setdiff(exposed.sig.names, colnames(gt.sigs)), c()))
+        gt.sigs <- gt.sigs[  , exposed.sig.names]
+      }
     }
-
 
 
     # Calculate extraction measures from ICAMSxtra::TP_FP_FN_avg_sim ----------
