@@ -1,4 +1,4 @@
-Mutation type,Trinucleotide,Signature.A,Signature.B,Signature.C
+Mutation type,Trinucleotide,Signature A,Signature B,Signature C
 C>A,ACA,0,0.0023307,7.574e-05
 C>A,ACC,0.00014288,0.00046225,0.00018379
 C>A,ACG,4.797e-05,0.00018637,7.435e-05
