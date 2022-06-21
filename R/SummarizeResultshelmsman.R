@@ -64,7 +64,7 @@ SummarizeSigOnehelmsmanSubdir <-
     }
 
     inferred.exp.path <- paste0(run.dir,"/inferred.exposures.csv")
-    mSigAct::WriteExposure(exposureCounts,inferred.exp.path)
+    ICAMSxtra:::WriteExposure(exposureCounts,inferred.exp.path)
 
 
     # SummarizeSigOneSubdir will generate a "/summary" folder
