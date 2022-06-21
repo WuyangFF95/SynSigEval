@@ -20,13 +20,14 @@ Imports:
     ggpubr,
     ggbeeswarm,
     gtools,
-    ICAMS (>= 3.0.0),
+    ICAMS (>= 3.0.5),
     ICAMSxtra (>= 0.1.0),
     mSigAct (>= 2.2.0),
     rlang,
     stats, 
     utils
 Remotes:
+    github::steverozen/ICAMS,
     github::steverozen/ICAMSxtra,
     github::steverozen/mSigAct
 Depends: R (>= 3.5)
