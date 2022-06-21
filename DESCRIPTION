@@ -20,6 +20,7 @@ Imports:
     gtools,
     ICAMS (>= 3.0.5),
     ICAMSxtra (>= 0.1.0),
+    methods,
     mSigAct (>= 2.2.0),
     rlang,
     stats, 

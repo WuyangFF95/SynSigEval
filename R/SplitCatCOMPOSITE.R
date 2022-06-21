@@ -8,7 +8,7 @@ SplitCatCOMPOSITE <- function(catalog) {
 
   # Read COMPOSITE catalog. Either from file or matrix-like
   stopifnot(is.character(catalog) | is.data.frame(catalog) | is.matrix(catalog))
-  if (class(catalog, "character"))
+  if (methods::is(catalog, "character"))
     catMatrix <- ICAMS::ReadCatalog(catalog)
   else
     catMatrix <- catalog
