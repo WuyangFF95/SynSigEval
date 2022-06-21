@@ -2,10 +2,7 @@
 % Please edit documentation in R/ReadAndAnalyzeSigs.R
 \name{ReadAndAnalyzeSigs}
 \alias{ReadAndAnalyzeSigs}
-\title{Assess how well extracted signatures match input signatures
-
-We assume that in many cases extraction programs will be run
-outside of R on file inputs and will generate fill outputs.}
+\title{Assess how well extracted signatures match input signatures}
 \usage{
 ReadAndAnalyzeSigs(extracted.sigs, ground.truth.sigs, ground.truth.exposures)
 }
@@ -24,8 +21,6 @@ that were actually represented in the exposures.}
 See \code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
 }
 \description{
-Assess how well extracted signatures match input signatures
-
 We assume that in many cases extraction programs will be run
 outside of R on file inputs and will generate fill outputs.
 }

@@ -99,7 +99,7 @@ ReadEMuCatalog <-
            catalog.type = "counts.signature"){
 
     stopifnot(is.character(cat) | is.data.frame(cat) | is.matrix(cat))
-    if(class(cat) == "character") {
+    if (methods::is(cat, "character")) {
       catalog <- utils::read.table(
         file = cat, sep = " ",
         as.is = T)

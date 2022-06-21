@@ -2,7 +2,7 @@
 
 #' @title Assess how well inferred exposures match input exposures
 #'
-#' We assume that in many cases attribution programs will be run
+#' @description We assume that in many cases attribution programs will be run
 #' outside of R on file inputs and will generate fill outputs.
 #'
 #' @param extracted.sigs Path to file containing the extracted signature profiles.

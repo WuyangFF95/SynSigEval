@@ -44,7 +44,7 @@ MMCatalog2ICAMS <- function(
 
   # Read MM-formatted catalog. Either from file or matrix-like
   stopifnot(is.character(cat) | is.data.frame(cat) | is.matrix(cat))
-  if(class(cat) == "character") {
+  if (methods::is(cat, "character")) {
     catMatrix <- read.table(
       file = cat, header = T,
       sep = "\t", row.names = 1,

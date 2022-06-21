@@ -11,8 +11,6 @@ Language: en-US
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    data.table, 
-    devtools, 
     fs,
     graphics,
     grDevices,
@@ -31,7 +29,7 @@ Remotes:
     github::steverozen/ICAMSxtra,
     github::steverozen/mSigAct
 Depends: R (>= 3.5)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Suggests: 
     testthat,
     knitr,

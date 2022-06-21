@@ -1,6 +1,6 @@
 #' @title Assess how well extracted signatures match input signatures
 #'
-#' We assume that in many cases extraction programs will be run
+#' @description We assume that in many cases extraction programs will be run
 #' outside of R on file inputs and will generate fill outputs.
 #'
 #' @param extracted.sigs Path to file containing the extracted signature profiles.

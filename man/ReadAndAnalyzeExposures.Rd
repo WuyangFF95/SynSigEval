@@ -2,10 +2,7 @@
 % Please edit documentation in R/ReadAndAnalyzeExposures.R
 \name{ReadAndAnalyzeExposures}
 \alias{ReadAndAnalyzeExposures}
-\title{Assess how well inferred exposures match input exposures
-
-We assume that in many cases attribution programs will be run
-outside of R on file inputs and will generate fill outputs.}
+\title{Assess how well inferred exposures match input exposures}
 \usage{
 ReadAndAnalyzeExposures(
   extracted.sigs,
@@ -49,8 +46,6 @@ ground-truth exposure and inferred exposure of all tumors
 to all ground-truth signatures.
 }
 \description{
-Assess how well inferred exposures match input exposures
-
 We assume that in many cases attribution programs will be run
 outside of R on file inputs and will generate fill outputs.
 }

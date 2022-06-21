@@ -91,7 +91,7 @@ helmsmanCatalog2ICAMS <- function(
   catalog.type = "counts.signature"){
 
   stopifnot(is.character(cat) | is.data.frame(cat) | is.matrix(cat))
-  if(class(cat) == "character") {
+  if (methods::is(cat, "character")) {
     catMatrix <- utils::read.table(
       file = cat, header = T,
       sep = "\t", as.is = T)
