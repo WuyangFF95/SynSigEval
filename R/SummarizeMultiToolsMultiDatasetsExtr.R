@@ -20,7 +20,13 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
   out.dir,
   display.datasetName = FALSE,
   sort.by.composite.extraction.measure = "descending",
-  overwrite = FALSE){
+  overwrite = FALSE) {
+
+  # Check whether package gtools is installed -------------------------------
+  if (!requireNamespace("gtools", quietly=TRUE)) {
+    stop("Package gtools needs to be installed\n")
+  }
+
 
   # I. Summarize extraction performance ---------------------------------------
 

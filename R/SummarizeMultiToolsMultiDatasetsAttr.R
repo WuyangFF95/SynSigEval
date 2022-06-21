@@ -20,7 +20,13 @@ SummarizeMultiToolsMultiDatasetsAttr <- function(
   out.dir,
   display.datasetName = FALSE,
   sort.by.composite.extraction.measure = "descending",
-  overwrite = FALSE){
+  overwrite = FALSE) {
+
+  # Check whether package gtools is installed -------------------------------
+  if (!requireNamespace("gtools", quietly=TRUE)) {
+    stop("Package gtools needs to be installed\n")
+  }
+
   #### I. Summarize scaled Manhattan distance
   ## Summarizing aggregated Scaled Manhattan distance results
   {
@@ -33,11 +39,11 @@ SummarizeMultiToolsMultiDatasetsAttr <- function(
       ## Add OneToolSummary <- NULL to please R check
       OneToolSummary <- NULL
       load(paste0(toolSummaryPath,"/OneToolSummary.RDa"))
-	  
+
 	  ## Read gtSigNames if it was unspecified
 	  if(!exists("gtSigNames"))
 	    gtSigNames <- gtools::mixedsort(setdiff(names(OneToolSummary$cosSim),"combined"))
-	  
+
 
       if(length(FinalAttr$AggManhattanDist) == 0){
         for(gtSigName in gtSigNames) {

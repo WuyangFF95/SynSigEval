@@ -17,7 +17,6 @@ Imports:
     ggplot2,
     ggpubr,
     ggbeeswarm,
-    gtools,
     ICAMS (>= 3.0.5),
     ICAMSxtra (>= 0.1.0),
     methods,
@@ -30,9 +29,10 @@ Remotes:
 Depends: R (>= 3.5)
 RoxygenNote: 7.2.0
 Suggests: 
-    testthat,
+    BiocManager,
+    DelayedArray,
+    gtools,
     knitr,
     lsa,
     rmarkdown,
-    DelayedArray,
-    BiocManager
+    testthat

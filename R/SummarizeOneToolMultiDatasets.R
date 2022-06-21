@@ -74,6 +74,11 @@ SummarizeOneToolMultiDatasets <-
            display.datasetName = FALSE,
            overwrite = FALSE){
 
+    # Check whether package gtools is installed -------------------------------
+    if (!requireNamespace("gtools", quietly=TRUE)) {
+      stop("Package gtools needs to be installed\n")
+    }
+
     # Create output directory -------------------------------------------------
     if (dir.exists(out.dir)) {
       if (!overwrite) stop(out.dir, " already exists")

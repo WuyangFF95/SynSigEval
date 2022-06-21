@@ -89,7 +89,6 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 #' distance of each mutational spectrum.
 #'
 #' @importFrom utils write.csv capture.output sessionInfo
-#' @importFrom gtools mixedsort
 #'
 #' @keywords internal
 
@@ -104,6 +103,11 @@ SummarizeSigOneSubdir <-
            overwrite = FALSE,
            summary.folder.name = "summary",
            export.Manhattan.each.spectrum = FALSE) {
+
+    # Check whether package gtools is installed -------------------------------
+    if (!requireNamespace("gtools", quietly=TRUE)) {
+      stop("Package gtools needs to be installed\n")
+    }
 
     # Specify and create output directory -------------------------------------
 
@@ -205,13 +209,13 @@ SummarizeSigOneSubdir <-
       cat("\nNumber of extracted signatures\n"),
       ncol(sigAnalysis$ex.sigs),
       cat("\nTrue positive ground-truth signatures\n"),
-      mixedsort(sigAnalysis$TP.gt.names),
+      gtools::mixedsort(sigAnalysis$TP.gt.names),
       cat("\nTrue positive extracted signatures\n"),
-      mixedsort(sigAnalysis$TP.ex.names),
+      gtools::mixedsort(sigAnalysis$TP.ex.names),
       cat("\nFalse positive signatures\n"),
-      mixedsort(sigAnalysis$FP.names),
+      gtools::mixedsort(sigAnalysis$FP.names),
       cat("\nFalse negative signatures\n"),
-      mixedsort(sigAnalysis$FN.names),
+      gtools::mixedsort(sigAnalysis$FN.names),
       file = paste0(outputPath,"/other.results.txt"))
 
 
