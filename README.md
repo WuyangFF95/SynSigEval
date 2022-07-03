@@ -40,7 +40,10 @@ R command line:
 
 ``` r
 install.packages("remotes")
-remotes::install_github("WuyangFF95/SynSigEval", ref = "master")
+# Stable version
+remotes::install_github("WuyangFF95/SynSigEval", ref = "0.3.1-branch")
+# Develop version
+remotes::install_github("WuyangFF95/SynSigEval", ref = "main")
 ```
 
 ## Reference manual
