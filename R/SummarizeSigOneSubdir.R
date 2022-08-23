@@ -105,7 +105,7 @@ SummarizeSigOneSubdir <-
            overwrite = FALSE,
            summary.folder.name = "summary",
            export.Manhattan.each.spectrum = FALSE,
-           verbose = 1) {
+           verbose = 0) {
 
     # Check whether package gtools is installed -------------------------------
     if (!requireNamespace("gtools", quietly=TRUE)) {
@@ -137,6 +137,8 @@ SummarizeSigOneSubdir <-
      sigAnalysis$TP.gt.names <- sigAnalysis$table$ref.sig
      sigAnalysis$FP.names <-
        setdiff(colnames(sigAnalysis$ex.sigs), sigAnalysis$table$ex.sig)
+
+     stopifnot(sigAnalysis$FP.names == sigAnalysis[["unmatched.ex.sigs"]])
      if (verbose > 0) {
        message("old FP names: ", paste(sigAnalysis$FP.names, collapse = " "))
        message("new FP names: ",
@@ -145,6 +147,7 @@ SummarizeSigOneSubdir <-
 
      sigAnalysis$FN.names <-
        setdiff(colnames(sigAnalysis$gt.sigs), sigAnalysis$table$ref.sig)
+     stopifnot(sigAnalysis$FN.names == sigAnalysis[["unmatched.ref.sigs"]])
      if (verbose > 0) {
        message("old FN names: ", paste(sigAnalysis$FN.names, collapse = " "))
        message("new FN names: ",
