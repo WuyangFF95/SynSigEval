@@ -39,7 +39,7 @@
 #'
 #'
 #' @details Generates output files by calling
-#' \code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
+#' \code{\link[mSigTools]{TP_FP_FN_avg_sim}}
 #'
 #' @export
 
@@ -56,9 +56,9 @@ ReadAndAnalyzeExposures <-
 
 
     ## Read in ground-truth and inferred exposures in ICAMS format
-    gtExposures <- ICAMSxtra:::ReadExposure(
+    gtExposures <- mSigTools::read_exposure(
       ground.truth.exposures,check.names = F)
-    inferredExposures <- ICAMSxtra:::ReadExposure(
+    inferredExposures <- mSigTools::read_exposure(
       inferred.exp.path,check.names = F)
 
     ## Names of ground-truth signatures

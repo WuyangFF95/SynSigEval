@@ -83,7 +83,7 @@ SummarizeSigOneSigProExtractorSubdir <-
 
     inferredExposures <- ReadSigProfilerExposure(inferred.exp.path.SP.format)
     inferred.exp.path <- paste0(run.dir,"/inferred.exposures.csv")
-    ICAMSxtra:::WriteExposure(inferredExposures,inferred.exp.path)
+    mSigHdp::WriteExposure(inferredExposures,inferred.exp.path)
 
 
     # SummarizeSigOneSubdir will generate a "/summary" folder
@@ -212,7 +212,7 @@ SummarizeSigOneSigProSSSubdir <-
   ## Remove the first "Similarity" row.
   inferredExposures <- inferredExposures[-1,,drop = FALSE]
   inferred.exp.path <- paste0(run.dir,"/inferred.exposures.csv")
-  ICAMSxtra:::WriteExposure(inferredExposures,inferred.exp.path)
+  mSigHdp::WriteExposure(inferredExposures,inferred.exp.path)
 
 
   # SummarizeSigOneSubdir will generate a "/summary" folder

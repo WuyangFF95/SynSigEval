@@ -18,7 +18,7 @@ Imports:
     ggpubr,
     ggbeeswarm,
     ICAMS (>= 3.0.5),
-    ICAMSxtra (>= 0.1.0),
+    mSigTools,
     methods,
     rlang,
     stats, 
@@ -27,12 +27,13 @@ Remotes:
     github::steverozen/ICAMS,
     github::steverozen/ICAMSxtra,
 Depends: R (>= 3.5)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Suggests: 
     BiocManager,
     DelayedArray,
     gtools,
     knitr,
     lsa,
+    mSigHdp,
     rmarkdown,
     testthat

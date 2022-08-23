@@ -51,5 +51,5 @@ outside of R on file inputs and will generate fill outputs.
 }
 \details{
 Generates output files by calling
-\code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
+\code{\link[mSigTools]{TP_FP_FN_avg_sim}}
 }

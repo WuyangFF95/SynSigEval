@@ -66,9 +66,9 @@ For SignatureAnalyzer, it's in:
  \code{<run.dir>/sa.output.exp.csv}
 
 For EMu, helmsman.NMF, MultiModalMuSig.LDA and MultiModalMuSig.CTM,
-their extracted signature files are not standard \code{ICAMSxtra} catalog format.
+their extracted signature files are not standard \code{ICAMS} catalog format.
 These non-standard extracted signatures are converted to
-\code{extracted.signatures.csv}, a standard \code{ICAMSxtra} exposures
+\code{extracted.signatures.csv}, a standard \code{mSigTools} exposures
 by their respective wrapper functions: \itemize{
 \item \code{\link{ReadEMuExposureFile}}
 \item \code{\link{ReadhelmsmanExposure}}, and

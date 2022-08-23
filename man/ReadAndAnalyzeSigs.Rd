@@ -18,7 +18,7 @@ assessment to only those signatures in \code{ground.truth.sigs}
 that were actually represented in the exposures.}
 }
 \value{
-See \code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
+See \code{\link[mSigTools]{TP_FP_FN_avg_sim}}
 }
 \description{
 We assume that in many cases extraction programs will be run
@@ -26,5 +26,5 @@ outside of R on file inputs and will generate fill outputs.
 }
 \details{
 Generates output files by calling
-\code{\link[ICAMSxtra]{TP_FP_FN_avg_sim}}
+\code{\link[mSigTools]{TP_FP_FN_avg_sim}}
 }
