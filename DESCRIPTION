@@ -18,7 +18,7 @@ Imports:
     ggpubr,
     ggbeeswarm,
     ICAMS (>= 3.0.5),
-    ICAMSxtra (>= 0.1.0),
+    ICAMSxtra (== 0.1.0),
     methods,
     rlang,
     stats, 
