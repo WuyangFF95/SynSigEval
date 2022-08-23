@@ -88,6 +88,8 @@ CopyWithChecks <- function(from, to.dir, overwrite = FALSE) {
 #' @param export.Manhattan.each.spectrum Whether to export csv files for Manhattan
 #' distance of each mutational spectrum.
 #'
+#' @param verbose If > 0, print progress / checking messages.
+#'
 #' @importFrom utils write.csv capture.output sessionInfo
 #'
 #' @keywords internal
@@ -102,7 +104,8 @@ SummarizeSigOneSubdir <-
            # extracted signature contributes to exposures.
            overwrite = FALSE,
            summary.folder.name = "summary",
-           export.Manhattan.each.spectrum = FALSE) {
+           export.Manhattan.each.spectrum = FALSE,
+           verbose = 0) {
 
     # Check whether package gtools is installed -------------------------------
     if (!requireNamespace("gtools", quietly=TRUE)) {
@@ -134,8 +137,19 @@ SummarizeSigOneSubdir <-
      sigAnalysis$TP.gt.names <- sigAnalysis$table$ref.sig
      sigAnalysis$FP.names <-
        setdiff(colnames(sigAnalysis$ex.sigs), sigAnalysis$table$ex.sig)
+     if (verbose > 0) {
+       message("old FP names: ", paste(sigAnalysis$FP.names, collapse = " "))
+       message("new FP names: ",
+               paste(sigAnalysis[["unmatched.ex.sigs"]], collapse = " "))
+     }
+
      sigAnalysis$FN.names <-
        setdiff(colnames(sigAnalysis$gt.sigs), sigAnalysis$table$ref.sig)
+     if (verbose > 0) {
+       message("old FN names: ", paste(sigAnalysis$FN.names, collapse = " "))
+       message("new FN names: ",
+               paste(sigAnalysis[["unmatched.ref.sigs"]], collapse = " "))
+     }
 
      sigAnalysis$averCosSim <- sigAnalysis$avg.cos.sim
      sigAnalysis$avg.cos.sim <- NULL
