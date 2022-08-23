@@ -105,7 +105,7 @@ SummarizeSigOneSubdir <-
            overwrite = FALSE,
            summary.folder.name = "summary",
            export.Manhattan.each.spectrum = FALSE,
-           verbose = 0) {
+           verbose = 1) {
 
     # Check whether package gtools is installed -------------------------------
     if (!requireNamespace("gtools", quietly=TRUE)) {
