@@ -121,7 +121,7 @@ SummarizeSigOneSubdir <-
 
     # Calculate signature extraction measures ---------------------------------
 
-    sigAnalysis <-
+    sigAnalysis <- # calls mSigTools::TP_FP_FN_avg_sim
       ReadAndAnalyzeSigs(
         extracted.sigs = extracted.sigs.path,
         ground.truth.sigs =
@@ -131,11 +131,11 @@ SummarizeSigOneSubdir <-
       )
 
      sigAnalysis$TP.ex.names <- sigAnalysis$table$ex.sig
-     sigAnalysis$TP.gt.names <- sigAnalysis$table$gt.sig
+     sigAnalysis$TP.gt.names <- sigAnalysis$table$ref.sig
      sigAnalysis$FP.names <-
        setdiff(colnames(sigAnalysis$ex.sigs), sigAnalysis$table$ex.sig)
      sigAnalysis$FN.names <-
-       setdiff(colnames(sigAnalysis$gt.sigs), sigAnalysis$table$gt.sig)
+       setdiff(colnames(sigAnalysis$gt.sigs), sigAnalysis$table$ref.sig)
 
      sigAnalysis$averCosSim <- sigAnalysis$avg.cos.sim
      sigAnalysis$avg.cos.sim <- NULL
@@ -151,7 +151,7 @@ SummarizeSigOneSubdir <-
      cosSim_TP_gt <- numeric(0)
      if(nrow(sigAnalysis$table) > 0) {
        cosSim_TP_gt <- sigAnalysis$table$sim
-       names(cosSim_TP_gt) <- sigAnalysis$table$gt.sig
+       names(cosSim_TP_gt) <- sigAnalysis$table$ref.sig
      }
 
      # For gt sigs which do not have a best match (and thus FN sigs),
