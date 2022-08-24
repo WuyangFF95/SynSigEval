@@ -12,7 +12,8 @@ SummarizeSigOneSubdir(
   summarize.exp = TRUE,
   overwrite = FALSE,
   summary.folder.name = "summary",
-  export.Manhattan.each.spectrum = FALSE
+  export.Manhattan.each.spectrum = FALSE,
+  verbose = 0
 )
 }
 \arguments{
@@ -86,6 +87,8 @@ Usually, it equals to "summary".}
 
 \item{export.Manhattan.each.spectrum}{Whether to export csv files for Manhattan
 distance of each mutational spectrum.}
+
+\item{verbose}{If > 0, print progress / checking messages.}
 }
 \description{
 Note: For summarizing SigProExtractor or SignatureAnalyzer,
