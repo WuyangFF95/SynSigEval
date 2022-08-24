@@ -41,7 +41,7 @@ ReadAndAnalyzeSigs <-
     # Also rename ex sigs.
     if (file.exists(ground.truth.exposures)) {
       # Rows are signatures, columns are samples.
-      exposure <- ICAMSxtra:::ReadExposure(
+      exposure <- ICAMSxtra::ReadExposure(
         ground.truth.exposures, check.names = F)
       if (!is.null(exposure)) {
         # Remove signatures that are have zero exposures

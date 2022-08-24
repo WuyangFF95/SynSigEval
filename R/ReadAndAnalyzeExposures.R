@@ -56,9 +56,9 @@ ReadAndAnalyzeExposures <-
 
 
     ## Read in ground-truth and inferred exposures in ICAMS format
-    gtExposures <- ICAMSxtra:::ReadExposure(
+    gtExposures <- ICAMSxtra::ReadExposure(
       ground.truth.exposures,check.names = F)
-    inferredExposures <- ICAMSxtra:::ReadExposure(
+    inferredExposures <- ICAMSxtra::ReadExposure(
       inferred.exp.path,check.names = F)
 
     ## Names of ground-truth signatures
