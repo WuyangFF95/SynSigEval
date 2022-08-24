@@ -18,7 +18,7 @@ Imports:
     ggpubr,
     ggbeeswarm,
     ICAMS (>= 3.0.5),
-    mSigTools,
+    mSigTools (>= 1.0.0),
     methods,
     rlang,
     stats, 
@@ -34,6 +34,5 @@ Suggests:
     gtools,
     knitr,
     lsa,
-    mSigHdp,
     rmarkdown,
     testthat
