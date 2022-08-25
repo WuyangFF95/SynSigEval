@@ -5,12 +5,12 @@
 #'
 #' @param extracted.sigs Path to file containing the extracted signature profiles.
 #'
-#' @param ground.truth.sigs File containing signature profiles from which the
+#' @param reference.sigs File containing signature profiles from which the
 #'  synthetic data were generated.
 #'
 #' @param ground.truth.exposures File containing the exposures from which
 #'  the synthetic catalogs were generated.  This file is used to restrict
-#'  assessment to only those signatures in \code{ground.truth.sigs}
+#'  assessment to only those signatures in \code{reference.sigs}
 #'  that were actually represented in the exposures.
 #'
 #' @return See \code{\link[mSigTools]{TP_FP_FN_avg_sim}}
@@ -22,14 +22,14 @@
 
 ReadAndAnalyzeSigs <-
   function(extracted.sigs,
-           ground.truth.sigs,
+           reference.sigs,
            ground.truth.exposures) {
 
-    # Import ex sigs, gt sigs -------------------------------------------------
+    # Import extracted sigs and reference sigs --------------------------------
     ex.sigs <- ICAMS::ReadCatalog(extracted.sigs,
                                   region = "unknown",
                                   catalog.type = "counts.signature")
-    gt.sigs <- ICAMS::ReadCatalog(ground.truth.sigs,
+    ref.sigs <- ICAMS::ReadCatalog(reference.sigs,
                                   region = "unknown",
                                   catalog.type = "counts.signature")
 
@@ -37,8 +37,8 @@ ReadAndAnalyzeSigs <-
 
 
     # If file ground.truth.exposures exists, ----------------------------------
-    # Remove gt sigs with zero ground-truth exposures
-    # Also rename ex sigs.
+    # Remove reference signatures with zero ground-truth exposures
+    # Also rename extracted signatures.
     if (file.exists(ground.truth.exposures)) {
       # Rows are signatures, columns are samples.
       exposure <- mSigTools::read_exposure(
@@ -48,23 +48,23 @@ ReadAndAnalyzeSigs <-
         # or not present in ground-truth exposure matrix
         exposed.sig.names <- rownames(exposure)[rowSums(exposure) > 0]
         # Make sure we do not have any signatures in exposures that
-        # are not in gt.sigs.
+        # are not in ref.sigs.
         stopifnot(
-          setequal(setdiff(exposed.sig.names, colnames(gt.sigs)), c()))
-        gt.sigs <- gt.sigs[  , exposed.sig.names]
+          setequal(setdiff(exposed.sig.names, colnames(ref.sigs)), c()))
+        ref.sigs <- ref.sigs[  , exposed.sig.names]
       }
     }
 
 
     # Calculate extraction measures from mSigTools::TP_FP_FN_avg_sim ----------
-    retval <- mSigTools::TP_FP_FN_avg_sim(ex.sigs, gt.sigs,
+    retval <- mSigTools::TP_FP_FN_avg_sim(ex.sigs, ref.sigs,
                                           similarity.cutoff = 0.9)
 
 
 
-    # Concatenate filtered gt.sigs and ex.sigs as-is --------------------------
+    # Concatenate filtered ex.sigs and ref.sigs as-is --------------------------
     retval$ex.sigs <- ex.sigs
-    retval$gt.sigs <- gt.sigs
+    retval$ref.sigs <- ref.sigs
 
 
 

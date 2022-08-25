@@ -12,7 +12,7 @@ Assess the performance of mutational-signature analysis programs using
 catalogs of synthetic mutational spectra created by package
 [**`SynSigGen`**](https://github.com/steverozen/SynSigGen).
 
-This version (0.3.2) and previous version (0.3.1) are suitable for
+This version (0.4.0) and previous version (0.3.1) are suitable for
 assessing the extraction accuracy in paper *mSigHdp: hierarchical
 Dirichlet processes for mutational signature discovery* - Liu et
 al. (2022).
@@ -22,7 +22,7 @@ For assessing extraction accuracy on data sets presented by paper
 Wu et al. (2022), please proceed to version
 [**`0.2.2`**](https://github.com/WuyangFF95/SynSigEval/tree/0.2.2).
 
-Check NEWS.md for differences between version 0.3.2 and previous
+Check NEWS.md for differences between version 0.4.0 and previous
 versions.
 
 ## Installation
@@ -44,11 +44,11 @@ R command line:
 ``` r
 install.packages("remotes")
 # Stable version
-remotes::install_github("WuyangFF95/SynSigEval", ref = "0.3.2-branch")
+remotes::install_github("WuyangFF95/SynSigEval", ref = "0.4.0-branch")
 # Develop version
 remotes::install_github("WuyangFF95/SynSigEval", ref = "main")
 ```
 
 ## Reference manual
 
-<https://github.com/WuyangFF95/SynSigEval/blob/0.3.2-branch/data-raw/SynSigEval_0.3.2.pdf>
+<https://github.com/WuyangFF95/SynSigEval/blob/main/data-raw/SynSigEval_0.4.0.pdf>

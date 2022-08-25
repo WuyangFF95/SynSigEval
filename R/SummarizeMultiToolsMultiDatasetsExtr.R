@@ -77,7 +77,7 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
       FinalExtr[[index]] <- rbind(FinalExtr[[index]],OneToolSummary[[index]])
     }
 
-    # Merge values of cosine similarity to each gt sig
+    # Merge values of cosine similarity to each reference signature
     if(!exists("gtSigNames"))
       gtSigNames <- gtools::mixedsort(setdiff(names(OneToolSummary$cosSim),"combined"))
     if(length(FinalExtr[["cosSim"]]) == 0){
@@ -171,13 +171,13 @@ SummarizeMultiToolsMultiDatasetsExtr <- function(
                 file = paste0(out.dir,"/",index,".csv"))
     }
 
-    # Export BEST cosine similarity of each gt signature
+    # Export BEST cosine similarity of each reference signature
     for(gtSigName in gtSigNames){
 
       output <- FinalExtr$cosSim[[gtSigName]]
 
       colnames(output)[1] <- "Seed or run number"
-      colnames(output)[2] <- paste0("Cosine similarity to ground-truth signature ",gtSigName)
+      colnames(output)[2] <- paste0("Cosine similarity to reference signature ",gtSigName)
       colnames(output)[3] <- "Name of computational approach"
       colnames(output)[4] <- "Name of mutational spectra dataset"
       colnames(output)[5] <- datasetGroupName

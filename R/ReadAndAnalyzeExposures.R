@@ -7,7 +7,7 @@
 #'
 #' @param extracted.sigs Path to file containing the extracted signature profiles.
 #'
-#' @param ground.truth.sigs File containing signature profiles from which the
+#' @param reference.sigs File containing signature profiles from which the
 #'  synthetic data were generated.
 #'
 #' @param inferred.exp.path File containing mutation counts (exposures)
@@ -16,26 +16,26 @@
 #' @param ground.truth.exposures File containing the exposures from which
 #'  the synthetic catalogs were generated.  This file is used to restrict
 #'  assessment of signature exposures to only those signatures in
-#'  \code{ground.truth.sigs} that were actually represented in the exposures.
+#'  \code{reference.sigs} that were actually represented in the exposures.
 #'
 #' @return A \code{\link{data.frame}} recording:
 #'
 #' \code{Ground.truth.exposure}: sum of ground truth exposures of
-#' all tumors to all ground-truth signatures.
+#' all tumors to all reference signatures.
 #'
 #' \code{Inferred.exposure}: sum of inferred exposures of
-#' all tumors to all ground-truth signatures.
+#' all tumors to all reference signatures.
 #' Here, inferred exposure of a tumor to a ground-truth
 #' signature equals to the sum of the exposures of this tumor
 #' to all extracted signatures which are most similar to
-#' a ground-truth signature.
+#' a reference signature.
 #' If there is no extracted signature resembling an ground-truth
 #' signature, the inferred exposure of this ground-truth
 #' signature will be \code{0}.
 #'
 #' \code{Absolute.difference}: sum of absolute difference between
 #' ground-truth exposure and inferred exposure of all tumors
-#' to all ground-truth signatures.
+#' to all reference signatures.
 #'
 #'
 #' @details Generates output files by calling
@@ -45,13 +45,13 @@
 
 ReadAndAnalyzeExposures <-
   function(extracted.sigs,
-           ground.truth.sigs,
+           reference.sigs,
            inferred.exp.path,
            ground.truth.exposures) {
 
     ## Bilaterally matching between ground-truth and extracted signatures
     sigMatch <- ReadAndAnalyzeSigs(extracted.sigs,
-                                   ground.truth.sigs,
+                                   reference.sigs,
                                    ground.truth.exposures)
 
 
@@ -61,8 +61,8 @@ ReadAndAnalyzeExposures <-
     inferredExposures <- mSigTools::read_exposure(
       inferred.exp.path,check.names = F)
 
-    ## Names of ground-truth signatures
-    gtSigsNames <- colnames(sigMatch$gt.sigs)
+    ## Names of reference signatures
+    gtSigsNames <- colnames(sigMatch$ref.sigs)
     ## Names of spectra
     spectrumNames <- colnames(inferredExposures)
 

@@ -117,9 +117,9 @@ SummarizeOneToolMultiDatasets <-
                      "TPR" = "True positive rate",
                      "PPV" = "Positive predictive value")
     subtitles <- c("averCosSim" = "",
-                   "falseNeg" = "Number of missing ground-truth signatures",
-                   "falsePos" = "Number of artefact signatures extracted, but different from ground-truth signatures",
-                   "truePos" = "Number of extracted ground-truth signatures",
+                   "falseNeg" = "Number of missing reference signatures",
+                   "falsePos" = "Number of artefact signatures extracted, but different from reference signatures",
+                   "truePos" = "Number of extracted reference signatures",
                    "TPR" = "True Positives / (True Positives + False Negatives)",
                    "PPV" = "True Positives / (True Positives + False Positives)")
     names(indexLabels) <- indexes
@@ -277,7 +277,7 @@ SummarizeOneToolMultiDatasets <-
 
 
 
-    # Combine best cosine similarity of each ground-truth signature -----------
+    # Combine best cosine similarity of each reference signature -----------
     OneToolSummary$cosSim <- list()
 
     # Combine
@@ -326,7 +326,9 @@ SummarizeOneToolMultiDatasets <-
 
 
 
-    # Plot violin + beeswarm plot for best cossim of each gt signature --------
+    # Plot violin + beeswarm plot,  -------------------------------------------
+    # for best cossim of each reference signature.
+
     # Only if there are two groupings.
     # if(!is.null(datasetSubGroup))
     if (FALSE)  { # debug
@@ -473,7 +475,7 @@ SummarizeOneToolMultiDatasets <-
           }
         }
 
-        # Combine multiple ground-truth signature Manhattan-distance data.frame
+        # Combine multiple reference signature Manhattan-distance data.frame
         # into OneToolSummary$AggManhattanDist$combined.
         OneToolSummary$AggManhattanDist$combined <- data.frame()
         for(gtSigName in gtSigNames){
@@ -608,14 +610,14 @@ SummarizeOneToolMultiDatasets <-
                 file = paste0(out.dir,"/",index,".csv"),
                 quote = F, row.names = F)
     }
-    # Best cosine similarity for each ground-truth sig
+    # Best cosine similarity for each reference sig
     for(gtSigName in gtSigNames){
       output <- OneToolSummary$cosSim[[gtSigName]]
 
       # Change "value" to label of measure.
       colnames(output)[1] <- "Seed or run number"
       colnames(output)[2] <-
-        paste0("Cosine similarity to ground-truth signature ",gtSigName)
+        paste0("Cosine similarity to reference signature ",gtSigName)
       colnames(output)[3] <- "Name of computational approach"
       colnames(output)[4] <- "Name of mutational spectra dataset"
       colnames(output)[5] <- datasetGroupName

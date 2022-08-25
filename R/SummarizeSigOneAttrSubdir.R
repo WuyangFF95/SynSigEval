@@ -18,7 +18,7 @@
 #' full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
 #' This code depends on a conventional directory structure documented
 #' elsewhere. For packages which can do both extraction and attribution,
-#' we expect two files, \code{ground.truth.signatures.csv}
+#' we expect two files, \code{reference.signatures.csv}
 #' and \code{inferred.exposures.csv} are in the folder.
 #'
 #' @param ground.truth.exposure.dir Folder which stores ground-truth exposures.
@@ -46,7 +46,7 @@ SummarizeSigOneAttrSubdir <-
     stopifnot(dir.exists(inputPath))
 
     # Specify the path of extracted signatures in ICAMS csv format.
-    ground.truth.sigs.path <- paste0(ground.truth.exposure.dir,"/ground.truth.syn.sigs.csv")
+    reference.sigs.path <- paste0(ground.truth.exposure.dir,"/ground.truth.syn.sigs.csv")
 
     # SummarizeSigOneSubdir will generate a "/summary" folder
     # under run.dir. Summarized results are dumped into
@@ -55,7 +55,7 @@ SummarizeSigOneAttrSubdir <-
       SummarizeSigOneSubdir(
         run.dir = inputPath,
         ground.truth.exposure.dir = ground.truth.exposure.dir,
-        extracted.sigs.path = ground.truth.sigs.path,
+        extracted.sigs.path = reference.sigs.path,
         inferred.exp.path = paste0(inputPath,"/inferred.exposures.csv"),
         summarize.exp = TRUE,
         overwrite = overwrite,

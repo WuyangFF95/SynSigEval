@@ -20,7 +20,7 @@ Here, \code{<top.dir>} refers to a top-level directory which contains the
 full information of a synthetic dataset. (e.g. \code{syn.2.7a.7b.abst.v8})
 This code depends on a conventional directory structure documented
 elsewhere. For packages which can do both extraction and attribution,
-we expect two files, \code{ground.truth.signatures.csv}
+we expect two files, \code{reference.signatures.csv}
 and \code{inferred.exposures.csv} are in the folder.}
 
 \item{ground.truth.exposure.dir}{Folder which stores ground-truth exposures.

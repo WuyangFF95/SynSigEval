@@ -4,17 +4,17 @@
 \alias{ReadAndAnalyzeSigs}
 \title{Assess how well extracted signatures match input signatures}
 \usage{
-ReadAndAnalyzeSigs(extracted.sigs, ground.truth.sigs, ground.truth.exposures)
+ReadAndAnalyzeSigs(extracted.sigs, reference.sigs, ground.truth.exposures)
 }
 \arguments{
 \item{extracted.sigs}{Path to file containing the extracted signature profiles.}
 
-\item{ground.truth.sigs}{File containing signature profiles from which the
+\item{reference.sigs}{File containing signature profiles from which the
 synthetic data were generated.}
 
 \item{ground.truth.exposures}{File containing the exposures from which
 the synthetic catalogs were generated.  This file is used to restrict
-assessment to only those signatures in \code{ground.truth.sigs}
+assessment to only those signatures in \code{reference.sigs}
 that were actually represented in the exposures.}
 }
 \value{

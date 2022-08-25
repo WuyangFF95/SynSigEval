@@ -202,9 +202,9 @@ SummarizeSigOneSigProSSSubdir <-
            summary.folder.name = "summary",
            export.Manhattan.each.spectrum = FALSE) {
 
-  # Read in ground-truth signatures in ICAMS csv format.
+  # Read in reference signatures in ICAMS csv format.
   # signatures will be included in the /summary folder.
-  gt.sigs.path <- paste0(ground.truth.exposure.dir,"/ground.truth.syn.sigs.csv")
+  ref.sigs.path <- paste0(ground.truth.exposure.dir,"/ground.truth.syn.sigs.csv")
 
 
   inferred.exp.path.SP.format <- paste0(run.dir,"/sig_activities.txt")
@@ -222,7 +222,7 @@ SummarizeSigOneSigProSSSubdir <-
     SummarizeSigOneSubdir(
       run.dir = run.dir,
       ground.truth.exposure.dir = ground.truth.exposure.dir,
-      extracted.sigs.path = gt.sigs.path,
+      extracted.sigs.path = ref.sigs.path,
       inferred.exp.path = inferred.exp.path,
       overwrite = overwrite,
       summary.folder.name = summary.folder.name,

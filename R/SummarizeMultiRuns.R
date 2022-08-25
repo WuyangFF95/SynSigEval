@@ -23,18 +23,18 @@
 #' @return A list contain values of measures measures in multiple runs: \itemize{
 #' \item $averCosSim Average cosine similarity. Only similarities between
 #'   TP sigs and extracted sigs most similar to them.
-#' \item $truePos True Positives(TP): Ground-truth signatures which are
+#' \item $truePos True Positives(TP): Reference signatures which are
 #'   active in the spectra, and extracted.
-#' \item $falseNeg False Negatives(FN): Ground-truth signatures not extracted.
+#' \item $falseNeg False Negatives(FN): Reference signatures not extracted.
 #' \item $falsePos False Positives(FP): Signatures wrongly extracted,
-#'   not resembling any ground-truth signatures.
+#'   not resembling any reference signatures.
 #' \item $TPR True positive rate (TPR, Sensitivity): TP / (TP + FN)
 #' \item $PPV Positive predictive value (PPV, Precision): TP / (FP + TP)
-#' \item $cosSim Cosine similarity between each of the ground-truth signatures,
+#' \item $cosSim Cosine similarity between each of the reference signatures,
 #'    and its most similar extracted signature.
 #' \item $AggManhattanDist (if exposures of signatures were inferred) Scaled
 #'   Manhattan distance between ground-truth and inferred
-#'   exposures to each of the ground-truth signatures.
+#'   exposures to each of the reference signatures.
 #' }
 #' This list also contains \code{mean} and \code{sd}, and other
 #' statistics of these measures in \itemize{
@@ -93,8 +93,8 @@ SummarizeMultiRuns <-
       sigAnalysis <- NULL
       load(file = sigAnalysisFile)
 
-      # Names of ground-truth signatures
-      gtSigNames <- colnames(sigAnalysis$gt.sigs)
+      # Names of reference signatures
+      gtSigNames <- colnames(sigAnalysis$ref.sigs)
 
       # Number of TP, TN and FP sigs
       falseNeg <- c(falseNeg, sigAnalysis$FN)
@@ -109,7 +109,7 @@ SummarizeMultiRuns <-
       TPR <- c(TPR, sigAnalysis$TPR)
       PPV <- c(PPV, sigAnalysis$PPV)
 
-      # Best cosine similarity between each ground-truth signature
+      # Best cosine similarity between each reference signature
       # and its MOST SIMILAR extracted signature
       for(gtSigName in gtSigNames) {
         if(is.null(cosSim[[gtSigName]]))
@@ -145,7 +145,7 @@ SummarizeMultiRuns <-
     multiRun$truePos <- truePos
     multiRun$TPR <- TPR
     multiRun$PPV <- PPV
-    # Save best cosine similarity for each ground-truth signature
+    # Save best cosine similarity for each reference signature
     multiRun$cosSim <- cosSim
 
 
@@ -187,9 +187,9 @@ SummarizeMultiRuns <-
                   "TPR" = "True positive rate (sensitivity)",
                   "PPV" = "Positive predictive value (PPV)")
       subtitles <- c("averCosSim" = "",
-                     "falseNeg" = "Number of ground-truth signatures not extracted",
-                     "falsePos" = "Number of signatures extracted, but different from ground-truth signatures",
-                     "truePos" = "Number of ground-truth signatures extracted",
+                     "falseNeg" = "Number of reference signatures not extracted",
+                     "falsePos" = "Number of signatures extracted, but different from reference signatures",
+                     "truePos" = "Number of reference signatures extracted",
                      "TPR" = "#True Positives / (#True Positives + #False Negatives)",
                      "PPV" = "#True Positives / (#True Positives + #False Positives)")
 

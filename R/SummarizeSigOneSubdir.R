@@ -127,14 +127,14 @@ SummarizeSigOneSubdir <-
     sigAnalysis <- # calls mSigTools::TP_FP_FN_avg_sim
       ReadAndAnalyzeSigs(
         extracted.sigs = extracted.sigs.path,
-        ground.truth.sigs =
+        reference.sigs =
           paste0(ground.truth.exposure.dir,"/ground.truth.syn.sigs.csv"),
         ground.truth.exposures =
           paste0(ground.truth.exposure.dir,"/ground.truth.syn.exposures.csv")
       )
 
      sigAnalysis$TP.ex.names <- sigAnalysis$table$ex.sig
-     sigAnalysis$TP.gt.names <- sigAnalysis$table$ref.sig
+     sigAnalysis$TP.ref.names <- sigAnalysis$table$ref.sig
      sigAnalysis$FP.names <-
        setdiff(colnames(sigAnalysis$ex.sigs), sigAnalysis$table$ex.sig)
 
@@ -146,7 +146,7 @@ SummarizeSigOneSubdir <-
      }
 
      sigAnalysis$FN.names <-
-       setdiff(colnames(sigAnalysis$gt.sigs), sigAnalysis$table$ref.sig)
+       setdiff(colnames(sigAnalysis$ref.sigs), sigAnalysis$table$ref.sig)
      stopifnot(sigAnalysis$FN.names == sigAnalysis[["unmatched.ref.sigs"]])
      if (verbose > 0) {
        message("old FN names: ", paste(sigAnalysis$FN.names, collapse = " "))
@@ -161,27 +161,27 @@ SummarizeSigOneSubdir <-
 
 
 
-     # Calculate best cosine similarity for each gt sig -----------------------
+     # Calculate best cosine similarity for each reference sig ----------------
 
-     # gt sigs in sigAnalysis$table are gt sigs with best match.
+     # Reference sigs in sigAnalysis$table are reference sigs with best match.
      # For these sigs, we directly record the cosSim values in $table.
-     cosSim_TP_gt <- numeric(0)
+     cosSim_TP_ref <- numeric(0)
      if(nrow(sigAnalysis$table) > 0) {
-       cosSim_TP_gt <- sigAnalysis$table$sim
-       names(cosSim_TP_gt) <- sigAnalysis$table$ref.sig
+       cosSim_TP_ref <- sigAnalysis$table$sim
+       names(cosSim_TP_ref) <- sigAnalysis$table$ref.sig
      }
 
-     # For gt sigs which do not have a best match (and thus FN sigs),
+     # For reference sigs which do not have a best match (and thus FN sigs),
      # their best cosine similarity values are calculated in cosSim_FN
      cosSim_FN <- numeric(0)
      if(sigAnalysis$FN > 0) {
        cosSim_FN <- numeric(sigAnalysis$FN)
        names(cosSim_FN) <- sigAnalysis$FN.names
-       for(gt_sig_name in sigAnalysis$FN.names) {
-         cosSim_FN[gt_sig_name] <- max(sigAnalysis$sim.matrix[, gt_sig_name])
+       for(ref_sig_name in sigAnalysis$FN.names) {
+         cosSim_FN[ref_sig_name] <- max(sigAnalysis$sim.matrix[, ref_sig_name])
        }
      }
-     sigAnalysis$cosSim <- c(cosSim_TP_gt, cosSim_FN)
+     sigAnalysis$cosSim <- c(cosSim_TP_ref, cosSim_FN)
 
 
 
@@ -196,19 +196,19 @@ SummarizeSigOneSubdir <-
       to.dir = outputPath,
       overwrite = TRUE)
 
-    # Export bi-lateral matching table between extracted and ground-truth sigs
+    # Export bi-lateral matching table between extracted and reference signatures
     write.csv(sigAnalysis$table,
-              file = paste(outputPath,"match.ex.to.gt.csv",sep = "/"),
+              file = paste(outputPath,"match.ex.to.ref.csv",sep = "/"),
               row.names = F)
     # Export full cosine similarity table
     write.csv(sigAnalysis$sim.matrix,
-              file = paste(outputPath,"full.cossims.ex.to.gt.csv",sep = "/"),
+              file = paste(outputPath,"full.cossims.ex.to.ref.csv",sep = "/"),
               row.names = T)
 
-    # Export ground-truth sigs with non-zero ground-truth exposures
+    # Export reference signatures with non-zero ground-truth exposures
     ICAMS::WriteCatalog(
-      sigAnalysis$gt.sigs,
-      paste(outputPath,"ground.truth.sigs.csv",sep = "/"),
+      sigAnalysis$ref.sigs,
+      paste(outputPath,"ref.sigs.csv",sep = "/"),
     )
     # Export extracted signatures with new names
     ex.sigs.renamed <- RelabelExSigs(sigAnalysis)
@@ -221,12 +221,12 @@ SummarizeSigOneSubdir <-
     capture.output(
       cat("Average cosine similarity, only best matches are considered\n"),
       sigAnalysis$averCosSim,
-      cat("\nNumber of ground-truth signatures\n"),
-      ncol(sigAnalysis$gt.sigs),
+      cat("\nNumber of reference signatures\n"),
+      ncol(sigAnalysis$ref.sigs),
       cat("\nNumber of extracted signatures\n"),
       ncol(sigAnalysis$ex.sigs),
-      cat("\nTrue positive ground-truth signatures\n"),
-      gtools::mixedsort(sigAnalysis$TP.gt.names),
+      cat("\nTrue positive reference signatures\n"),
+      gtools::mixedsort(sigAnalysis$TP.ref.names),
       cat("\nTrue positive extracted signatures\n"),
       gtools::mixedsort(sigAnalysis$TP.ex.names),
       cat("\nFalse positive signatures\n"),
@@ -242,10 +242,10 @@ SummarizeSigOneSubdir <-
     # Currently, ICAMS cannot plot COMPOSITE catalog.
     # TODO(Wuyang): To add a ICAMS:::PlotCatalog.COMPOSITECatalog function
 
-    # Plot ground-truth sigs with non-zero ground-truth exposures
-    if("COMPOSITECatalog" %in% class(sigAnalysis$gt.sigs) == FALSE){
-      ICAMS::PlotCatalogToPdf(sigAnalysis$gt.sigs,
-                              paste0(outputPath,"/ground.truth.sigs.pdf"))
+    # Plot reference sigs with non-zero ground-truth exposures
+    if("COMPOSITECatalog" %in% class(sigAnalysis$ref.sigs) == FALSE){
+      ICAMS::PlotCatalogToPdf(sigAnalysis$ref.sigs,
+                              paste0(outputPath,"/ref.sigs.pdf"))
     }
     # Plot renamed and sorted extracted sigs
     if("COMPOSITECatalog" %in% class(sigAnalysis$ex.sigs) == FALSE){
@@ -264,7 +264,7 @@ SummarizeSigOneSubdir <-
       if(file.exists(inferred.exp.path)) {
         exposureDiff <- ReadAndAnalyzeExposures(
           extracted.sigs = extracted.sigs.path,
-          ground.truth.sigs =
+          reference.sigs =
             paste0(ground.truth.exposure.dir,"/ground.truth.syn.sigs.csv"),
           inferred.exp.path = inferred.exp.path,
           ground.truth.exposures =
@@ -283,7 +283,7 @@ SummarizeSigOneSubdir <-
 
         # Write results of exposure inference measures,
         # in aggregated format for each tumor and each
-        # ground-truth signature.
+        # reference signature.
         if(export.Manhattan.each.spectrum){
           for(spectrumName in names(exposureDiff$Manhattan)){
             ## Replace all characters unsuitable for filenames.

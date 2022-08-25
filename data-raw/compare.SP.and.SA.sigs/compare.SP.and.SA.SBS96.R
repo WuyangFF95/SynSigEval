@@ -1,17 +1,17 @@
 # Compare SigProfiler and SignatureAnalyzer extracted signatures
 
-# res1 <- MatchSigs2Directions(sp.sigs, sa.96.sigs)
+# res1 <- ICAMSxtra::MatchSigs2Directions(sp.sigs, sa.96.sigs)
 
 dummy.exposure1 <- matrix(10, ncol=1, nrow=ncol(sp.sigs))
 rownames(dummy.exposure1) <- colnames(sp.sigs)
 
-res1 <- MatchSigsAndRelabel(
+res1 <- ICAMSxtra::MatchSigsAndRelabel(
   ex.sigs = sa.96.sigs, gt.sigs = sp.sigs, exposure = dummy.exposure1)
 
 dummy.exposure2 <- matrix(10, ncol=1, nrow=ncol(sa.96.sigs))
 rownames(dummy.exposure2) <- colnames(sa.96.sigs)
 
-res2 <- MatchSigsAndRelabel(
+res2 <- ICAMSxtra::MatchSigsAndRelabel(
   gt.sigs = sa.96.sigs, ex.sigs = sp.sigs, exposure = dummy.exposure2)
 
 file.exists(devtools::package_file("data-raw/compare.SP.and.SA.sigs"))
