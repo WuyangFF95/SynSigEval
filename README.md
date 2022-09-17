@@ -44,7 +44,7 @@ R command line:
 ``` r
 install.packages("remotes")
 # Stable version
-remotes::install_github("WuyangFF95/SynSigEval", ref = "0.4.0-branch")
+remotes::install_github("WuyangFF95/SynSigEval", ref = "v0.4.0-branch")
 # Develop version
 remotes::install_github("WuyangFF95/SynSigEval", ref = "main")
 ```
