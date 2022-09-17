@@ -5,7 +5,7 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/WuyangFF95/SynSigEval/workflows/R-CMD-check/badge.svg?branch=main)](https://github.com/WuyangFF95/SynSigEval/actions?query=workflow%3AR-CMD-check+branch%3Amain)
+[![R-CMD-check](https://github.com/WuyangFF95/SynSigEval/workflows/R-CMD-check/badge.svg?branch=v0.4.0-branch)](https://github.com/WuyangFF95/SynSigEval/actions?query=workflow%3AR-CMD-check+branch%3Av0.4.0-branch)
 <!-- badges: end -->
 
 Assess the performance of mutational-signature analysis programs using
